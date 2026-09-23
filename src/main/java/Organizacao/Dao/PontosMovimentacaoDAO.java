@@ -1,7 +1,7 @@
 package Organizacao.Dao;
 
 import Organizacao.Model.PontosMovimentacaoModel;
-import Organizacao.Conexo.Conexao_Banco;
+import Organizacao.Conexao.Conexao_Banco;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
