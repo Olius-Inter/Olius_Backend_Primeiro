@@ -1,0 +1,317 @@
+package Servlet;
+
+import Organizacao.Dao.UsuarioDAO;
+import Organizacao.Model.UsuarioModel;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@WebServlet("/usuario")
+public class UsuarioSERVLET extends HttpServlet {
+
+    // Define o formato da data de primeiro registro nas respostas da API.
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    private UsuarioDAO usuarioDAO;
+
+    // Inicializa o DAO responsável pelas operações de acesso aos usuários.
+    @Override
+    public void init() throws ServletException {
+        usuarioDAO = new UsuarioDAO();
+    }
+
+    // Processa GET, consulta os usuários e devolve os registros em JSON.
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            List<UsuarioModel> usuarios = usuarioDAO.listar();
+
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+
+            for (int i = 0; i < usuarios.size(); i++) {
+
+                UsuarioModel usuario = usuarios.get(i);
+
+                json.append("{");
+
+                json.append("\"id_usuario\":")
+                        .append(usuario.getId_usuario())
+                        .append(",");
+
+                json.append("\"nome\":\"")
+                        .append(escape(usuario.getNome()))
+                        .append("\",");
+
+                json.append("\"email\":\"")
+                        .append(escape(usuario.getEmail()))
+                        .append("\",");
+
+                json.append("\"primeiro_registro\":\"")
+                        .append(escape(formatarData(usuario.getPrimeiroRegistro())))
+                        .append("\",");
+
+                json.append("\"tipo_usuario\":\"")
+                        .append(escape(usuario.getTipoUsuario()))
+                        .append("\",");
+
+                json.append("\"telefone\":\"")
+                        .append(escape(usuario.getTelefone()))
+                        .append("\"");
+
+                // Observação: a senha propositalmente não é devolvida na resposta.
+
+                json.append("}");
+
+                if (i < usuarios.size() - 1) {
+                    json.append(",");
+                }
+            }
+
+            json.append("]");
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+
+            enviarErro(
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Erro ao listar usuários: " + e.getMessage()
+            );
+        }
+    }
+
+    // Processa POST, valida os dados e cadastra um novo usuário no banco.
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            int idUsuario = obterId(request);
+
+            String nome = obterParametroObrigatorio(request, "nome");
+            String email = obterParametroObrigatorio(request, "email");
+            String senha = obterParametroObrigatorio(request, "senha");
+            String primeiroRegistroString = request.getParameter("primeiro_registro");
+            String tipoUsuario = obterParametroObrigatorio(request, "tipo_usuario");
+            String telefone = obterParametroObrigatorio(request, "telefone");
+
+            Date primeiroRegistro = obterData(primeiroRegistroString);
+
+            UsuarioModel usuario = new UsuarioModel(
+                    idUsuario,
+                    nome,
+                    email,
+                    senha,
+                    primeiroRegistro,
+                    tipoUsuario,
+                    telefone
+            );
+
+            usuarioDAO.salvar(usuario);
+
+            response.setStatus(HttpServletResponse.SC_CREATED);
+
+            response.getWriter().write(
+                    "{\"mensagem\":\"Usuário cadastrado com sucesso!\"}"
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+
+        } catch (Exception e) {
+
+            enviarErro(
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Erro ao cadastrar usuário: " + e.getMessage()
+            );
+        }
+    }
+
+    // Processa PUT, valida os dados e atualiza um usuário existente.
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            int idUsuario = obterId(request);
+
+            String nome = obterParametroObrigatorio(request, "nome");
+            String email = obterParametroObrigatorio(request, "email");
+            String senha = obterParametroObrigatorio(request, "senha");
+            String tipoUsuario = obterParametroObrigatorio(request, "tipo_usuario");
+            String telefone = obterParametroObrigatorio(request, "telefone");
+
+            // O UPDATE altera os dados do usuário, mas não altera primeiro_registro.
+            UsuarioModel usuario = new UsuarioModel(
+                    idUsuario,
+                    nome,
+                    email,
+                    senha,
+                    null,
+                    tipoUsuario,
+                    telefone
+            );
+
+            usuarioDAO.atualizarUsuario(usuario);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getWriter().write(
+                    "{\"mensagem\":\"Usuário atualizado com sucesso!\"}"
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+
+        } catch (Exception e) {
+
+            enviarErro(
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Erro ao atualizar usuário: " + e.getMessage()
+            );
+        }
+    }
+
+    // Processa DELETE, obtém o ID e remove o usuário do banco de dados.
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            int idUsuario = obterId(request);
+
+            usuarioDAO.deletarUsuario(idUsuario);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getWriter().write(
+                    "{\"mensagem\":\"Usuário deletado com sucesso!\"}"
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+
+        } catch (Exception e) {
+
+            enviarErro(
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Erro ao deletar usuário: " + e.getMessage()
+            );
+        }
+    }
+
+    // Escapa caracteres especiais para manter a resposta JSON válida.
+    private String escape(String texto) {
+
+        if (texto == null) {
+            return "";
+        }
+
+        return texto
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f");
+    }
+
+    // Obtém um parâmetro obrigatório e garante que ele não esteja vazio.
+    private String obterParametroObrigatorio(HttpServletRequest request, String nome) {
+
+        String valor = request.getParameter(nome);
+
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+        }
+
+        return valor.trim();
+    }
+
+    // Obtém o ID enviado na requisição e converte o valor para inteiro.
+    private int obterId(HttpServletRequest request) {
+        String valor = request.getParameter("id_usuario");
+
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID do usuário é obrigatório.");
+        }
+
+        try {
+            return Integer.parseInt(valor);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("ID do usuário inválido.", e);
+        }
+    }
+
+    // Converte a data yyyy-MM-dd para o tipo usado pelo banco de dados.
+    private Date obterData(String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException("Data de primeiro registro é obrigatória.");
+        }
+
+        try {
+            // Date.valueOf interpreta a data recebida no formato yyyy-MM-dd.
+            return Date.valueOf(valor);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
+        }
+    }
+
+    // Converte a data do banco para dd-MM-yyyy ou retorna vazio quando nula.
+    private String formatarData(Date data) {
+        if (data == null) {
+            return "";
+        }
+
+        return data.toLocalDate().format(FORMATO_DATA);
+    }
+
+    // Envia uma resposta de erro padronizada em formato JSON.
+    private void enviarErro(HttpServletResponse response, int status, String mensagem)
+            throws IOException {
+
+        response.setStatus(status);
+
+        response.getWriter().write(
+                "{\"erro\":\""
+                        + escape(mensagem == null ? "Erro interno." : mensagem)
+                        + "\"}"
+        );
+    }
+}
