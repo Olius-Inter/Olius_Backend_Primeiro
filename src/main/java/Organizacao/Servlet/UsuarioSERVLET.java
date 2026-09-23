@@ -1,4 +1,4 @@
-package Servlet;
+package Organizacao.Servlet;
 
 import Organizacao.Dao.UsuarioDAO;
 import Organizacao.Model.UsuarioModel;
