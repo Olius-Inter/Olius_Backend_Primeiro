@@ -1,6 +1,6 @@
 package Organizacao.Dao;
 
-import Organizacao.Conexo.Conexao_Banco;
+import Organizacao.Conexao.Conexao_Banco;
 import Organizacao.Model.UsuarioModel;
 
 import java.sql.Connection;
