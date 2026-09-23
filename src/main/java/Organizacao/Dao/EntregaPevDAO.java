@@ -1,7 +1,7 @@
 package Organizacao.Dao;
 
 import Organizacao.Model.EntregaPevModel;
-import Organizacao.Conexo.Conexao_Banco;
+import Organizacao.Conexao.Conexao_Banco;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
