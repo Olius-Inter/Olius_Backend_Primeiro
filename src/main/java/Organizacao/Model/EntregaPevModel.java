@@ -3,9 +3,7 @@ package Organizacao.Model;
 import java.time.LocalDate;
 
 // Representa a entidade EntregaPev do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class EntregaPevModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -16,9 +14,7 @@ public class EntregaPevModel {
     private int pontos_gerados;
     private LocalDate dt_entrega;
 
-    // Construtor completo: cria o objeto EntregaPev já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto EntregaPev já com todos os dados informados
     public EntregaPevModel(int id_usuario_b2c,
                            int id_pev,
                            double qtd_litros,
@@ -32,7 +28,7 @@ public class EntregaPevModel {
         this.dt_entrega = dt_entrega;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_entrega() {
         return id_entrega;
     }

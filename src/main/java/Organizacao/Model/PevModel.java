@@ -3,9 +3,7 @@ package Organizacao.Model;
 import java.time.LocalDate;
 
 // Representa a entidade Pev do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class PevModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -17,9 +15,7 @@ public class PevModel {
     private String status;
     private LocalDate dt_aprovacao;
 
-    // Construtor completo: cria o objeto Pev já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto Pev já com todos os dados informados
     public PevModel(int id_endereco, int id_usuario_b2b,
                     int id_usuario_b2c, String qr_code,
                     String status, LocalDate dt_aprovacao) {
@@ -32,7 +28,7 @@ public class PevModel {
         this.dt_aprovacao = dt_aprovacao;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_pev() {
         return id_pev;
     }

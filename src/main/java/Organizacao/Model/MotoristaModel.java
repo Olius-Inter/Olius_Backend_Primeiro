@@ -1,9 +1,7 @@
 package Organizacao.Model;
 
 // Representa a entidade Motorista do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class MotoristaModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -15,9 +13,7 @@ public class MotoristaModel {
     private String empresa;
     private String status;
 
-    // Construtor completo: cria o objeto Motorista já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto Motorista já com todos os dados informados
     public MotoristaModel(String nome, String cpf,
                           String telefone, String cnh,
                           String empresa, String status) {
@@ -30,7 +26,7 @@ public class MotoristaModel {
         this.status = status;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_motorista() {
         return id_motorista;
     }

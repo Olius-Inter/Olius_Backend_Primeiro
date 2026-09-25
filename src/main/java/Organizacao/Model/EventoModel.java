@@ -1,9 +1,7 @@
 package Organizacao.Model;
 
 // Representa a entidade Evento do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class EventoModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -14,9 +12,7 @@ public class EventoModel {
     private String dt_inicio;
     private int id_b2b;
 
-    // Construtor completo: cria o objeto Evento já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto Evento já com todos os dados informados
     public EventoModel(String nome, String descricao, String dt_finalizacao, String dt_inicio, int id_b2b) {
         this.nome = nome;
         this.descricao = descricao;
@@ -25,7 +21,7 @@ public class EventoModel {
         this.id_b2b = id_b2b;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_evento() {
         return id_evento;
     }

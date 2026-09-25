@@ -14,19 +14,24 @@ import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+// Servlet responsável por expor, via HTTP.
 @WebServlet("/usuarios")
 public class UsuarioSERVLET extends HttpServlet {
 
+    // Formato usado para exibir a data de primeiro registro na resposta JSON
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     private UsuarioDAO usuarioDAO;
 
+    // Executado uma única vez, na inicialização do servlet, para
+    // instanciar o DAO.
     @Override
     public void init() throws ServletException {
         usuarioDAO = new UsuarioDAO();
     }
 
+    // Lista todos os usuários cadastrados.
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -65,12 +70,15 @@ public class UsuarioSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(json.toString());
 
+        // Qualquer falha (DAO, banco, etc.) vira um erro.
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao listar usuários: " + e.getMessage());
         }
     }
 
+    // Lê e valida os parâmetros obrigatórios da requisição e cadastra
+    // um novo usuário.
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -103,14 +111,18 @@ public class UsuarioSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_CREATED);
             response.getWriter().write("{\"mensagem\":\"Usuário cadastrado com sucesso!\"}");
 
+        // Dados inválidos
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        // Qualquer outra falha
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao cadastrar usuário: " + e.getMessage());
         }
     }
 
+    // Lê os parâmetros da requisição e atualiza o usuário correspondente
+    // ao id_usuario informado.
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -148,6 +160,8 @@ public class UsuarioSERVLET extends HttpServlet {
         }
     }
 
+
+    // Remove o usuário pelo id_usuario é informado como parâmetro.
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -184,6 +198,8 @@ public class UsuarioSERVLET extends HttpServlet {
                 .replace("\f", "\\f");
     }
 
+    // Lê um parâmetro de texto obrigatório da requisição.
+
     private String obterParametroObrigatorio(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
 
@@ -193,6 +209,8 @@ public class UsuarioSERVLET extends HttpServlet {
 
         return valor.trim();
     }
+
+    // Lê e valida o id_usuario enviado como parâmetro na requisição.
 
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
@@ -207,6 +225,8 @@ public class UsuarioSERVLET extends HttpServlet {
             throw new IllegalArgumentException("ID do usuário inválido.", e);
         }
     }
+
+    // Converte a String recebida (formato yyyy-MM-dd) para java.sql.Date.
 
     private Date obterData(String valor) {
         if (valor == null || valor.trim().isEmpty()) {
@@ -228,6 +248,7 @@ public class UsuarioSERVLET extends HttpServlet {
         return data.toLocalDate().format(FORMATO_DATA);
     }
 
+    // Monta e envia uma resposta de erro padronizada.
     private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
         response.setStatus(status);
         response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");

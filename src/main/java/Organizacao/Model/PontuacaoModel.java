@@ -3,9 +3,7 @@ package Organizacao.Model;
 import java.time.LocalDate;
 
 // Representa a entidade Pontuacao do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class PontuacaoModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -17,9 +15,7 @@ public class PontuacaoModel {
     private String descricao;
     private LocalDate dt_movimentacao;
 
-    // Construtor completo: cria o objeto Pontuacao já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto Pontuacao já com todos os dados informados
     public PontuacaoModel(int id_usuario_b2c, int id_entrega,
                           int pontos, String tp_movimentacao,
                           String descricao, LocalDate dt_movimentacao) {
@@ -32,7 +28,7 @@ public class PontuacaoModel {
         this.dt_movimentacao = dt_movimentacao;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_pontuacao() {
         return id_pontuacao;
     }

@@ -3,9 +3,7 @@ package Organizacao.Model;
 import java.time.LocalDate;
 
 // Representa a entidade Certificado do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class CertificadoModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -17,9 +15,7 @@ public class CertificadoModel {
     private LocalDate dt_emissao;
     private String arquivo_pdf;
 
-    // Construtor completo: cria o objeto Certificado já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor completo: cria o objeto Certificado já com todos os dados informados
     public CertificadoModel(int id_usuario_b2b,
                             String codigo,
                             String nivel,
@@ -35,7 +31,7 @@ public class CertificadoModel {
         this.arquivo_pdf = arquivo_pdf;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_certificado() {
         return id_certificado;
     }

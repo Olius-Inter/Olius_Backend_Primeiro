@@ -1,9 +1,7 @@
 package Organizacao.Model;
 
 // Representa a entidade PontosMovimentacao do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class PontosMovimentacaoModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -15,9 +13,7 @@ public class PontosMovimentacaoModel {
     private int id_carteira;
     private int id_participacao;
 
-    // Construtor completo: cria o objeto PontosMovimentacao já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto PontosMovimentacao já com todos os dados informados
     public PontosMovimentacaoModel(int pontos_ganhos, String tipo_movimentacao, String dt_movimentacao, int id_entrega, int id_carteira, int id_participacao) {
         this.pontos_ganhos = pontos_ganhos;
         this.tipo_movimentacao = tipo_movimentacao;
@@ -27,7 +23,7 @@ public class PontosMovimentacaoModel {
         this.id_participacao = id_participacao;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_movimentacao() {
         return id_movimentacao;
     }

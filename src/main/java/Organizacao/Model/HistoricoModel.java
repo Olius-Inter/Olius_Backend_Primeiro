@@ -3,9 +3,7 @@ package Organizacao.Model;
 import java.time.LocalDate;
 
 // Representa a entidade Historico do sistema.
-// Cada instância desta classe corresponde a um registro da tabela
-// correspondente no banco de dados, sendo utilizada para transportar
-// os dados entre o DAO (persistência) e o Servlet (camada web).
+
 public class HistoricoModel {
 
     // Atributos que representam as colunas da tabela no banco de dados
@@ -15,9 +13,7 @@ public class HistoricoModel {
     private String descricao;
     private LocalDate dt_evento;
 
-    // Construtor completo: cria o objeto Historico já com todos os
-    // dados informados (usado, por exemplo, ao montar o objeto a partir
-    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
+    // Construtor: cria o objeto Historico já com todos os dados informados
     public HistoricoModel(int id_usuario, String tp_evento,
                           String descricao, LocalDate dt_evento) {
 
@@ -27,7 +23,7 @@ public class HistoricoModel {
         this.dt_evento = dt_evento;
     }
 
-    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
+    // Getters e setters
     public int getId_historico() {
         return id_historico;
     }
