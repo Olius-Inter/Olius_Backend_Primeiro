@@ -1,7 +1,12 @@
 package Organizacao.Model;
 
+// Representa a entidade Carteira do sistema.
+// Cada instância desta classe corresponde a um registro da tabela
+// correspondente no banco de dados, sendo utilizada para transportar
+// os dados entre o DAO (persistência) e o Servlet (camada web).
 public class CarteiraModel {
 
+    // Atributos que representam as colunas da tabela no banco de dados
     private int id_carteira;
     private int pontuacao;
     private String patente;
@@ -9,6 +14,9 @@ public class CarteiraModel {
     private int id_b2c;
 
     // Construtor sem ID (INSERT)
+    // Construtor completo: cria o objeto Carteira já com todos os
+    // dados informados (usado, por exemplo, ao montar o objeto a partir
+    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
     public CarteiraModel(int pontuacao, String patente, String nivel, int id_b2c) {
         this.pontuacao = pontuacao;
         this.patente = patente;
@@ -17,6 +25,9 @@ public class CarteiraModel {
     }
 
     // Construtor com ID (READ/UPDATE)
+    // Construtor completo: cria o objeto Carteira já com todos os
+    // dados informados (usado, por exemplo, ao montar o objeto a partir
+    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
     public CarteiraModel(int id_carteira, int pontuacao, String patente, String nivel, int id_b2c) {
         this.id_carteira = id_carteira;
         this.pontuacao = pontuacao;
@@ -25,6 +36,7 @@ public class CarteiraModel {
         this.id_b2c = id_b2c;
     }
 
+    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
     public int getId_carteira() {
         return id_carteira;
     }

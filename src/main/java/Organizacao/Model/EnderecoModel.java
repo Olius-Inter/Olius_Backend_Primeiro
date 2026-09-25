@@ -1,7 +1,12 @@
 package Organizacao.Model;
 
+// Representa a entidade Endereco do sistema.
+// Cada instância desta classe corresponde a um registro da tabela
+// correspondente no banco de dados, sendo utilizada para transportar
+// os dados entre o DAO (persistência) e o Servlet (camada web).
 public class EnderecoModel {
 
+    // Atributos que representam as colunas da tabela no banco de dados
     private int id_endereco;
     private String cep;
     private String logradouro;
@@ -12,6 +17,9 @@ public class EnderecoModel {
     private String estado;
     private String pais;
 
+    // Construtor completo: cria o objeto Endereco já com todos os
+    // dados informados (usado, por exemplo, ao montar o objeto a partir
+    // do ResultSet no DAO ou dos parâmetros recebidos no Servlet).
     public EnderecoModel(String cep, String logradouro,
                          String numero, String complemento,
                          String bairro, String cidade,
@@ -27,6 +35,7 @@ public class EnderecoModel {
         this.pais = pais;
     }
 
+    // Getters e setters: expõem e permitem alterar cada atributo (encapsulamento)
     public int getId_endereco() {
         return id_endereco;
     }
