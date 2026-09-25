@@ -62,7 +62,7 @@ public class B2bDAO {
     }
     //UPDATE
     public void atualizarB2b(B2bModel b2b) {
-        String sql = "UPDATE B2b SET cnpj = ?, razao_social = ?, nome_fantasia = ?, telefone = ? WHERE id_usuario = ?";
+        String sql = "UPDATE B2b SET cnpj = ?, razao_social = ?, nome_fantasia = ?, telefone = ?, id_endereco = ? WHERE id_usuario = ?";
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -71,7 +71,8 @@ public class B2bDAO {
             stmt.setString(2, b2b.getRazao_social());
             stmt.setString(3, b2b.getNome_fantasia());
             stmt.setString(4, b2b.getTelefone());
-            stmt.setInt(5, b2b.getId_usuario());
+            stmt.setInt(5, b2b.getId_endereco());
+            stmt.setInt(6, b2b.getId_usuario());
 
             int linhasAfetadas = stmt.executeUpdate();
 
@@ -86,7 +87,7 @@ public class B2bDAO {
         }
     }
     public void deletarB2b(int id) {
-        String sql = "DELETE FROM B2b WHERE id = ?";
+        String sql = "DELETE FROM B2b WHERE id_usuario = ?";
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -101,8 +102,8 @@ public class B2bDAO {
                 System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
             }
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar B2b: " + e.getMessage(), e);
         }
     }
 }
