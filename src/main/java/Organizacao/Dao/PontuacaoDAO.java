@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Pontuacao.
+
 public class PontuacaoDAO {
 
-    // CREATE
+    // Insere um novo registro de Pontuacao no banco de dados.
+
     public void inserirPontuacao(PontuacaoModel pontuacao) {
         String sql = "INSERT INTO pontuacao (id_usuario_b2c, id_entrega, pontos, tp_movimentacao, descricao, dt_movimentacao) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -30,12 +33,14 @@ public class PontuacaoDAO {
             stmt.executeUpdate();
             System.out.println("Pontuação cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir pontuação: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Pontuacao cadastrados no banco.
+
     public List<PontuacaoModel> listarPontuacoes() {
         List<PontuacaoModel> listaPontuacoes = new ArrayList<>();
         String sql = "SELECT * FROM pontuacao ORDER BY id_pontuacao";
@@ -61,6 +66,7 @@ public class PontuacaoDAO {
                 listaPontuacoes.add(pontuacao);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar pontuações: " + e.getMessage(), e);
         }
@@ -68,7 +74,8 @@ public class PontuacaoDAO {
         return listaPontuacoes;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Pontuacao já existente.
+
     public void atualizarPontuacao(PontuacaoModel pontuacao) {
         String sql = "UPDATE pontuacao SET id_usuario_b2c = ?, id_entrega = ?, pontos = ?, tp_movimentacao = ?, descricao = ?, dt_movimentacao = ? WHERE id_pontuacao = ?";
 
@@ -91,12 +98,14 @@ public class PontuacaoDAO {
                 System.out.println("Pontuação não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar pontuação: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Pontuacao do banco de dados.
+
     public void deletarPontuacao(int id_pontuacao) {
         String sql = "DELETE FROM pontuacao WHERE id_pontuacao = ?";
 
@@ -113,6 +122,7 @@ public class PontuacaoDAO {
                 System.out.println("Pontuação não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar pontuação: " + e.getMessage());
         }

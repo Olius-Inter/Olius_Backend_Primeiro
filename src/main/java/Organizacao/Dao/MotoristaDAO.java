@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Motorista.
+
 public class MotoristaDAO {
 
-    // CREATE
+    // Insere um novo registro de Motorista no banco de dados.
+
     public void inserirMotorista(MotoristaModel motorista) {
         String sql = "INSERT INTO motorista (nome, cpf, telefone, cnh, empresa, status) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -29,12 +32,14 @@ public class MotoristaDAO {
             stmt.executeUpdate();
             System.out.println("Motorista cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir motorista: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Motorista cadastrados no banco.
+
     public List<MotoristaModel> listarMotoristas() {
         List<MotoristaModel> listaMotoristas = new ArrayList<>();
         String sql = "SELECT * FROM motorista ORDER BY id_motorista";
@@ -58,6 +63,7 @@ public class MotoristaDAO {
                 listaMotoristas.add(motorista);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar motoristas: " + e.getMessage(), e);
         }
@@ -65,7 +71,8 @@ public class MotoristaDAO {
         return listaMotoristas;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Motorista já existente.
+
     public void atualizarMotorista(MotoristaModel motorista) {
         String sql = "UPDATE motorista SET nome = ?, cpf = ?, telefone = ?, cnh = ?, empresa = ?, status = ? WHERE id_motorista = ?";
 
@@ -88,12 +95,14 @@ public class MotoristaDAO {
                 System.out.println("Motorista não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar motorista: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Motorista do banco de dados.
+
     public void deletarMotorista(int id_motorista) {
         String sql = "DELETE FROM motorista WHERE id_motorista = ?";
 
@@ -110,6 +119,7 @@ public class MotoristaDAO {
                 System.out.println("Motorista não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar motorista: " + e.getMessage());
         }

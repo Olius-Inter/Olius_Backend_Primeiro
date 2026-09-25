@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade SolicitacaoColeta.
+
 public class SolicitacaoColetaDAO {
 
-    // CREATE
+    // Insere um novo registro de SolicitacaoColeta no banco de dados.
+
     public void inserirSolicitacao(SolicitacaoColetaModel solicitacao) {
         String sql = "INSERT INTO solicitacao_coleta (litros_estimados, dt_solicitacao, status, id_b2b, id_pev) VALUES (?, ?, ?, ?, ?)";
 
@@ -28,12 +31,14 @@ public class SolicitacaoColetaDAO {
             stmt.executeUpdate();
             System.out.println("Solicitação de coleta cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir solicitação de coleta: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de SolicitacaoColeta cadastrados no banco.
+
     public List<SolicitacaoColetaModel> listarSolicitacoes() {
         List<SolicitacaoColetaModel> listaSolicitacoes = new ArrayList<>();
         String sql = "SELECT * FROM solicitacao_coleta ORDER BY id_solicitacao";
@@ -58,6 +63,7 @@ public class SolicitacaoColetaDAO {
                 listaSolicitacoes.add(solicitacao);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar solicitações de coleta: " + e.getMessage(), e);
         }
@@ -65,8 +71,9 @@ public class SolicitacaoColetaDAO {
         return listaSolicitacoes;
     }
 
-    // UPDATE
-    public void atualizarSolicitacao(SolicitacaoColetaModel solicitacao) {
+    // Atualiza os dados de um registro de SolicitacaoColeta já existente.
+
+      public void atualizarSolicitacao(SolicitacaoColetaModel solicitacao) {
         String sql = "UPDATE solicitacao_coleta SET litros_estimados = ?, dt_solicitacao = ?, status = ?, id_b2b = ?, id_pev = ? WHERE id_solicitacao = ?";
 
         try (Connection conexao = Conexao_Banco.conectar();
@@ -87,12 +94,14 @@ public class SolicitacaoColetaDAO {
                 System.out.println("Solicitação não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar solicitação: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de SolicitacaoColeta do banco de dados.
+
     public void deletarSolicitacao(int id_solicitacao) {
         String sql = "DELETE FROM solicitacao_coleta WHERE id_solicitacao = ?";
 
@@ -109,6 +118,7 @@ public class SolicitacaoColetaDAO {
                 System.out.println("Solicitação não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar solicitação: " + e.getMessage());
         }

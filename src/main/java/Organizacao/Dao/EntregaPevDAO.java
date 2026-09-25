@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade EntregaPev.
+
 public class EntregaPevDAO {
 
-    // CREATE
+    // Insere um novo registro de EntregaPev no banco de dados.
+    // @param entrega dado(s) utilizado(s) na operação
     public void inserirEntregaPev(EntregaPevModel entrega) {
         String sql = "INSERT INTO entrega_pev (id_usuario_b2c, id_pev, qtd_litros, pontos_gerados, dt_entrega) VALUES (?, ?, ?, ?, ?)";
 
@@ -29,12 +32,14 @@ public class EntregaPevDAO {
             stmt.executeUpdate();
             System.out.println("Entrega PEV cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir entrega PEV: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de EntregaPev cadastrados no banco.
+
     public List<EntregaPevModel> listarEntregasPev() {
         List<EntregaPevModel> listaEntregas = new ArrayList<>();
         String sql = "SELECT * FROM entrega_pev ORDER BY id_entrega";
@@ -59,6 +64,7 @@ public class EntregaPevDAO {
                 listaEntregas.add(entrega);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar entregas PEV: " + e.getMessage(), e);
         }
@@ -66,7 +72,8 @@ public class EntregaPevDAO {
         return listaEntregas;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de EntregaPev já existente.
+
     public void atualizarEntregaPev(EntregaPevModel entrega) {
         String sql = "UPDATE entrega_pev SET id_usuario_b2c = ?, id_pev = ?, qtd_litros = ?, pontos_gerados = ?, dt_entrega = ? WHERE id_entrega = ?";
 
@@ -88,12 +95,14 @@ public class EntregaPevDAO {
                 System.out.println("Entrega PEV não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar entrega PEV: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de EntregaPev do banco de dados.
+
     public void deletarEntregaPev(int id_entrega) {
         String sql = "DELETE FROM entrega_pev WHERE id_entrega = ?";
 
@@ -110,6 +119,7 @@ public class EntregaPevDAO {
                 System.out.println("Entrega PEV não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar entrega PEV: " + e.getMessage());
         }

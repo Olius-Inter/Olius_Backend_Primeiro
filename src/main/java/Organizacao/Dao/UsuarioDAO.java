@@ -10,9 +10,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Usuario.
+
 public class UsuarioDAO {
 
-    // create
+    // Insere um novo registro de Usuario no banco de dados.
+
+    // throws Exception em caso de falha de acesso ao banco de dados
     public void salvar(UsuarioModel usuario) throws Exception {
         String sql = "INSERT INTO usuario (id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -31,7 +35,7 @@ public class UsuarioDAO {
         }
     }
 
-    // read
+    // Consulta e retorna os registros de Usuario cadastrados no banco.
     public List<UsuarioModel> listar() throws Exception {
         List<UsuarioModel> lista = new ArrayList<>();
         String sql = "SELECT * FROM usuario";
@@ -56,7 +60,8 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Usuario já existente.
+
     public void atualizarUsuario(UsuarioModel usuario) {
         String sql = "UPDATE usuario SET nome = ?, email = ?, senha = ?, tipo_usuario = ?, telefone = ? WHERE id_usuario = ?";
 
@@ -78,12 +83,13 @@ public class UsuarioDAO {
                 System.out.println("Nenhum registro de usuário encontrado com o ID informado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar usuário: " + e.getMessage(), e);
         }
     }
 
-    // delete
+    // Remove definitivamente um registro de Usuario do banco de dados.
     public void deletarUsuario(int id_Usuario) {
         String sql = "DELETE FROM usuario WHERE id_usuario = ?";
 
@@ -100,6 +106,7 @@ public class UsuarioDAO {
                 System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
         }

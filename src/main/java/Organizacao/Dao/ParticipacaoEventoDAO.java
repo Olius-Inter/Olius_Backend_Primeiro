@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade ParticipacaoEvento.
+
 public class ParticipacaoEventoDAO {
 
-    // CREATE
+    // Insere um novo registro de ParticipacaoEvento no banco de dados.
+
     public void inserirParticipacao(ParticipacaoEventoModel participacao) {
         String sql = "INSERT INTO participacao_evento (status, id_b2c, id_evento) VALUES (?, ?, ?)";
 
@@ -26,12 +29,14 @@ public class ParticipacaoEventoDAO {
             stmt.executeUpdate();
             System.out.println("Participação em evento cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir participação: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de ParticipacaoEvento cadastrados no banco.
+
     public List<ParticipacaoEventoModel> listarParticipacoes() {
         List<ParticipacaoEventoModel> listaParticipacoes = new ArrayList<>();
         String sql = "SELECT * FROM participacao_evento ORDER BY id_participacao";
@@ -52,6 +57,7 @@ public class ParticipacaoEventoDAO {
                 listaParticipacoes.add(participacao);
             }
 
+            // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar participações: " + e.getMessage(), e);
         }
@@ -59,7 +65,8 @@ public class ParticipacaoEventoDAO {
         return listaParticipacoes;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de ParticipacaoEvento já existente.
+
     public void atualizarParticipacao(ParticipacaoEventoModel participacao) {
         String sql = "UPDATE participacao_evento SET status = ?, id_b2c = ?, id_evento = ? WHERE id_participacao = ?";
 
@@ -79,12 +86,14 @@ public class ParticipacaoEventoDAO {
                 System.out.println("Participação não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar participação: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de ParticipacaoEvento do banco de dados.
+
     public void deletarParticipacao(int id_participacao) {
         String sql = "DELETE FROM participacao_evento WHERE id_participacao = ?";
 
@@ -101,6 +110,7 @@ public class ParticipacaoEventoDAO {
                 System.out.println("Participação não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar participação: " + e.getMessage());
         }

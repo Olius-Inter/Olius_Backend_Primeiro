@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Endereco.
+
 public class EnderecoDAO {
 
-    // CREATE
+    // Insere um novo registro de Endereco no banco de dados.
+
     public void inserirEndereco(EnderecoModel endereco) {
         String sql = "INSERT INTO endereco (cep, logradouro, numero, complemento, bairro, cidade, estado, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -31,12 +34,14 @@ public class EnderecoDAO {
             stmt.executeUpdate();
             System.out.println("Endereço cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados (conexão, SQL inválido, violação de constraint etc.)
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir endereço: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Endereco cadastrados no banco.
+    // @return List<EnderecoModel> resultante da operação
     public List<EnderecoModel> listarEnderecos() {
         List<EnderecoModel> listaEnderecos = new ArrayList<>();
         String sql = "SELECT * FROM endereco ORDER BY id_endereco";
@@ -64,6 +69,7 @@ public class EnderecoDAO {
                 listaEnderecos.add(endereco);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar endereços: " + e.getMessage(), e);
         }
@@ -71,7 +77,8 @@ public class EnderecoDAO {
         return listaEnderecos;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Endereco já existente.
+
     public void atualizarEndereco(EnderecoModel endereco) {
         String sql = "UPDATE endereco SET cep = ?, logradouro = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, pais = ? WHERE id_endereco = ?";
 
@@ -96,12 +103,14 @@ public class EnderecoDAO {
                 System.out.println("Endereço não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar endereço: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Endereco do banco de dados.
+
     public void deletarEndereco(int id_endereco) {
         String sql = "DELETE FROM endereco WHERE id_endereco = ?";
 
@@ -118,6 +127,7 @@ public class EnderecoDAO {
                 System.out.println("Endereço não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar endereço: " + e.getMessage());
         }

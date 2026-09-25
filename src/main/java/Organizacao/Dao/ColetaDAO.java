@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Coleta.
+
 public class ColetaDAO {
 
-    // CREATE
+    // Insere um novo registro de Coleta no banco de dados.
+
     public void inserirColeta(ColetaModel coleta) {
         String sql = "INSERT INTO coleta (id_solicitacao, id_motorista, dt_coleta, volume, observacao) VALUES (?, ?, ?, ?, ?)";
 
@@ -29,12 +32,14 @@ public class ColetaDAO {
             stmt.executeUpdate();
             System.out.println("Coleta cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir coleta: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Coleta cadastrados no banco.
+
     public List<ColetaModel> listarColetas() {
         List<ColetaModel> listaColetas = new ArrayList<>();
         String sql = "SELECT * FROM coleta ORDER BY id_coleta";
@@ -57,6 +62,7 @@ public class ColetaDAO {
                 listaColetas.add(coleta);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar coletas: " + e.getMessage(), e);
         }
@@ -64,7 +70,8 @@ public class ColetaDAO {
         return listaColetas;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Coleta já existente.
+
     public void atualizarColeta(ColetaModel coleta) {
         String sql = "UPDATE coleta SET id_solicitacao = ?, id_motorista = ?, dt_coleta = ?, volume = ?, observacao = ? WHERE id_coleta = ?";
 
@@ -86,12 +93,14 @@ public class ColetaDAO {
                 System.out.println("Coleta não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados (conexão, SQL inválido, violação de constraint etc.)
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar coleta: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Coleta do banco de dados.
+
     public void deletarColeta(int id_coleta) {
         String sql = "DELETE FROM coleta WHERE id_coleta = ?";
 
@@ -108,6 +117,7 @@ public class ColetaDAO {
                 System.out.println("Coleta não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar coleta: " + e.getMessage());
         }

@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade PontosMovimentacao.
+
 public class PontosMovimentacaoDAO {
 
-    // CREATE
+    // Insere um novo registro de PontosMovimentacao no banco de dados.
+
     public void inserirPontosMovimentacao(PontosMovimentacaoModel movimentacao) {
         String sql = "INSERT INTO pontos_movimentacao (pontos_ganhos, tipo_movimentacao, dt_movimentacao, id_entrega, id_carteira, id_participacao) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -29,12 +32,14 @@ public class PontosMovimentacaoDAO {
             stmt.executeUpdate();
             System.out.println("Movimentação de pontos cadastrada com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir movimentação de pontos: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de PontosMovimentacao cadastrados no banco.
+
     public List<PontosMovimentacaoModel> listarPontosMovimentacao() {
         List<PontosMovimentacaoModel> listaMovimentacoes = new ArrayList<>();
         String sql = "SELECT * FROM pontos_movimentacao ORDER BY id_movimentacao";
@@ -60,6 +65,7 @@ public class PontosMovimentacaoDAO {
                 listaMovimentacoes.add(movimentacao);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar movimentações de pontos: " + e.getMessage(), e);
         }
@@ -67,7 +73,8 @@ public class PontosMovimentacaoDAO {
         return listaMovimentacoes;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de PontosMovimentacao já existente.
+
     public void atualizarPontosMovimentacao(PontosMovimentacaoModel movimentacao) {
         String sql = "UPDATE pontos_movimentacao SET pontos_ganhos = ?, tipo_movimentacao = ?, dt_movimentacao = ?, id_entrega = ?, id_carteira = ?, id_participacao = ? WHERE id_movimentacao = ?";
 
@@ -90,12 +97,14 @@ public class PontosMovimentacaoDAO {
                 System.out.println("Movimentação não encontrada.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar movimentação de pontos: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de PontosMovimentacao do banco de dados.
+
     public void deletarPontosMovimentacao(int id_movimentacao) {
         String sql = "DELETE FROM pontos_movimentacao WHERE id_movimentacao = ?";
 
@@ -112,6 +121,7 @@ public class PontosMovimentacaoDAO {
                 System.out.println("Movimentação não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar movimentação: " + e.getMessage());
         }

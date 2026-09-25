@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Pev.
+
 public class PevDAO {
 
-    // CREATE
+    // Insere um novo registro de Pev no banco de dados.
+
     public void inserirPev(PevModel pev) {
         String sql = "INSERT INTO pev (id_endereco, id_usuario_b2b, id_usuario_b2c, qr_code, status, dt_aprovacao) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -30,12 +33,14 @@ public class PevDAO {
             stmt.executeUpdate();
             System.out.println("PEV cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir PEV: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Pev cadastrados no banco.
+
     public List<PevModel> listarPevs() {
         List<PevModel> listaPevs = new ArrayList<>();
         String sql = "SELECT * FROM pev ORDER BY id_pev";
@@ -61,6 +66,7 @@ public class PevDAO {
                 listaPevs.add(pev);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar PEVs: " + e.getMessage(), e);
         }
@@ -68,7 +74,8 @@ public class PevDAO {
         return listaPevs;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Pev já existente.
+
     public void atualizarPev(PevModel pev) {
         String sql = "UPDATE pev SET id_endereco = ?, id_usuario_b2b = ?, id_usuario_b2c = ?, qr_code = ?, status = ?, dt_aprovacao = ? WHERE id_pev = ?";
 
@@ -91,12 +98,14 @@ public class PevDAO {
                 System.out.println("PEV não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar PEV: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Pev do banco de dados.
+
     public void deletarPev(int id_pev) {
         String sql = "DELETE FROM pev WHERE id_pev = ?";
 
@@ -113,6 +122,7 @@ public class PevDAO {
                 System.out.println("PEV não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar PEV: " + e.getMessage());
         }

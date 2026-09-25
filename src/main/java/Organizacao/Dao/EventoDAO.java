@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Evento.
+
 public class EventoDAO {
 
-    // CREATE
+    // Insere um novo registro de Evento no banco de dados.
+
     public void inserirEvento(EventoModel evento) {
         String sql = "INSERT INTO evento (nome, descricao, dt_finalizacao, dt_inicio, id_b2b) VALUES (?, ?, ?, ?, ?)";
 
@@ -28,12 +31,14 @@ public class EventoDAO {
             stmt.executeUpdate();
             System.out.println("Evento cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir evento: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Evento cadastrados no banco.
+
     public List<EventoModel> listarEventos() {
         List<EventoModel> listaEventos = new ArrayList<>();
         String sql = "SELECT * FROM evento ORDER BY id_evento";
@@ -56,6 +61,7 @@ public class EventoDAO {
                 listaEventos.add(evento);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar eventos: " + e.getMessage(), e);
         }
@@ -63,7 +69,8 @@ public class EventoDAO {
         return listaEventos;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Evento já existente.
+
     public void atualizarEvento(EventoModel evento) {
         String sql = "UPDATE evento SET nome = ?, descricao = ?, dt_finalizacao = ?, dt_inicio = ?, id_b2b = ? WHERE id_evento = ?";
 
@@ -85,12 +92,14 @@ public class EventoDAO {
                 System.out.println("Evento não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar evento: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Evento do banco de dados.
+
     public void deletarEvento(int id_evento) {
         String sql = "DELETE FROM evento WHERE id_evento = ?";
 
@@ -107,6 +116,7 @@ public class EventoDAO {
                 System.out.println("Evento não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar evento: " + e.getMessage());
         }

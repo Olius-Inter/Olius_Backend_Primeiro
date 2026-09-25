@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Certificado.
+
 public class CertificadoDAO {
 
-    // CREATE
+    // Insere um novo registro de Certificado no banco de dados.
+
     public void inserirCertificado(CertificadoModel certificado) {
         String sql = "INSERT INTO certificado (id_usuario_b2b, codigo, nivel, volume_total, dt_emissao, arquivo_pdf) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -30,12 +33,14 @@ public class CertificadoDAO {
             stmt.executeUpdate();
             System.out.println("Certificado cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir certificado: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Certificado cadastrados no banco.
+
     public List<CertificadoModel> listarCertificados() {
         List<CertificadoModel> listaCertificados = new ArrayList<>();
         String sql = "SELECT * FROM certificado ORDER BY id_certificado";
@@ -61,6 +66,7 @@ public class CertificadoDAO {
                 listaCertificados.add(certificado);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar certificados: " + e.getMessage(), e);
         }
@@ -68,7 +74,8 @@ public class CertificadoDAO {
         return listaCertificados;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Certificado já existente.
+
     public void atualizarCertificado(CertificadoModel certificado) {
         String sql = "UPDATE certificado SET id_usuario_b2b = ?, codigo = ?, nivel = ?, volume_total = ?, dt_emissao = ?, arquivo_pdf = ? WHERE id_certificado = ?";
 
@@ -91,12 +98,14 @@ public class CertificadoDAO {
                 System.out.println("Certificado não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar certificado: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Certificado do banco de dados.
+
     public void deletarCertificado(int id_certificado) {
         String sql = "DELETE FROM certificado WHERE id_certificado = ?";
 
@@ -113,6 +122,7 @@ public class CertificadoDAO {
                 System.out.println("Certificado não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar certificado: " + e.getMessage());
         }

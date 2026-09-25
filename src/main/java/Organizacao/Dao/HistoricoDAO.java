@@ -11,9 +11,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Historico.
+
 public class HistoricoDAO {
 
-    // CREATE
+    // Insere um novo registro de Historico no banco de dados.
+
     public void inserirHistorico(HistoricoModel historico) {
         String sql = "INSERT INTO historico (id_usuario, tp_evento, descricao, dt_evento) VALUES (?, ?, ?, ?)";
 
@@ -28,12 +31,14 @@ public class HistoricoDAO {
             stmt.executeUpdate();
             System.out.println("Histórico cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir histórico: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Historico cadastrados no banco.
+
     public List<HistoricoModel> listarHistoricos() {
         List<HistoricoModel> listaHistoricos = new ArrayList<>();
         String sql = "SELECT * FROM historico ORDER BY id_historico";
@@ -55,6 +60,7 @@ public class HistoricoDAO {
                 listaHistoricos.add(historico);
             }
 
+        // Falha de acesso ao banco de dados (conexão, SQL inválido, violação de constraint etc.)
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar históricos: " + e.getMessage(), e);
         }
@@ -62,7 +68,8 @@ public class HistoricoDAO {
         return listaHistoricos;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Historico já existente.
+
     public void atualizarHistorico(HistoricoModel historico) {
         String sql = "UPDATE historico SET id_usuario = ?, tp_evento = ?, descricao = ?, dt_evento = ? WHERE id_historico = ?";
 
@@ -83,12 +90,14 @@ public class HistoricoDAO {
                 System.out.println("Histórico não encontrado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar histórico: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Historico do banco de dados.
+
     public void deletarHistorico(int id_historico) {
         String sql = "DELETE FROM historico WHERE id_historico = ?";
 
@@ -105,6 +114,7 @@ public class HistoricoDAO {
                 System.out.println("Histórico não encontrado.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar histórico: " + e.getMessage());
         }
