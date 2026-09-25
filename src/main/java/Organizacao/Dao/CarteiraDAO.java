@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade Carteira.
+
 public class CarteiraDAO {
 
-    // CREATE
+    // Insere um novo registro de Carteira no banco de dados.
+
     public void inserirCarteira(CarteiraModel carteira) {
 
         String sql = "INSERT INTO carteira (pontuacao, patente, nivel, id_b2c) VALUES (?, ?, ?, ?)";
@@ -31,12 +34,14 @@ public class CarteiraDAO {
 
             System.out.println("Carteira cadastrada com sucesso!");
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao inserir carteira: " + e.getMessage());
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de Carteira cadastrados no banco.
+
     public List<CarteiraModel> listarCarteiras() {
 
         List<CarteiraModel> listaCarteiras = new ArrayList<>();
@@ -69,6 +74,7 @@ public class CarteiraDAO {
                 listaCarteiras.add(carteira);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             System.out.println("Erro ao listar carteiras: " + e.getMessage());
         }
@@ -76,7 +82,8 @@ public class CarteiraDAO {
         return listaCarteiras;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de Carteira já existente.
+
     public void atualizarCarteira(CarteiraModel carteira) {
 
         String sql = "UPDATE carteira SET pontuacao = ?, patente = ?, nivel = ?, id_b2c = ? WHERE id_carteira = ?";
@@ -100,12 +107,14 @@ public class CarteiraDAO {
                 System.out.println("Carteira não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao atualizar carteira: " + e.getMessage());
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de Carteira do banco de dados.
+
     public void deletarCarteira(int id_carteira) {
 
         String sql = "DELETE FROM carteira WHERE id_carteira = ?";
@@ -125,6 +134,7 @@ public class CarteiraDAO {
                 System.out.println("Carteira não encontrada.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar carteira: " + e.getMessage());
         }

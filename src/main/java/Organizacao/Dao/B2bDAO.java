@@ -10,11 +10,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade B2b.
+
 public class B2bDAO {
 
-    // CREATE
+    // Insere um novo registro de B2b no banco de dados.
+
     public void inserirB2b(B2bModel b2b) {
+        // Comando SQL
         String sql = "INSERT INTO B2b (cnpj, razao_social, nome_fantasia, telefone, id_endereco) VALUES (?, ?, ?, ?, ?)";
+
+        //Preparando a conexão com o banco com PreparedStatement
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -25,16 +31,20 @@ public class B2bDAO {
             stmt.setString(4, b2b.getTelefone());
             stmt.setInt(5, b2b.getId_endereco());
 
+            
+
             stmt.executeUpdate();
             System.out.println("Usuário B2b cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados (conexão, SQL inválido, violação de constraint etc.)
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir B2b: " + e.getMessage(), e);
         }
     }
 
 
-    // READ
+    // Consulta e retorna os registros de B2b cadastrados no banco.
+
     public List<B2bModel> listarB2b() {
         List<B2bModel> listaB2b = new ArrayList<>();
         String sql = "SELECT * FROM B2b ORDER BY id_usuario";
@@ -54,13 +64,15 @@ public class B2bDAO {
                 listaB2b.add(novoB2b);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar B2b: " + e.getMessage(), e);
         }
 
         return listaB2b;
     }
-    //UPDATE
+    // Atualiza os dados de um registro de B2b já existente.
+
     public void atualizarB2b(B2bModel b2b) {
         String sql = "UPDATE B2b SET cnpj = ?, razao_social = ?, nome_fantasia = ?, telefone = ? WHERE id_usuario = ?";
 
@@ -81,6 +93,7 @@ public class B2bDAO {
                 System.out.println("Nenhum registro B2b encontrado com o ID informado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar B2b: " + e.getMessage(), e);
         }
@@ -98,9 +111,10 @@ public class B2bDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Usuário B2b deletado com sucesso!");
             } else {
-                System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
+                System.out.println("Nenhum usuário B2b encontrado com esse ID para deletar.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar: " + e.getMessage());
         }

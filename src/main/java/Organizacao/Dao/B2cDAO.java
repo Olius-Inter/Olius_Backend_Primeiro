@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe de acesso a dados (DAO) da entidade B2c.
+
 public class B2cDAO {
 
-    // CREATE
+    // Insere um novo registro de B2c no banco de dados.
+
     public void inserirB2c(B2cModel b2c) {
         String sql = "INSERT INTO B2c ( cpf, telefone, id_usuario) VALUES (?, ?, ?)";
 
@@ -26,12 +29,14 @@ public class B2cDAO {
             stmt.executeUpdate();
             System.out.println("Usuário B2c cadastrado com sucesso!");
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir B2c: " + e.getMessage(), e);
         }
     }
 
-    // READ
+    // Consulta e retorna os registros de B2c cadastrados no banco.
+
     public List<B2cModel> listarB2c() {
         List<B2cModel> listaB2c = new ArrayList<>();
         String sql = "SELECT * FROM B2c ORDER BY id_usuario";
@@ -49,6 +54,7 @@ public class B2cDAO {
                 listaB2c.add(novoB2c);
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar B2c: " + e.getMessage(), e);
         }
@@ -56,7 +62,8 @@ public class B2cDAO {
         return listaB2c;
     }
 
-    // UPDATE
+    // Atualiza os dados de um registro de B2c já existente.
+
     public void atualizarB2c(B2cModel b2c) {
         String sql = "UPDATE B2c SET cpf = ?, telefone = ? WHERE id_usuario = ?";
 
@@ -75,12 +82,14 @@ public class B2cDAO {
                 System.out.println("Nenhum registro B2c encontrado com o ID informado.");
             }
 
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar B2c: " + e.getMessage(), e);
         }
     }
 
-    // DELETE
+    // Remove definitivamente um registro de B2c do banco de dados.
+
     public void deletarB2c(int id_usuario) {
         String sql = "DELETE FROM B2c WHERE id_usuario = ?";
 
@@ -97,6 +106,7 @@ public class B2cDAO {
                 System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
             }
 
+        // Captura qualquer outro erro inesperado durante a operação
         } catch (Exception e) {
             System.out.println("Erro ao deletar: " + e.getMessage());
         }
