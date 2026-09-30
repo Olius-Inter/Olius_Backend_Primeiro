@@ -1,7 +1,7 @@
 package Organizacao.Servlet;
 
-import Organizacao.Dao.B2bDAO;
-import Organizacao.Model.B2bModel;
+import Organizacao.Dao.B2cDAO;
+import Organizacao.Model.B2cModel;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,21 +12,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/empresas")
-// atende requisicoes http de empresa b dois b
-public class B2bSERVLET extends HttpServlet {
+@WebServlet("/usuarios")
+// atende requisicoes http de usuario b dois c
+public class B2cSERVLET extends HttpServlet {
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
-    private B2bDAO empresasDAO;
+    private B2cDAO usuariosDAO;
 
     @Override
     // inicializa o acesso aos dados usado pelas requisicoes
     public void init() throws ServletException {
-        empresasDAO = new B2bDAO();
+        usuariosDAO = new B2cDAO();
     }
 
     @Override
-    // consulta os registros de empresa b dois b e devolve a resposta json
+    // consulta os registros de usuario b dois c e devolve a resposta json
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -34,23 +34,20 @@ public class B2bSERVLET extends HttpServlet {
 
         // consulta os registros e monta a resposta json
         try {
-            List<B2bModel> empresas = empresasDAO.listarB2b();
+            List<B2cModel> clientes = usuariosDAO.listarB2c();
             StringBuilder json = new StringBuilder("[");
 
             // percorre os registros e acrescenta cada objeto a resposta json
-            for (int i = 0; i < empresas.size(); i++) {
-                B2bModel empresa = empresas.get(i);
+            for (int i = 0; i < clientes.size(); i++) {
+                B2cModel cliente = clientes.get(i);
                 json.append("{")
-                        .append("\"id_usuario\":").append(empresa.getId_usuario()).append(",")
-                        .append("\"cnpj\":\"").append(escape(empresa.getCnpj())).append("\",")
-                        .append("\"razao_social\":\"").append(escape(empresa.getRazao_social())).append("\",")
-                        .append("\"nome_fantasia\":\"").append(escape(empresa.getNome_fantasia())).append("\",")
-                        .append("\"telefone\":\"").append(escape(empresa.getTelefone())).append("\",")
-                        .append("\"id_endereco\":").append(empresa.getId_endereco())
+                        .append("\"id_usuario\":").append(cliente.getId_usuario()).append(",")
+                        .append("\"cpf\":\"").append(escape(cliente.getCpf())).append("\",")
+                        .append("\"telefone\":\"").append(escape(cliente.getTelefone())).append("\"")
                         .append("}");
 
                 // acrescenta uma virgula somente entre objetos json
-                if (i < empresas.size() - 1) {
+                if (i < clientes.size() - 1) {
                     json.append(",");
                 }
             }
@@ -63,23 +60,23 @@ public class B2bSERVLET extends HttpServlet {
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar empresas B2B: " + mensagem(e));
+                    "Erro ao listar clientes B2C: " + mensagem(e));
         }
     }
 
     @Override
-    // valida os dados recebidos e cadastra empresa b dois b
+    // valida os dados recebidos e cadastra usuario b dois c
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida os campos da requisicao e cadastra empresa b dois b
+        // valida os campos da requisicao e cadastra usuario b dois c
         try {
-            empresasDAO.inserirB2b(criarEmpresa(request));
+            usuariosDAO.inserirB2c(criarCliente(request, obterId(request)));
             // define o status de criacao e confirma o cadastro em json
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Empresa B2B cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Cliente B2C cadastrado com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
         } catch (IllegalArgumentException e) {
@@ -87,33 +84,23 @@ public class B2bSERVLET extends HttpServlet {
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar empresa B2B: " + mensagem(e));
+                    "Erro ao cadastrar cliente B2C: " + mensagem(e));
         }
     }
 
     @Override
-    // valida os dados recebidos e atualiza empresa b dois b
+    // valida os dados recebidos e atualiza usuario b dois c
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida os campos da requisicao e atualiza empresa b dois b
+        // valida os campos da requisicao e atualiza usuario b dois c
         try {
-            int idUsuario = obterId(request);
-            B2bModel empresa = criarEmpresa(request);
-            empresasDAO.atualizarB2b(new B2bModel(
-                    idUsuario,
-                    empresa.getCnpj(),
-                    empresa.getRazao_social(),
-                    empresa.getNome_fantasia(),
-                    empresa.getTelefone(),
-                    empresa.getId_endereco()
-            ));
-
+            usuariosDAO.atualizarB2c(criarCliente(request, obterId(request)));
             // define o status de atualizacao e confirma a alteracao em json
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Empresa B2B atualizada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Cliente B2C atualizado com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
         } catch (IllegalArgumentException e) {
@@ -121,23 +108,23 @@ public class B2bSERVLET extends HttpServlet {
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar empresa B2B: " + mensagem(e));
+                    "Erro ao atualizar cliente B2C: " + mensagem(e));
         }
     }
 
     @Override
-    // valida o identificador e remove empresa b dois b
+    // valida o identificador e remove usuario b dois c
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida o identificador da requisicao e remove empresa b dois b
+        // valida o identificador da requisicao e remove usuario b dois c
         try {
-            empresasDAO.deletarB2b(obterId(request));
+            usuariosDAO.deletarB2c(obterId(request));
             // define o status de exclusao e confirma a remocao em json
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Empresa B2B deletada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Cliente B2C deletado com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
         } catch (IllegalArgumentException e) {
@@ -145,46 +132,35 @@ public class B2bSERVLET extends HttpServlet {
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao deletar empresa B2B: " + mensagem(e));
+                    "Erro ao deletar cliente B2C: " + mensagem(e));
         }
     }
 
-    // monta os dados da empresa com os campos obrigatorios da requisicao
-    private B2bModel criarEmpresa(HttpServletRequest request) {
-        return new B2bModel(
-                obterParametroObrigatorio(request, "cnpj"),
-                obterParametroObrigatorio(request, "razao_social"),
-                obterParametroObrigatorio(request, "nome_fantasia"),
-                obterParametroObrigatorio(request, "telefone"),
-                obterIdEndereco(request)
+    // monta os dados do cliente com os campos obrigatorios da requisicao
+    private B2cModel criarCliente(HttpServletRequest request, int idUsuario) {
+        return new B2cModel(
+                idUsuario,
+                obterParametroObrigatorio(request, "cpf"),
+                obterParametroObrigatorio(request, "telefone")
         );
     }
 
     // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
-        return obterInteiroObrigatorio(request, "id_usuario", "ID do usuário");
-    }
-
-    // valida e converte o identificador do endereco recebido
-    private int obterIdEndereco(HttpServletRequest request) {
-        return obterInteiroObrigatorio(request, "id_endereco", "ID do endereço");
-    }
-
-    // valida e converte um parametro obrigatorio para inteiro
-    private int obterInteiroObrigatorio(HttpServletRequest request, String nome, String descricao) {
-        String valor = request.getParameter(nome);
+        String valor = request.getParameter("id_usuario");
 
         // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException(descricao + " é obrigatório.");
+            throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
 
-        // valida e converte os dados recebidos antes de usa los
+        // converte o texto do identificador para inteiro
         try {
+
             return Integer.parseInt(valor.trim());
         // converte erro de conversao em uma validacao clara do parametro
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(descricao + " inválido.", e);
+            throw new IllegalArgumentException("ID do usuário inválido.", e);
         }
     }
 
