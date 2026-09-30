@@ -149,7 +149,7 @@ public class B2cSERVLET extends HttpServlet {
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
 
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
+        // rejeita a requisicao quando o parametro obrigatorio esta ausente.
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
