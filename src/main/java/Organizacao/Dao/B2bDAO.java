@@ -36,7 +36,7 @@ public class B2bDAO {
             stmt.executeUpdate();
             System.out.println("Usuário B2b cadastrado com sucesso!");
 
-        // Falha de acesso ao banco de dados (conexão, SQL inválido, violação de constraint etc.)
+        // Falha de acesso ao banco de dados
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir B2b: " + e.getMessage(), e);
         }

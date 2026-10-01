@@ -12,7 +12,7 @@ public class B2bModel {
     private String telefone;
     private int id_endereco;
 
-    // Construtor completo: cria o objeto B2b já com todos os
+    // Construtor: cria o objeto B2b já com todos os dados informado.
 
     public B2bModel(String cnpj, String razao_social,
                     String nome_fantasia, String telefone,
@@ -25,7 +25,7 @@ public class B2bModel {
         this.id_endereco = id_endereco;
     }
 
-    // Construtor completo: cria o objeto B2b já com todos os dados informado.
+    // Construtor: cria o objeto B2b já com todos os dados informado.
     public B2bModel(int id_usuario, String cnpj, String razao_social, String nome_fantasia, String telefone, int id_endereco) {
         this.id_usuario = id_usuario;
         this.cnpj = cnpj;
