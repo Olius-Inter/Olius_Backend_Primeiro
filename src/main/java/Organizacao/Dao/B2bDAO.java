@@ -99,7 +99,7 @@ public class B2bDAO {
         }
     }
     public void deletarB2b(int id) {
-        String sql = "DELETE FROM B2b WHERE id = ?";
+        String sql = "DELETE FROM B2b WHERE id_usuario = ?";
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -118,5 +118,6 @@ public class B2bDAO {
         } catch (Exception e) {
             System.out.println("Erro ao deletar: " + e.getMessage());
         }
+
     }
 }
