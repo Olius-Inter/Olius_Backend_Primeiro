@@ -145,7 +145,7 @@ public class B2cSERVLET extends HttpServlet {
         );
     }
 
-    // valida e converte o identificador recebido na requisicao
+    // valida e converte o identificador recebido na requisicao.
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
 
