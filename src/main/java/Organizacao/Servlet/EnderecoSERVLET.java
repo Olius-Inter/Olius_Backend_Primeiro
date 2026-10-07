@@ -179,17 +179,7 @@ public class EnderecoSERVLET extends HttpServlet {
     }
 
     private String escape(String texto) {
-        if (texto == null) {
-            return "";
-        }
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        String json = ServletSupport.json(texto == null ? "" : texto);
+        return json.substring(1, json.length() - 1);
     }
 }

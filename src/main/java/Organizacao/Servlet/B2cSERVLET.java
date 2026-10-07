@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/usuarios")
+@WebServlet("/b2c")
 // atende requisicoes http de usuario b dois c
 public class B2cSERVLET extends HttpServlet {
 
@@ -70,6 +70,7 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra usuario b dois c
         try {
@@ -94,6 +95,7 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza usuario b dois c
         try {
@@ -198,20 +200,7 @@ public class B2cSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        // devolve texto vazio quando o valor recebido e nulo
-        if (texto == null) {
-
-            return "";
-        }
-
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        String json = ServletSupport.json(texto == null ? "" : texto);
+        return json.substring(1, json.length() - 1);
     }
 }

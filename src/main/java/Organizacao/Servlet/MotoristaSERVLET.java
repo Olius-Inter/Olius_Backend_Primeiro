@@ -75,6 +75,7 @@ public class MotoristaSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra motorista
         try {
@@ -101,6 +102,7 @@ public class MotoristaSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza motorista
         try {
@@ -217,20 +219,7 @@ public class MotoristaSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        // devolve texto vazio quando o valor recebido e nulo
-        if (texto == null) {
-
-            return "";
-        }
-
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        String json = ServletSupport.json(texto == null ? "" : texto);
+        return json.substring(1, json.length() - 1);
     }
 }
