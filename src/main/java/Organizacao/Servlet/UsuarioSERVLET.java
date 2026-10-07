@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @WebServlet("/usuarios")
@@ -19,9 +18,6 @@ import java.util.List;
 public class UsuarioSERVLET extends HttpServlet {
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
-    private static final DateTimeFormatter FORMATO_DATA =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
     private UsuarioDAO usuarioDAO;
 
     @Override
@@ -87,6 +83,7 @@ public class UsuarioSERVLET extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra usuario
         try {
@@ -132,6 +129,7 @@ public class UsuarioSERVLET extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza usuario
         try {
@@ -195,21 +193,8 @@ public class UsuarioSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        // devolve texto vazio quando o valor recebido e nulo
-        if (texto == null) {
-
-            return "";
-        }
-
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        String json = ServletSupport.json(texto == null ? "" : texto);
+        return json.substring(1, json.length() - 1);
     }
 
     // valida e devolve um parametro de texto obrigatorio
@@ -269,7 +254,7 @@ public class UsuarioSERVLET extends HttpServlet {
         }
 
 
-        return data.toLocalDate().format(FORMATO_DATA);
+        return data.toLocalDate().toString();
     }
 
     // define o status de erro e devolve uma resposta json

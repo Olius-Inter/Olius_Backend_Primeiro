@@ -135,8 +135,8 @@ public class MotoristaDAO {
 
         // registra a falha ao remover motorista e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar motorista: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar motorista: " + e.getMessage(), e);
         }
     }
 }

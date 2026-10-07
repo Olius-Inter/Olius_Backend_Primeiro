@@ -122,8 +122,8 @@ public class B2cDAO {
 
         // registra a falha ao remover usuario b dois c e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar usuário B2C: " + e.getMessage(), e);
         }
     }
 }

@@ -39,8 +39,8 @@ public class CarteiraDAO {
 
         // registra a falha ao gravar carteira de pontos e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao inserir carteira: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao inserir carteira: " + e.getMessage(), e);
         }
     }
 
@@ -120,8 +120,8 @@ public class CarteiraDAO {
 
         // registra a falha ao atualizar carteira de pontos e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao atualizar carteira: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar carteira: " + e.getMessage(), e);
         }
     }
 
@@ -152,8 +152,8 @@ public class CarteiraDAO {
 
         // registra a falha ao remover carteira de pontos e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar carteira: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar carteira: " + e.getMessage(), e);
         }
     }
 }

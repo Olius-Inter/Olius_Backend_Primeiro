@@ -138,8 +138,8 @@ public class PontuacaoDAO {
 
         // registra a falha ao remover pontuacao de usuario e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar pontuação: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar pontuação: " + e.getMessage(), e);
         }
     }
 }

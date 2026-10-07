@@ -137,8 +137,8 @@ public class PontosMovimentacaoDAO {
 
         // registra a falha ao remover movimentacao de pontos e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar movimentação: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar movimentação: " + e.getMessage(), e);
         }
     }
 }
