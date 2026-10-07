@@ -135,8 +135,8 @@ public class EntregaPevDAO {
 
         // registra a falha ao remover entrega em ponto voluntario e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar entrega PEV: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar entrega PEV: " + e.getMessage(), e);
         }
     }
 }

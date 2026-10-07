@@ -138,8 +138,8 @@ public class CertificadoDAO {
 
         // registra a falha ao remover certificado empresarial e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar certificado: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar certificado: " + e.getMessage(), e);
         }
     }
 }

@@ -143,8 +143,8 @@ public class EnderecoDAO {
 
         // registra a falha ao remover endereco e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar endereço: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar endereço: " + e.getMessage(), e);
         }
     }
 }

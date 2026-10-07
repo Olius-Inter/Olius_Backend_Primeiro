@@ -132,8 +132,8 @@ public class EventoDAO {
 
         // registra a falha ao remover evento e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar evento: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar evento: " + e.getMessage(), e);
         }
     }
 }

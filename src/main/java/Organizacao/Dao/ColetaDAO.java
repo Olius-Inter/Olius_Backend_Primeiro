@@ -133,8 +133,8 @@ public class ColetaDAO {
 
         // registra a falha ao remover coleta e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar coleta: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar coleta: " + e.getMessage(), e);
         }
     }
 }

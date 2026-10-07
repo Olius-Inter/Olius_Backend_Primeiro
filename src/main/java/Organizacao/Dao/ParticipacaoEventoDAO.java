@@ -126,8 +126,8 @@ public class ParticipacaoEventoDAO {
 
         // registra a falha ao remover participacao em evento e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar participação: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar participação: " + e.getMessage(), e);
         }
     }
 }

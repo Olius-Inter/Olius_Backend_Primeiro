@@ -130,8 +130,8 @@ public class HistoricoDAO {
 
         // registra a falha ao remover historico de usuario e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar histórico: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar histórico: " + e.getMessage(), e);
         }
     }
 }

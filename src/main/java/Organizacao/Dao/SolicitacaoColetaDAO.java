@@ -134,8 +134,8 @@ public class SolicitacaoColetaDAO {
 
         // registra a falha ao remover solicitacao de coleta e informa o ocorrido
 
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar solicitação: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar solicitação: " + e.getMessage(), e);
         }
     }
 }
