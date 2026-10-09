@@ -147,11 +147,11 @@ public class B2cSERVLET extends HttpServlet {
         );
     }
 
-    // valida e converte o identificador recebido na requisicao.
+    // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
 
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente.
+        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
@@ -200,7 +200,26 @@ public class B2cSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        String json = ServletSupport.json(texto == null ? "" : texto);
-        return json.substring(1, json.length() - 1);
+        StringBuilder escaped = new StringBuilder();
+        String value = texto == null ? "" : texto;
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            switch (character) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    if (character < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) character));
+                    } else {
+                        escaped.append(character);
+                    }
+            }
+        }
+        return escaped.toString();
     }
 }
