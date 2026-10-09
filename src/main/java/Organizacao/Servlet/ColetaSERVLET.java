@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-// Servlet responsável por expor, via HTTP, as operações de CRUD da entidade Coleta.
+// atende requisicoes http relacionadas as coletas
 @WebServlet(name = "ColetaSERVLET", value = "/coleta")
 public class ColetaSERVLET extends HttpServlet {
 
@@ -24,7 +24,7 @@ public class ColetaSERVLET extends HttpServlet {
         coletaDAO = new ColetaDAO();
     }
 
-    // Lista todas as coletas cadastradas.
+    // lista as coletas e devolve os dados em json
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -57,7 +57,7 @@ public class ColetaSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(json.toString());
 
-            // Qualquer falha (DAO, banco, etc.) vira um erro
+            // informa falhas ocorridas ao consultar as coletas
         } catch (Exception e) {
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao listar coletas: " + e.getMessage());
@@ -65,7 +65,7 @@ public class ColetaSERVLET extends HttpServlet {
     }
 
 
-    // Lê os parâmetros da requisição, valida-os e cadastra uma nova coleta.
+    // valida os dados recebidos e cadastra uma coleta
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -87,17 +87,17 @@ public class ColetaSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_CREATED);
             response.getWriter().write("{\"mensagem\":\"Coleta cadastrada com sucesso!\"}");
 
-            // Dados de entrada inválidos
+            // informa quando os dados enviados sao invalidos
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            // Qualquer outra falha -> HTTP 500 (erro do servidor)
         } catch (Exception e) {
+            // informa falhas ocorridas durante o cadastro
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao cadastrar coleta: " + e.getMessage());
         }
     }
 
-    // Lê os parâmetros da requisição
+    // valida os dados recebidos e atualiza uma coleta
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -122,14 +122,16 @@ public class ColetaSERVLET extends HttpServlet {
             response.getWriter().write("{\"mensagem\":\"Coleta atualizada com sucesso!\"}");
 
         } catch (IllegalArgumentException e) {
+            // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
+            // informa falhas ocorridas durante a atualizacao
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao atualizar coleta: " + e.getMessage());
         }
     }
 
-    // Remove a coleta pelo id_coleta é informado como parâmetro.
+    // valida o identificador e remove uma coleta
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -144,14 +146,16 @@ public class ColetaSERVLET extends HttpServlet {
             response.getWriter().write("{\"mensagem\":\"Coleta deletada com sucesso!\"}");
 
         } catch (IllegalArgumentException e) {
+            // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
+            // informa falhas ocorridas durante a remocao
             enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Erro ao deletar coleta: " + e.getMessage());
         }
     }
 
-    // Lê um parâmetro obrigatório da requisição e converte para int.
+    // valida e converte um parametro obrigatorio para inteiro
 
     private int obterParametroInt(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
@@ -167,7 +171,7 @@ public class ColetaSERVLET extends HttpServlet {
         }
     }
 
-    // Lê um parâmetro obrigatório da requisição e converte para double.
+    // valida e converte um parametro obrigatorio para numero decimal
 
     private double obterParametroDouble(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
@@ -183,7 +187,7 @@ public class ColetaSERVLET extends HttpServlet {
         }
     }
 
-    // Converte a String recebida (formato yyyy-MM-dd) para LocalDate.
+    // valida e converte a data recebida para data local
 
     private LocalDate obterData(String valor) {
         if (valor == null || valor.trim().isEmpty()) {
@@ -198,11 +202,30 @@ public class ColetaSERVLET extends HttpServlet {
     }
 
     private String escape(String texto) {
-        String json = ServletSupport.json(texto == null ? "" : texto);
-        return json.substring(1, json.length() - 1);
+        StringBuilder escaped = new StringBuilder();
+        String value = texto == null ? "" : texto;
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            switch (character) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    if (character < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) character));
+                    } else {
+                        escaped.append(character);
+                    }
+            }
+        }
+        return escaped.toString();
     }
 
-    // Monta e envia uma resposta de erro padronizada
+    // monta e envia uma resposta de erro em json
     private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
         response.setStatus(status);
         response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");
