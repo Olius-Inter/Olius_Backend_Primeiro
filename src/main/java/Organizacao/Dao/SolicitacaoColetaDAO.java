@@ -10,43 +10,48 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// Classe de acesso a dados (DAO) da entidade SolicitacaoColeta.
 
+// acessa e administra os registros de solicitacao de coleta
 public class SolicitacaoColetaDAO {
 
-    // Insere um novo registro de SolicitacaoColeta no banco de dados.
-
+    // grava os dados de solicitacao de coleta no banco de dados
     public void inserirSolicitacao(SolicitacaoColetaModel solicitacao) {
+        // define a consulta sql de insercao para solicitacao de coleta
         String sql = "INSERT INTO solicitacao_coleta (litros_estimados, dt_solicitacao, status, id_b2b, id_pev) VALUES (?, ?, ?, ?, ?)";
 
+        // abre a conexao e prepara a insercao de solicitacao de coleta com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
+            // associa os campos de solicitacao de coleta aos parametros da insercao
             stmt.setDouble(1, solicitacao.getLitros_estimados());
             stmt.setString(2, solicitacao.getDt_solicitacao());
             stmt.setString(3, solicitacao.getStatus());
             stmt.setInt(4, solicitacao.getId_b2b());
             stmt.setInt(5, solicitacao.getId_pev());
 
+            // executa a gravacao dos dados de solicitacao de coleta
             stmt.executeUpdate();
             System.out.println("Solicitação de coleta cadastrada com sucesso!");
 
-        // Falha de acesso ao banco de dados
+        // propaga a falha ao gravar solicitacao de coleta para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir solicitação de coleta: " + e.getMessage(), e);
         }
     }
 
-    // Consulta e retorna os registros de SolicitacaoColeta cadastrados no banco.
-
+    // consulta os registros de solicitacao de coleta e devolve a lista
     public List<SolicitacaoColetaModel> listarSolicitacoes() {
         List<SolicitacaoColetaModel> listaSolicitacoes = new ArrayList<>();
+        // define a consulta sql de leitura para solicitacao de coleta
         String sql = "SELECT * FROM solicitacao_coleta ORDER BY id_solicitacao";
 
+        // abre a conexao e executa a consulta de solicitacao de coleta com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
+            // converte os campos de cada linha consultada em solicitacao de coleta
             while (rs.next()) {
                 int id_solicitacao = rs.getInt("id_solicitacao");
                 double litros_estimados = rs.getDouble("litros_estimados");
@@ -63,22 +68,25 @@ public class SolicitacaoColetaDAO {
                 listaSolicitacoes.add(solicitacao);
             }
 
-        // Falha de acesso ao banco de dados
+        // propaga a falha ao consultar solicitacao de coleta para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar solicitações de coleta: " + e.getMessage(), e);
         }
 
+        // devolve os registros encontrados pela consulta
         return listaSolicitacoes;
     }
 
-    // Atualiza os dados de um registro de SolicitacaoColeta já existente.
-
-      public void atualizarSolicitacao(SolicitacaoColetaModel solicitacao) {
+    // atualiza os dados de solicitacao de coleta no banco de dados
+    public void atualizarSolicitacao(SolicitacaoColetaModel solicitacao) {
+        // define a consulta sql de atualizacao para solicitacao de coleta
         String sql = "UPDATE solicitacao_coleta SET litros_estimados = ?, dt_solicitacao = ?, status = ?, id_b2b = ?, id_pev = ? WHERE id_solicitacao = ?";
 
+        // abre a conexao e prepara a atualizacao de solicitacao de coleta com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
+            // associa os campos de solicitacao de coleta aos parametros da atualizacao
             stmt.setDouble(1, solicitacao.getLitros_estimados());
             stmt.setString(2, solicitacao.getDt_solicitacao());
             stmt.setString(3, solicitacao.getStatus());
@@ -86,41 +94,48 @@ public class SolicitacaoColetaDAO {
             stmt.setInt(5, solicitacao.getId_pev());
             stmt.setInt(6, solicitacao.getId_solicitacao());
 
+            // executa a atualizacao dos dados de solicitacao de coleta
             int linhasAfetadas = stmt.executeUpdate();
 
+            // verifica se algum registro de solicitacao de coleta foi atualizado
             if (linhasAfetadas > 0) {
                 System.out.println("Solicitação atualizada com sucesso!");
             } else {
                 System.out.println("Solicitação não encontrada.");
             }
 
-        // Falha de acesso ao banco de dados
+        // propaga a falha ao atualizar solicitacao de coleta para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar solicitação: " + e.getMessage(), e);
         }
     }
 
-    // Remove definitivamente um registro de SolicitacaoColeta do banco de dados.
-
+    // remove o registro de solicitacao de coleta do banco de dados
     public void deletarSolicitacao(int id_solicitacao) {
+        // define a consulta sql de exclusao para solicitacao de coleta
         String sql = "DELETE FROM solicitacao_coleta WHERE id_solicitacao = ?";
 
+        // abre a conexao e prepara a exclusao de solicitacao de coleta com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
+            // associa o identificador do registro aos parametros da exclusao
             stmt.setInt(1, id_solicitacao);
 
+            // executa a exclusao do registro de solicitacao de coleta
             int linhasAfetadas = stmt.executeUpdate();
 
+            // verifica se algum registro de solicitacao de coleta foi removido
             if (linhasAfetadas > 0) {
                 System.out.println("Solicitação deletada com sucesso!");
             } else {
                 System.out.println("Solicitação não encontrada.");
             }
 
-        // Captura qualquer outro erro inesperado durante a operação
-        } catch (Exception e) {
-            System.out.println("Erro ao deletar solicitação: " + e.getMessage());
+        // registra a falha ao remover solicitacao de coleta e informa o ocorrido
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar solicitação: " + e.getMessage(), e);
         }
     }
 }

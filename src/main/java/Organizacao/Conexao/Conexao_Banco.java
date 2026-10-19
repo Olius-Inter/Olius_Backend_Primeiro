@@ -4,44 +4,43 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-// Classe responsável por abrir a conexão com o banco de dados
 
+
+// abre conexoes com o banco de dados
 public class Conexao_Banco {
+    // mantem as credenciais carregadas do ambiente
 
-    // Credenciais do banco, obtidas do servidor
     static String username = System.getenv("DB_USERNAME");
     static String password = System.getenv("DB_PASSWORD");
     static String URL = System.getenv("DB_URL");
 
-    // Abre e retorna uma nova conexão com o banco de dados PostgreSQL.
 
+    // carrega o driver e abre uma conexao com o banco de dados
     public static Connection conectar() {
 
+        // carrega o driver e tenta abrir a conexao com as credenciais do ambiente
         try {
-            // Registra o driver do PostgreSQL
             Class.forName("org.postgresql.Driver");
 
-            // Efetivamente abre a conexão usando URL/usuário/senha
             return DriverManager.getConnection(
                     URL,
                     username,
                     password
             );
 
+        // trata a ausencia do driver necessario para acessar o banco
         } catch (ClassNotFoundException erro) {
-            // Ocorre quando o driver do PostgreSQL não está disponível
 
             System.out.println("Driver não localizado");
             erro.printStackTrace();
 
+        // trata falhas ao abrir a conexao ou executar operacoes sql
         } catch (SQLException erro) {
-            // Ocorre quando a URL/usuário/senha estão incorretos, o banco
-            // está fora do ar, ou há qualquer outra falha de conexão/SQL
             System.out.println("Erro ao conectar com o banco");
             erro.printStackTrace();
         }
 
-        // Nenhuma conexão pôde ser estabelecida
+        // informa que nenhuma conexao pode ser devolvida
         return null;
     }
 }

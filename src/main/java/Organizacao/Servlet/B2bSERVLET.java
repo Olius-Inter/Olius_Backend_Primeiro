@@ -73,6 +73,7 @@ public class B2bSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra empresa b dois b
         try {
@@ -97,6 +98,7 @@ public class B2bSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza empresa b dois b
         try {
@@ -222,20 +224,26 @@ public class B2bSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        // devolve texto vazio quando o valor recebido e nulo
-        if (texto == null) {
-
-            return "";
+        StringBuilder escaped = new StringBuilder();
+        String value = texto == null ? "" : texto;
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            switch (character) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    if (character < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) character));
+                    } else {
+                        escaped.append(character);
+                    }
+            }
         }
-
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        return escaped.toString();
     }
 }
