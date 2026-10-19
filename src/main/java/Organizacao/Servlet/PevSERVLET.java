@@ -84,7 +84,7 @@ public class PevSERVLET extends HttpServlet {
                     obterParametroInt(request, "id_usuario_b2b"),
                     obterParametroInt(request, "id_usuario_b2c"),
                     request.getParameter("qr_code"),
-                    request.getParameter("status"),
+                    validarStatus(request.getParameter("status")),
                     obterData(request.getParameter("dt_aprovacao"))
             );
 
@@ -117,7 +117,7 @@ public class PevSERVLET extends HttpServlet {
                     obterParametroInt(request, "id_usuario_b2b"),
                     obterParametroInt(request, "id_usuario_b2c"),
                     request.getParameter("qr_code"),
-                    request.getParameter("status"),
+                    validarStatus(request.getParameter("status")),
                     obterData(request.getParameter("dt_aprovacao"))
             );
             pev.setId_pev(obterParametroInt(request, "id_pev"));
@@ -169,20 +169,24 @@ public class PevSERVLET extends HttpServlet {
     // valida e converte um parametro obrigatorio para inteiro
     private int obterParametroInt(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
-
-        // converte o texto do identificador para inteiro
         try {
-            // devolve o valor validado e convertido
-            return Integer.parseInt(valor.trim());
-        // converte erro de conversao em uma validacao clara do parametro
+            int id = Integer.parseInt(valor.trim());
+            if (id <= 0) throw new NumberFormatException();
+            return id;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número inteiro.", e);
+                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
         }
+    }
+
+    private String validarStatus(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return status;
+        }
+        if (!status.trim().matches("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*")) {
+            throw new IllegalArgumentException("Status contém caracteres inválidos.");
+        }
+        return status.trim();
     }
 
     // valida e converte a data recebida para o tipo de data local
@@ -192,12 +196,15 @@ public class PevSERVLET extends HttpServlet {
             throw new IllegalArgumentException("A data de aprovação é obrigatória.");
         }
 
+        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
+        }
         // interpreta o texto recebido como data local
         try {
             // devolve o valor validado e convertido
             return LocalDate.parse(valor.trim());
         // informa que o texto recebido nao representa uma data valida
-        } catch (Exception e) {
+        } catch (java.time.format.DateTimeParseException e) {
             throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
         }
     }

@@ -1,7 +1,7 @@
 package Organizacao.Model;
 
 
-// representa os dados da entidade empresa b dois b
+// representa os dados da entidade empresa B2B
 public class B2bModel {
     // armazena os atributos e relacionamentos da entidade
 
@@ -12,7 +12,7 @@ public class B2bModel {
     private String telefone;
     private int id_endereco;
 
-    // inicializa os dados de empresa b dois b
+    // inicializa os dados de empresa B2B
     public B2bModel(String cnpj, String razao_social,
                     String nome_fantasia, String telefone,
                     int id_endereco) {
@@ -24,7 +24,7 @@ public class B2bModel {
         this.id_endereco = id_endereco;
     }
 
-    // inicializa os dados de empresa b dois b com identificador
+    // inicializa os dados de empresa B2B com identificador
     public B2bModel(int id_usuario, String cnpj, String razao_social, String nome_fantasia, String telefone, int id_endereco) {
         this.id_usuario = id_usuario;
         this.cnpj = cnpj;

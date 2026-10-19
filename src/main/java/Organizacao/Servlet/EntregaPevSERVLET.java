@@ -186,9 +186,13 @@ public class EntregaPevSERVLET extends HttpServlet {
     // valida e converte um parametro para data
     private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
+        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException(
+                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
+        }
         try {
             return java.time.LocalDate.parse(value);
-        } catch (RuntimeException e) {
+        } catch (java.time.format.DateTimeParseException e) {
             // informa o formato esperado para a data
             throw new IllegalArgumentException(
                     "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);

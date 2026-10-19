@@ -11,10 +11,22 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @WebServlet("/motoristas")
 // atende requisicoes http de motorista
 public class MotoristaSERVLET extends HttpServlet {
+
+    private static final Pattern CPF_PATTERN = Pattern.compile(
+            "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
+    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
+            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
+    private static final Pattern CNH_PATTERN = Pattern.compile("\\d{11}");
+    private static final Pattern NOME_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*");
+    private static final Pattern TEXTO_EMPRESARIAL_PATTERN = Pattern.compile(
+            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&()/-]*");
+    private static final Pattern TEXTO_CURTO_PATTERN = Pattern.compile(
+            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private MotoristaDAO motoristaDAO;
@@ -155,31 +167,33 @@ public class MotoristaSERVLET extends HttpServlet {
     // monta os dados do motorista com os campos obrigatorios da requisicao
     private MotoristaModel criarMotorista(HttpServletRequest request) {
         return new MotoristaModel(
-                obterParametroObrigatorio(request, "nome"),
-                obterParametroObrigatorio(request, "cpf"),
-                obterParametroObrigatorio(request, "telefone"),
-                obterParametroObrigatorio(request, "cnh"),
-                obterParametroObrigatorio(request, "empresa"),
-                obterParametroObrigatorio(request, "status")
+                validarFormato(obterParametroObrigatorio(request, "nome"), NOME_PATTERN,
+                        "Nome deve conter apenas letras, espaços, apóstrofos, pontos ou hífens."),
+                validarFormato(obterParametroObrigatorio(request, "cpf"), CPF_PATTERN,
+                        "CPF inválido. Informe 11 dígitos, com ou sem pontuação."),
+                validarFormato(obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
+                        "Telefone inválido. Informe DDD e um telefone brasileiro válido."),
+                validarFormato(obterParametroObrigatorio(request, "cnh"), CNH_PATTERN,
+                        "CNH inválida. Informe os 11 dígitos."),
+                validarFormato(obterParametroObrigatorio(request, "empresa"),
+                        TEXTO_EMPRESARIAL_PATTERN, "Empresa contém caracteres inválidos."),
+                validarFormato(obterParametroObrigatorio(request, "status"),
+                        TEXTO_CURTO_PATTERN, "Status contém caracteres inválidos.")
         );
     }
 
     // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_motorista");
-
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do motorista é obrigatório.");
         }
-
-        // converte o texto do identificador para inteiro
         try {
-
-            return Integer.parseInt(valor.trim());
-        // converte erro de conversao em uma validacao clara do parametro
+            int id = Integer.parseInt(valor.trim());
+            if (id <= 0) throw new NumberFormatException();
+            return id;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do motorista inválido.", e);
+            throw new IllegalArgumentException("ID do motorista deve ser um inteiro positivo.", e);
         }
     }
 
@@ -195,6 +209,13 @@ public class MotoristaSERVLET extends HttpServlet {
         }
 
         return valor.trim();
+    }
+
+    private String validarFormato(String valor, Pattern padrao, String mensagem) {
+        if (!padrao.matcher(valor).matches()) {
+            throw new IllegalArgumentException(mensagem);
+        }
+        return valor;
     }
 
     // define o formato json e a codificacao da resposta

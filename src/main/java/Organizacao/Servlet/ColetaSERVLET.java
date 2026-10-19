@@ -159,15 +159,16 @@ public class ColetaSERVLET extends HttpServlet {
 
     private int obterParametroInt(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
-
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
-
         try {
-            return Integer.parseInt(valor.trim());
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) throw new NumberFormatException();
+            return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número inteiro.", e);
+            throw new IllegalArgumentException(
+                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
         }
     }
 
@@ -181,9 +182,14 @@ public class ColetaSERVLET extends HttpServlet {
         }
 
         try {
-            return Double.parseDouble(valor.trim());
+            double numero = Double.parseDouble(valor.trim());
+            if (!Double.isFinite(numero) || numero < 0) {
+                throw new NumberFormatException();
+            }
+            return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número.", e);
+            throw new IllegalArgumentException(
+                    "O parâmetro '" + nome + "' deve ser um número válido não negativo.", e);
         }
     }
 
@@ -194,9 +200,12 @@ public class ColetaSERVLET extends HttpServlet {
             throw new IllegalArgumentException("A data da coleta é obrigatória.");
         }
 
+        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
+        }
         try {
             return LocalDate.parse(valor.trim());
-        } catch (Exception e) {
+        } catch (java.time.format.DateTimeParseException e) {
             throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
         }
     }

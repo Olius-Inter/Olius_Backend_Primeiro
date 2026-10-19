@@ -11,10 +11,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @WebServlet("/b2c")
-// atende requisicoes http de usuario b dois c
+// atende requisicoes http de clientes B2C
 public class B2cSERVLET extends HttpServlet {
+
+    private static final Pattern CPF_PATTERN = Pattern.compile(
+            "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
+    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
+            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private B2cDAO usuariosDAO;
@@ -26,7 +32,7 @@ public class B2cSERVLET extends HttpServlet {
     }
 
     @Override
-    // consulta os registros de usuario b dois c e devolve a resposta json
+    // consulta os registros de clientes B2C e devolve a resposta json
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -65,14 +71,14 @@ public class B2cSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida os dados recebidos e cadastra usuario b dois c
+    // valida os dados recebidos e cadastra um cliente B2C
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e cadastra usuario b dois c
+        // valida os campos da requisicao e cadastra um cliente B2C
         try {
             usuariosDAO.inserirB2c(criarCliente(request, obterId(request)));
             // define o status de criacao e confirma o cadastro em json
@@ -90,14 +96,14 @@ public class B2cSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida os dados recebidos e atualiza usuario b dois c
+    // valida os dados recebidos e atualiza um cliente B2C
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e atualiza usuario b dois c
+        // valida os campos da requisicao e atualiza um cliente B2C
         try {
             usuariosDAO.atualizarB2c(criarCliente(request, obterId(request)));
             // define o status de atualizacao e confirma a alteracao em json
@@ -115,13 +121,13 @@ public class B2cSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida o identificador e remove usuario b dois c
+    // valida o identificador e remove um cliente B2C
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida o identificador da requisicao e remove usuario b dois c
+        // valida o identificador da requisicao e remove um cliente B2C
         try {
             usuariosDAO.deletarB2c(obterId(request));
             // define o status de exclusao e confirma a remocao em json
@@ -142,27 +148,25 @@ public class B2cSERVLET extends HttpServlet {
     private B2cModel criarCliente(HttpServletRequest request, int idUsuario) {
         return new B2cModel(
                 idUsuario,
-                obterParametroObrigatorio(request, "cpf"),
-                obterParametroObrigatorio(request, "telefone")
+                validarFormato(obterParametroObrigatorio(request, "cpf"), CPF_PATTERN,
+                        "CPF inválido. Informe 11 dígitos, com ou sem pontuação."),
+                validarFormato(obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
+                        "Telefone inválido. Informe DDD e um telefone brasileiro válido.")
         );
     }
 
     // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
-
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
-
-        // converte o texto do identificador para inteiro
         try {
-
-            return Integer.parseInt(valor.trim());
-        // converte erro de conversao em uma validacao clara do parametro
+            int id = Integer.parseInt(valor.trim());
+            if (id <= 0) throw new NumberFormatException();
+            return id;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do usuário inválido.", e);
+            throw new IllegalArgumentException("ID do usuário deve ser um inteiro positivo.", e);
         }
     }
 
@@ -176,6 +180,13 @@ public class B2cSERVLET extends HttpServlet {
         }
 
         return valor.trim();
+    }
+
+    private String validarFormato(String valor, Pattern padrao, String mensagem) {
+        if (!padrao.matcher(valor).matches()) {
+            throw new IllegalArgumentException(mensagem);
+        }
+        return valor;
     }
 
     // define o formato json e a codificacao da resposta
