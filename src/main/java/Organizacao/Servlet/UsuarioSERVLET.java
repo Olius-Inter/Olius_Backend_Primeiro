@@ -12,10 +12,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @WebServlet("/usuarios")
 // atende requisicoes http de usuario
 public class UsuarioSERVLET extends HttpServlet {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+");
+    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
+            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
+    private static final Pattern NOME_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*");
+    private static final Pattern TIPO_USUARIO_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M}_-]*");
+    private static final Pattern DATA_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private UsuarioDAO usuarioDAO;
@@ -88,11 +97,16 @@ public class UsuarioSERVLET extends HttpServlet {
         // valida os campos da requisicao e cadastra usuario
         try {
             int idUsuario = obterId(request);
-            String nome = obterParametroObrigatorio(request, "nome");
-            String email = obterParametroObrigatorio(request, "email");
+            String nome = validarFormato(
+                    obterParametroObrigatorio(request, "nome"), NOME_PATTERN, "Nome inválido.");
+            String email = validarFormato(
+                    obterParametroObrigatorio(request, "email"), EMAIL_PATTERN, "E-mail inválido.");
             String senha = obterParametroObrigatorio(request, "senha");
-            String tipoUsuario = obterParametroObrigatorio(request, "tipo_usuario");
-            String telefone = obterParametroObrigatorio(request, "telefone");
+            String tipoUsuario = validarFormato(obterParametroObrigatorio(request, "tipo_usuario"),
+                    TIPO_USUARIO_PATTERN, "Tipo de usuário contém caracteres inválidos.");
+            String telefone = validarFormato(
+                    obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
+                    "Telefone inválido. Informe DDD e um telefone brasileiro válido.");
             String primeiroRegistroString = request.getParameter("primeiro_registro");
 
             Date primeiroRegistro = obterData(primeiroRegistroString);
@@ -134,11 +148,16 @@ public class UsuarioSERVLET extends HttpServlet {
         // valida os campos da requisicao e atualiza usuario
         try {
             int idUsuario = obterId(request);
-            String nome = obterParametroObrigatorio(request, "nome");
-            String email = obterParametroObrigatorio(request, "email");
+            String nome = validarFormato(
+                    obterParametroObrigatorio(request, "nome"), NOME_PATTERN, "Nome inválido.");
+            String email = validarFormato(
+                    obterParametroObrigatorio(request, "email"), EMAIL_PATTERN, "E-mail inválido.");
             String senha = obterParametroObrigatorio(request, "senha");
-            String tipoUsuario = obterParametroObrigatorio(request, "tipo_usuario");
-            String telefone = obterParametroObrigatorio(request, "telefone");
+            String tipoUsuario = validarFormato(obterParametroObrigatorio(request, "tipo_usuario"),
+                    TIPO_USUARIO_PATTERN, "Tipo de usuário contém caracteres inválidos.");
+            String telefone = validarFormato(
+                    obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
+                    "Telefone inválido. Informe DDD e um telefone brasileiro válido.");
 
             UsuarioModel usuario = new UsuarioModel(
                     idUsuario,
@@ -231,19 +250,15 @@ public class UsuarioSERVLET extends HttpServlet {
     // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
-
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
-
-        // converte o texto do identificador para inteiro
         try {
-
-            return Integer.parseInt(valor.trim());
-        // converte erro de conversao em uma validacao clara do parametro
+            int id = Integer.parseInt(valor.trim());
+            if (id <= 0) throw new NumberFormatException();
+            return id;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do usuário inválido.", e);
+            throw new IllegalArgumentException("ID do usuário deve ser um inteiro positivo.", e);
         }
     }
 
@@ -257,11 +272,22 @@ public class UsuarioSERVLET extends HttpServlet {
         // interpreta o texto recebido como data local
         try {
             // devolve o valor validado e convertido
-            return Date.valueOf(valor.trim());
+            String data = valor.trim();
+            if (!DATA_PATTERN.matcher(data).matches()) {
+                throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
+            }
+            return Date.valueOf(data);
         // devolve erro de requisicao quando os dados recebidos sao invalidos
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
         }
+    }
+
+    private String validarFormato(String valor, Pattern padrao, String mensagem) {
+        if (!padrao.matcher(valor).matches()) {
+            throw new IllegalArgumentException(mensagem);
+        }
+        return valor;
     }
 
     // converte a data para o formato exibido na resposta

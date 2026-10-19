@@ -151,7 +151,7 @@ public class PontuacaoSERVLET extends HttpServlet {
         String value = request.getParameter(name);
         // rejeita parametros ausentes ou vazios
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O par?metro '" + name + "' ? obrigat?rio.");
+            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
         }
         return value.trim();
     }
@@ -166,7 +166,7 @@ public class PontuacaoSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O par?metro '" + name + "' deve ser um inteiro positivo.", e);
+                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
         }
     }
 
@@ -180,19 +180,23 @@ public class PontuacaoSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O par?metro '" + name + "' deve ser um n?mero v?lido n?o negativo.", e);
+                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
         }
     }
 
     // valida e converte um parametro para data
     private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
+        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException(
+                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
+        }
         try {
             return java.time.LocalDate.parse(value);
-        } catch (RuntimeException e) {
+        } catch (java.time.format.DateTimeParseException e) {
             // informa o formato esperado para a data
             throw new IllegalArgumentException(
-                    "O par?metro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
+                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
         }
     }
 

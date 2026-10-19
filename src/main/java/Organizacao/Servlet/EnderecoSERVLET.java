@@ -11,10 +11,29 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @WebServlet("/enderecos")
 // atende as requisicoes relacionadas aos enderecos
 public class EnderecoSERVLET extends HttpServlet {
+
+    // Aceita CEP com oito dígitos, com ou sem hífen entre os grupos.
+    private static final Pattern CEP_PATTERN = Pattern.compile("\\d{5}-?\\d{3}");
+
+    // Aceita números, complementos de letra, intervalos e a indicação S/N.
+    private static final Pattern NUMERO_PATTERN =
+            Pattern.compile("(?:\\d+[a-z]?(?:[-/]\\d+[a-z]?)?|s/?n)", Pattern.CASE_INSENSITIVE);
+
+    // Aceita somente siglas oficiais de estados brasileiros e do Distrito Federal.
+    private static final Pattern ESTADO_PATTERN = Pattern.compile(
+            "(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    // Aceita texto Unicode, números e pontuação comum em nomes e endereços.
+    private static final Pattern TEXTO_PATTERN =
+            Pattern.compile("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&():;/\\-]*");
 
     // mantem o acesso aos dados dos enderecos
     private EnderecoDAO enderecoDAO;
@@ -140,32 +159,74 @@ public class EnderecoSERVLET extends HttpServlet {
 
     // valida os campos recebidos e cria o objeto do endereco
     private EnderecoModel criarEndereco(HttpServletRequest request) {
-        return new EnderecoModel(
+        String cep = validarFormato(
                 obterParametroObrigatorio(request, "cep"),
+                CEP_PATTERN,
+                "CEP inválido. Use 00000-000 ou 00000000."
+        );
+        String logradouro = validarFormato(
                 obterParametroObrigatorio(request, "logradouro"),
+                TEXTO_PATTERN,
+                "O logradouro contém caracteres inválidos."
+        );
+        String numero = validarFormato(
                 obterParametroObrigatorio(request, "numero"),
-                obterParametroOpcional(request, "complemento"),
+                NUMERO_PATTERN,
+                "Número inválido. Use números, como 123, 123A, ou S/N."
+        );
+        String complemento = obterParametroOpcional(request, "complemento");
+        if (!complemento.isEmpty()) {
+            complemento = validarFormato(
+                    complemento,
+                    TEXTO_PATTERN,
+                    "O complemento contém caracteres inválidos."
+            );
+        }
+        String bairro = validarFormato(
                 obterParametroObrigatorio(request, "bairro"),
+                TEXTO_PATTERN,
+                "O bairro contém caracteres inválidos."
+        );
+        String cidade = validarFormato(
                 obterParametroObrigatorio(request, "cidade"),
+                TEXTO_PATTERN,
+                "A cidade contém caracteres inválidos."
+        );
+        String estado = validarFormato(
                 obterParametroObrigatorio(request, "estado"),
-                obterParametroObrigatorio(request, "pais")
+                ESTADO_PATTERN,
+                "Estado inválido. Informe a sigla de duas letras, como SP."
+        ).toUpperCase(Locale.ROOT);
+        String pais = validarFormato(
+                obterParametroObrigatorio(request, "pais"),
+                TEXTO_PATTERN,
+                "O país contém caracteres inválidos."
+        );
+
+        return new EnderecoModel(
+                cep,
+                logradouro,
+                numero,
+                complemento,
+                bairro,
+                cidade,
+                estado,
+                pais
         );
     }
 
     // valida e devolve o identificador do endereco
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_endereco");
-
-        // rejeita identificadores ausentes ou vazios
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do endereço é obrigatório.");
         }
-
         try {
-            return Integer.parseInt(valor.trim());
+            int id = Integer.parseInt(valor.trim());
+            if (id <= 0) throw new NumberFormatException();
+            return id;
         } catch (NumberFormatException e) {
-            // informa quando o identificador nao e um numero inteiro
-            throw new IllegalArgumentException("ID do endereço inválido.", e);
+            throw new IllegalArgumentException("ID do endereço deve ser um inteiro positivo.", e);
         }
     }
 
@@ -179,6 +240,15 @@ public class EnderecoSERVLET extends HttpServlet {
         }
 
         return valor.trim();
+    }
+
+    // valida o formato do campo e fornece uma mensagem clara quando ele não corresponde ao padrão
+    private String validarFormato(String valor, Pattern padrao, String mensagemErro) {
+        if (!padrao.matcher(valor).matches()) {
+            throw new IllegalArgumentException(mensagemErro);
+        }
+
+        return valor;
     }
 
     // devolve o valor informado ou um texto vazio

@@ -123,7 +123,7 @@ public class CarteiraSERVLET extends HttpServlet {
     // cria uma carteira com os dados recebidos
     private CarteiraModel criarCarteira(HttpServletRequest request) {
         return new CarteiraModel(
-                obterInteiroObrigatorio(request, "pontuacao"),
+                obterInteiroNaoNegativo(request, "pontuacao"),
                 obterParametroObrigatorio(request, "patente"),
                 obterParametroObrigatorio(request, "nivel"),
                 obterInteiroObrigatorio(request, "id_b2c")
@@ -136,12 +136,31 @@ public class CarteiraSERVLET extends HttpServlet {
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
-
         try {
-            return Integer.parseInt(valor.trim());
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) throw new NumberFormatException();
+            return numero;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número inteiro.", e);
+                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
+        }
+    }
+
+    private int obterInteiroNaoNegativo(HttpServletRequest request, String nome) {
+        String valor = request.getParameter(nome);
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+        }
+
+        try {
+            int numero = Integer.parseInt(valor.trim());
+            if (numero < 0) {
+                throw new NumberFormatException();
+            }
+            return numero;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "O parâmetro '" + nome + "' deve ser um inteiro não negativo.", e);
         }
     }
 
