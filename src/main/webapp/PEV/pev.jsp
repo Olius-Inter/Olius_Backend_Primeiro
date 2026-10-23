@@ -22,7 +22,7 @@
     >
 </head>
 
-<body>
+<body data-api="${pageContext.request.contextPath}/pev" data-id="id_pev" data-base="${pageContext.request.contextPath}/PEV" data-columns="id_usuario_b2b,dt_aprovacao,status,id_endereco">
 
     <!-- Menu lateral -->
     <aside class="menu">
@@ -33,14 +33,14 @@
 
          <div class="caixa"></div>
         <nav>
-            <a href="${pageContext.request.contextPath}/adm.html">Dashboard</a>
-            <a href="${pageContext.request.contextPath}/empresas.html">Empresas</a>
-            <a href="${pageContext.request.contextPath}/usuarios.html">Usuários</a>
-            <a href="${pageContext.request.contextPath}/pev.html" class="ativo">PEV</a>
-            <a href="${pageContext.request.contextPath}/motoristas.html">Motoristas</a>
-            <a href="${pageContext.request.contextPath}/solicitacoes.html">Solicitações de coleta</a>
-            <a href="${pageContext.request.contextPath}/coletas.html">Coletas realizadas</a>
-            <a href="${pageContext.request.contextPath}/certificados.html">Certificados</a>
+            <a href="${pageContext.request.contextPath}/index.jsp">Dashboard</a>
+            <a href="${pageContext.request.contextPath}/Empresas/empresa.jsp">Empresas</a>
+            <a href="${pageContext.request.contextPath}/Usuarios/usuarios.jsp">Usuários</a>
+            <a href="${pageContext.request.contextPath}/PEV/pev.jsp" class="ativo">PEV</a>
+            <a href="${pageContext.request.contextPath}/Motoristas/motoristas.jsp">Motoristas</a>
+            <a href="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">Solicitações de coleta</a>
+            <a href="${pageContext.request.contextPath}/Coletas/coletas.jsp">Coletas realizadas</a>
+            <a href="${pageContext.request.contextPath}/Certificados/certificados.jsp">Certificados</a>
         </nav>
 
     </aside>
@@ -51,7 +51,7 @@
         <header class="topo">
             <h1>Pontos de coleta (PEV)</h1>
 
-            <a href="novo-pev.html" class="adicionar" type="button" onclick="window.location.href='${pageContext.request.contextPath}/PEV/formulario.jsp>'">
+            <a href="${pageContext.request.contextPath}/PEV/formulario.jsp" class="adicionar">
                 + Adicionar PEV
             </a>
         </header>
@@ -65,23 +65,24 @@
                         <th>Responsável</th>
                         <th>Data de aprovação</th>
                         <th>Status</th>
+                        <th>Endereço</th>
                         <th></th>
                     </tr>
                 </thead>
 
                 <tbody>
 
-                    <c:forEach var="pev" items = ${pevs}>
+                    <c:forEach var="pev" items = "${pevs}">
                         <tr>
-                            <td><c:out value="${pev.responsavel}"/></td>
-                            <td><c:out value="${pev.dataAprovacao}"/></td>
+                            <td><c:out value="${pev.id_usuario_b2b}"/></td>
+                            <td><c:out value="${pev.dt_aprovacao}"/></td>
                             <td><c:out value="${pev.status}"/></td>
                             <td class="acoes">
-                            <button type="button" class="editar" title="Editar" type="button" onclick="window.location.href='${pageContext.request.contextPath}/PEV/formulario.jsp?id=${pev.id_pev}'">
+                            <button type="button" class="editar" title="Editar" onclick="window.location.href='${pageContext.request.contextPath}/PEV/formulario.jsp?id=${pev.id_pev}'">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
 
-                            <button type="button" class="excluir" title="Excluir" type="button" onclick="window.location.href='${pageContext.request.contextPath}/PEV/excluir.jsp?id=${pev.id_pev}'">
+                            <button type="button" class="excluir" title="Excluir" onclick="window.location.href='${pageContext.request.contextPath}/PEV/excluir.jsp?id=${pev.id_pev}'">
                                 <i class="fa-regular fa-trash-can"></i>
                             </button>
                             </td>
@@ -93,6 +94,8 @@
         </section>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>

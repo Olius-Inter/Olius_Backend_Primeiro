@@ -16,19 +16,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-endereco="true" data-api="${pageContext.request.contextPath}/pev" data-id="id_pev">
 
     <main class="formulario">
 
-        <h1>${not empty PEV.id ? 'Novo Ponto de Coleta' : 'Editar Ponto de Coleta'}</h1>
+        <h1>${not empty param.id ? 'Editar Ponto de Coleta' : 'Novo Ponto de Coleta'}</h1>
 
 
         <!-- dados do ponto de coleta -->
-        <form id="formPEV" action="${pageContext.request.contextPath}/PEV" method="post">
+        <form id="formPEV" action="${pageContext.request.contextPath}/pev" method="post" data-retorno="${pageContext.request.contextPath}/PEV/pev.jsp">
 
             <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty PEV.id}">
-                <input type="hidden" name="id" value="${PEV.id}">
+            <c:if test = "${not empty param.id}">
+                <input type="hidden" name="id" value="${param.id}">
             </c:if>
 
 
@@ -36,63 +36,67 @@
             <div class="campos">
 
                 <div class="campo">
-                    <label for="nome">Nome do ponto de coleta *</label>
-                    <input type="text" id="nome" name="nome" value="<c:out value='${PEV.nome}'/>"required>
+                    <label for="nome">QR Code *</label>
+                    <input type="text" id="nome" name="qr_code" value="<c:out value='${PEV.qr_code}'/>" maxlength="255" required>
                 </div>
 
                 <div class="campo">
-                    <label for="responsavel">Responsável *</label>
-                    <input type="text" id="responsavel" name="responsavel" value="<c:out value='${PEV.responsavel}'/>" required>
+                    <label for="responsavel">Empresa responsável (ID) *</label>
+                    <input type="number" id="responsavel" name="id_usuario_b2b" value="<c:out value='${PEV.id_usuario_b2b}'/>" required>
                 </div>
 
                 <div class="campo">
-                    <label for="cidade">Cidade *</label>
-                    <input type="text" id="cidade" name="cidade" value="<c:out value='${PEV.cidade}'/>" required>
+                    <label for="id_usuario_b2c">Usuário B2C responsável (ID) *</label>
+                    <input type="number" id="id_usuario_b2c" name="id_usuario_b2c" value="<c:out value='${PEV.id_usuario_b2c}'/>" required>
                 </div>
 
                 <div class="campo">
-                    <label for="estado">Estado *</label>
-                    <select id="estado" name="estado" required>
-                        <option value="" selected disabled ${empty PEV.estado ? 'selected' : ''}>Selecione o estado</option>
-                        <option value="AC" ${PEV.estado == 'AC' ? 'selected' : ''}>Acre</option>
-                        <option value="AL" ${PEV.estado == 'AL' ? 'selected' : ''}>Alagoas</option>
-                        <option value="AP" ${PEV.estado == 'AP' ? 'selected' : ''}>Amapá</option>
-                        <option value="AM" ${PEV.estado == 'AM' ? 'selected' : ''}>Amazonas</option>
-                        <option value="BA" ${PEV.estado == 'BA' ? 'selected' : ''}>Bahia</option>
-                        <option value="CE" ${PEV.estado == 'CE' ? 'selected' : ''}>Ceará</option>
-                        <option value="DF" ${PEV.estado == 'DF' ? 'selected' : ''}>Distrito Federal</option>
-                        <option value="ES" ${PEV.estado == 'ES' ? 'selected' : ''}>Espírito Santo</option>
-                        <option value="GO" ${PEV.estado == 'GO' ? 'selected' : ''}>Goiás</option>
-                        <option value="MA" ${PEV.estado == 'MA' ? 'selected' : ''}>Maranhão</option>
-                        <option value="MT" ${PEV.estado == 'MT' ? 'selected' : ''}>Mato Grosso</option>
-                        <option value="MS" ${PEV.estado == 'MS' ? 'selected' : ''}>Mato Grosso do Sul</option>
-                        <option value="MG" ${PEV.estado == 'MG' ? 'selected' : ''}>Minas Gerais</option>
-                        <option value="PA" ${PEV.estado == 'PA' ? 'selected' : ''}>Pará</option>
-                        <option value="PB" ${PEV.estado == 'PB' ? 'selected' : ''}>Paraíba</option>
-                        <option value="PR" ${PEV.estado == 'PR' ? 'selected' : ''}>Paraná</option>
-                        <option value="PE" ${PEV.estado == 'PE' ? 'selected' : ''}>Pernambuco</option>
-                        <option value="PI" ${PEV.estado == 'PI' ? 'selected' : ''}>Piauí</option>
-                        <option value="RJ" ${PEV.estado == 'RJ' ? 'selected' : ''}>Rio de Janeiro</option>
-                        <option value="RN" ${PEV.estado == 'RN' ? 'selected' : ''}>Rio Grande do Norte</option>
-                        <option value="RS" ${PEV.estado == 'RS' ? 'selected' : ''}>Rio Grande do Sul</option>
-                        <option value="RO" ${PEV.estado == 'RO' ? 'selected' : ''}>Rondônia</option>
-                        <option value="RR" ${PEV.estado == 'RR' ? 'selected' : ''}>Roraima</option>
-                        <option value="SC" ${PEV.estado == 'SC' ? 'selected' : ''}>Santa Catarina</option>
-                        <option value="SP" ${PEV.estado == 'SP' ? 'selected' : ''}>São Paulo</option>
-                        <option value="SE" ${PEV.estado == 'SE' ? 'selected' : ''}>Sergipe</option>
-                        <option value="TO" ${PEV.estado == 'TO' ? 'selected' : ''}>Tocantins</option>
-                    </select>
+                    <label for="dt_aprovacao">Data de aprovação *</label>
+                    <input type="date" id="dt_aprovacao" name="dt_aprovacao" required>
                 </div>
 
+                <!-- endereco proprio deste cadastro -->
                 <div class="campo campo-completo">
-                    <label for="endereco">Endereço *</label>
-                    <input type="text" id="endereco" name="endereco" value="<c:out value='${PEV.endereco}'/>" required>
+                    <h2>Endereço</h2>
                 </div>
+                <div class="campo">
+                    <label for="endereco_cep">CEP *</label>
+                    <input type="text" id="endereco_cep" name="cep" maxlength="15" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_logradouro">Logradouro *</label>
+                    <input type="text" id="endereco_logradouro" name="logradouro" maxlength="200" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_numero">Número *</label>
+                    <input type="text" id="endereco_numero" name="numero" maxlength="20" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_complemento">Complemento</label>
+                    <input type="text" id="endereco_complemento" name="complemento" maxlength="100">
+                </div>
+                <div class="campo">
+                    <label for="endereco_bairro">Bairro *</label>
+                    <input type="text" id="endereco_bairro" name="bairro" maxlength="100" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_cidade">Cidade *</label>
+                    <input type="text" id="endereco_cidade" name="cidade" maxlength="100" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_estado">Estado *</label>
+                    <input type="text" id="endereco_estado" name="estado" maxlength="50" required>
+                </div>
+                <div class="campo">
+                    <label for="endereco_pais">País *</label>
+                    <input type="text" id="endereco_pais" name="pais" maxlength="50" required>
+                </div>
+
 
                 <div class="campo campo-completo">
                     <label for="status">Status *</label>
                     <select id="status" name="status" required>
-                        <option value="" selected disabled ${empty PEV.status ? 'selected' : ''}>Selecione o status</option>
+                        <option value="" disabled ${empty PEV.status ? 'selected' : ''}>Selecione o status</option>
                         <option value="ativo" ${PEV.status == 'ativo' ? 'selected' : ''}>Ativo</option>
                         <option value="inativo" ${PEV.status == 'inativo' ? 'selected' : ''}>Inativo</option>
                         <option value="pendente" ${PEV.status == 'pendente' ? 'selected' : ''}>Pendente</option>
@@ -107,7 +111,7 @@
                 <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/PEV/pev.jsp'">Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                    ${empty PEV.id ? 'Adicionar' : 'Salvar'}
+                    ${empty param.id ? 'Adicionar' : 'Salvar'}
                 </button>
 
             </div>
@@ -115,6 +119,8 @@
         </form>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>
