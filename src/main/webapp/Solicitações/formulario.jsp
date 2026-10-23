@@ -16,31 +16,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-api="${pageContext.request.contextPath}/solicitacoes-coleta" data-id="id_solicitacao">
 
     <main class="formulario">
 
         <!-- if para o título: se solicitacao.id estiver vazio, exibe 'Nova Solicitação de Coleta', senão exibe 'Editar Solicitação de Coleta' -->
-        <h1>${not empty solicitacao.id ? 'Nova Solicitação de Coleta' : 'Editar Solicitação de Coleta'}</h1>
+        <h1>${not empty param.id ? 'Editar Solicitação de Coleta' : 'Novo Solicitação de Coleta'}</h1>
 
 
         <!-- dados da solicitação -->
-        <form id="formSolicitacao" action="${pageContext.request.contextPath}/solicitacao" method="post">
+        <form id="formSolicitacao" action="${pageContext.request.contextPath}/solicitacoes-coleta" method="post" data-retorno="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">
 
             <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty solicitacao.id}">
-                <input type="hidden" name="id" value="${solicitacao.id}">
+            <c:if test = "${not empty param.id}">
+                <input type="hidden" name="id" value="${param.id}">
             </c:if>
 
             <div class="campos">
 
                 <div class="campo">
-                    <label for="empresa">Empresa solicitante *</label>
+                    <label for="empresa">Empresa solicitante (ID) *</label>
                     <input
-                        type="text"
+                        type="number"
                         id="empresa"
-                        name="empresa"
-                        value="<c:out value='${solicitacao.empresa}'/>"
+                        name="id_b2b"
+                        value="<c:out value='${solicitacao.id_b2b}'/>"
                         required
                     >
                 </div>
@@ -50,8 +50,8 @@
                     <input
                         type="date"
                         id="data"
-                        name="data"
-                        value="<c:out value='${solicitacao.data}'/>"
+                        name="dt_solicitacao"
+                        value="<c:out value='${solicitacao.dt_solicitacao}'/>"
                         required
                     >
                 </div>
@@ -64,10 +64,10 @@
                         <input
                             type="number"
                             id="volume"
-                            name="volume"
+                            name="litros_estimados"
                             min="0.1"
                             step="0.1"
-                            value="<c:out value='${solicitacao.volume}'/>"
+                            value="<c:out value='${solicitacao.litros_estimados}'/>"
                             required
                         >
                         <span>L</span>
@@ -77,7 +77,7 @@
                 <div class="campo campo-completo">
                     <label for="status">Status *</label>
                     <select id="status" name="status" required>
-                        <option value="" selected disabled ${empty solicitacao.status ? 'selected' : ''}>Selecione o status</option>
+                        <option value="" disabled ${empty solicitacao.status ? 'selected' : ''}>Selecione o status</option>
                         <option value="pendente" ${solicitacao.status == 'pendente' ? 'selected' : ''}>Pendente</option>
                         <option value="aprovada" ${solicitacao.status == 'aprovada' ? 'selected' : ''}>Aprovada</option>
                         <option value="em_andamento" ${solicitacao.status == 'em_andamento' ? 'selected' : ''}>Em andamento</option>
@@ -86,6 +86,16 @@
                     </select>
                 </div>
 
+
+                <div class="campo">
+                    <label for="id_pev">Ponto de coleta (ID) *</label>
+                    <input
+                        type="number"
+                        id="id_pev"
+                        name="id_pev"
+                        required
+                    >
+                </div>
             </div>
 
             <!-- botões do formulário -->
@@ -94,7 +104,7 @@
                 <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp'">Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                     ${empty solicitacao.id ? 'Adicionar' : 'Salvar'}
+                     ${empty param.id ? 'Adicionar' : 'Salvar'}
                 </button>
 
             </div>
@@ -102,6 +112,8 @@
         </form>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>

@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -29,7 +31,7 @@
             </button>
 
             <button class="excluir" type="button"
-                    data-url="${pageContext.request.contextPath}/solicitacoes" data-parametro="id_solicitacao"
+                    data-url="${pageContext.request.contextPath}/solicitacoes-coleta" data-parametro="id_solicitacao"
                     data-id="<c:out value='${param.id}'/>">
                 Excluir
             </button>
