@@ -16,19 +16,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-api="${pageContext.request.contextPath}/motoristas" data-id="id_motorista">
 
     <main class="formulario">
 
-        <h1>${not empty param.id ? 'Novo Motorista' : 'Editar Motorista'}</h1>
+        <h1>${not empty param.id ? 'Editar Motorista' : 'Novo Motorista'}</h1>
 
         <!-- dados do motorista -->
-        <form id="formMotorista" action="${pageContext.request.contextPath}/motorista" method="post">
+        <form id="formMotorista" action="${pageContext.request.contextPath}/motoristas" method="post" data-retorno="${pageContext.request.contextPath}/Motoristas/motoristas.jsp">
 
 
             <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty motorista.id}">
-                <input type="hidden" name="id" value="${motorista.id}">
+            <c:if test = "${not empty param.id}">
+                <input type="hidden" name="id" value="${param.id}">
             </c:if>
 
 
@@ -40,19 +40,18 @@
                         type="text"
                         id="nome"
                         name="nome"
-                        value="<c:out value='${motorista.nome}'/>"
+                        value="<c:out value='${motorista.nome}'/>" maxlength="150"
                         required
                     >
                 </div>
 
                 <div class="campo">
-                    <label for="email">E-mail *</label>
+                    <label for="cpf">CPF (opcional)</label>
                     <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="<c:out value='${motorista.email}'/>"
-                        required
+                        type="text"
+                        id="cpf"
+                        name="cpf"
+                        value="<c:out value='${motorista.cpf}'/>" maxlength="15"
                     >
                 </div>
 
@@ -62,18 +61,18 @@
                         type="text"
                         id="empresa"
                         name="empresa"
-                        value="<c:out value='${motorista.empresa}'/>"
+                        value="<c:out value='${motorista.empresa}'/>" maxlength="150"
                         required
                     >
                 </div>
 
                 <div class="campo">
-                    <label for="licenca">Licença (CNH) *</label>
+                    <label for="cnh">Licença (CNH) *</label>
                     <input
                         type="text"
-                        id="licenca"
-                        name="licenca"
-                        value="<c:out value='${motorista.licenca}'/>"
+                        id="cnh"
+                        name="cnh"
+                        value="<c:out value='${motorista.cnh}'/>" maxlength="20"
                         required
                     >
                 </div>
@@ -81,13 +80,23 @@
                 <div class="campo campo-completo">
                     <label for="status">Status *</label>
                     <select id="status" name="status" required>
-                        <option value="" selected disabled ${empty motorista.status ? 'selected' : ''}>Selecione o status</option>
+                        <option value="" disabled ${empty motorista.status ? 'selected' : ''}>Selecione o status</option>
                         <option value="ativo" ${motorista.status == 'ativo' ? 'selected' : ''}>Ativo</option>
                         <option value="inativo" ${motorista.status == 'inativo' ? 'selected' : ''}>Inativo</option>
                         <option value="pendente" ${motorista.status == 'pendente' ? 'selected' : ''}>Pendente</option>
                     </select>
                 </div>
 
+
+                <div class="campo">
+                    <label for="telefone">Telefone *</label>
+                    <input
+                        type="tel"
+                        id="telefone"
+                        name="telefone"
+                        required
+                     maxlength="30">
+                </div>
             </div>
 
             <!-- botões do formulário -->
@@ -96,7 +105,7 @@
                 <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/Motoristas/motoristas.jsp'">Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                    ${empty motorista.id ? 'Adicionar' : 'Salvar'}
+                    ${empty param.id ? 'Adicionar' : 'Salvar'}
                 </button>
 
             </div>
@@ -104,6 +113,8 @@
         </form>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>
