@@ -144,12 +144,13 @@ public class CertificadoSERVLET extends HttpServlet {
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
-
         try {
-            return Integer.parseInt(valor.trim());
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) throw new NumberFormatException();
+            return numero;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número inteiro.", e);
+                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
         }
     }
 
@@ -162,13 +163,13 @@ public class CertificadoSERVLET extends HttpServlet {
 
         try {
             double numero = Double.parseDouble(valor.trim());
-            if (Double.isNaN(numero) || Double.isInfinite(numero)) {
+            if (!Double.isFinite(numero) || numero < 0) {
                 throw new NumberFormatException();
             }
             return numero;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número válido.", e);
+                    "O parâmetro '" + nome + "' deve ser um número válido não negativo.", e);
         }
     }
 
@@ -187,9 +188,12 @@ public class CertificadoSERVLET extends HttpServlet {
             throw new IllegalArgumentException("A data de emissão é obrigatória.");
         }
 
+        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
+        }
         try {
             return LocalDate.parse(valor.trim());
-        } catch (Exception e) {
+        } catch (java.time.format.DateTimeParseException e) {
             throw new IllegalArgumentException(
                     "Data inválida. Use o formato yyyy-MM-dd.", e);
         }

@@ -11,10 +11,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @WebServlet("/empresas")
-// atende requisicoes http de empresa b dois b
+// atende requisicoes http de empresas B2B
 public class B2bSERVLET extends HttpServlet {
+
+    private static final Pattern CNPJ_PATTERN = Pattern.compile(
+            "\\d{14}|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
+    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
+            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
+    private static final Pattern TEXTO_EMPRESARIAL_PATTERN = Pattern.compile(
+            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&()/-]*");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private B2bDAO empresasDAO;
@@ -26,7 +34,7 @@ public class B2bSERVLET extends HttpServlet {
     }
 
     @Override
-    // consulta os registros de empresa b dois b e devolve a resposta json
+    // consulta os registros de empresas B2B e devolve a resposta json
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -68,14 +76,14 @@ public class B2bSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida os dados recebidos e cadastra empresa b dois b
+    // valida os dados recebidos e cadastra uma empresa B2B
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e cadastra empresa b dois b
+        // valida os campos da requisicao e cadastra uma empresa B2B
         try {
             empresasDAO.inserirB2b(criarEmpresa(request));
             // define o status de criacao e confirma o cadastro em json
@@ -93,14 +101,14 @@ public class B2bSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida os dados recebidos e atualiza empresa b dois b
+    // valida os dados recebidos e atualiza uma empresa B2B
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e atualiza empresa b dois b
+        // valida os campos da requisicao e atualiza empresa b2b
         try {
             int idUsuario = obterId(request);
             B2bModel empresa = criarEmpresa(request);
@@ -128,13 +136,13 @@ public class B2bSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida o identificador e remove empresa b dois b
+    // valida o identificador e remove empresa b2b
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida o identificador da requisicao e remove empresa b dois b
+        // valida o identificador da requisicao e remove empresa b doib
         try {
             empresasDAO.deletarB2b(obterId(request));
             // define o status de exclusao e confirma a remocao em json
@@ -154,10 +162,14 @@ public class B2bSERVLET extends HttpServlet {
     // monta os dados da empresa com os campos obrigatorios da requisicao
     private B2bModel criarEmpresa(HttpServletRequest request) {
         return new B2bModel(
-                obterParametroObrigatorio(request, "cnpj"),
-                obterParametroObrigatorio(request, "razao_social"),
-                obterParametroObrigatorio(request, "nome_fantasia"),
-                obterParametroObrigatorio(request, "telefone"),
+                validarFormato(obterParametroObrigatorio(request, "cnpj"), CNPJ_PATTERN,
+                        "CNPJ inválido. Informe 14 dígitos, com ou sem pontuação."),
+                validarFormato(obterParametroObrigatorio(request, "razao_social"),
+                        TEXTO_EMPRESARIAL_PATTERN, "Razão social contém caracteres inválidos."),
+                validarFormato(obterParametroObrigatorio(request, "nome_fantasia"),
+                        TEXTO_EMPRESARIAL_PATTERN, "Nome fantasia contém caracteres inválidos."),
+                validarFormato(obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
+                        "Telefone inválido. Informe DDD e um telefone brasileiro válido."),
                 obterIdEndereco(request)
         );
     }
@@ -175,19 +187,23 @@ public class B2bSERVLET extends HttpServlet {
     // valida e converte um parametro obrigatorio para inteiro
     private int obterInteiroObrigatorio(HttpServletRequest request, String nome, String descricao) {
         String valor = request.getParameter(nome);
-
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException(descricao + " é obrigatório.");
         }
-
-        // valida e converte os dados recebidos antes de usa los
         try {
-            return Integer.parseInt(valor.trim());
-        // converte erro de conversao em uma validacao clara do parametro
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) throw new NumberFormatException();
+            return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(descricao + " inválido.", e);
+            throw new IllegalArgumentException(descricao + " deve ser um inteiro positivo.", e);
         }
+    }
+
+    private String validarFormato(String valor, Pattern padrao, String mensagem) {
+        if (!padrao.matcher(valor).matches()) {
+            throw new IllegalArgumentException(mensagem);
+        }
+        return valor;
     }
 
     // valida e devolve um parametro de texto obrigatorio
