@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/b2c")
+@WebServlet("/b2c-usuarios")
 // atende requisicoes http de usuario b dois c
 public class B2cSERVLET extends HttpServlet {
 
@@ -70,7 +70,6 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra usuario b dois c
         try {
@@ -95,7 +94,6 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza usuario b dois c
         try {
@@ -151,7 +149,7 @@ public class B2cSERVLET extends HttpServlet {
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
 
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
+        // rejeita a requisicao quando o parametro obrigatorio esta ausente.
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
@@ -200,26 +198,20 @@ public class B2cSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        StringBuilder escaped = new StringBuilder();
-        String value = texto == null ? "" : texto;
-        for (int i = 0; i < value.length(); i++) {
-            char character = value.charAt(i);
-            switch (character) {
-                case '"': escaped.append("\\\""); break;
-                case '\\': escaped.append("\\\\"); break;
-                case '\b': escaped.append("\\b"); break;
-                case '\f': escaped.append("\\f"); break;
-                case '\n': escaped.append("\\n"); break;
-                case '\r': escaped.append("\\r"); break;
-                case '\t': escaped.append("\\t"); break;
-                default:
-                    if (character < 0x20) {
-                        escaped.append(String.format("\\u%04x", (int) character));
-                    } else {
-                        escaped.append(character);
-                    }
-            }
+        // devolve texto vazio quando o valor recebido e nulo
+        if (texto == null) {
+
+            return "";
         }
-        return escaped.toString();
+
+
+        return texto
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f");
     }
 }
