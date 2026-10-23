@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body>
+<body data-api="${pageContext.request.contextPath}/usuarios" data-id="id_usuario" data-base="${pageContext.request.contextPath}/Usuarios" data-columns="nome,email,telefone,tipo_usuario,primeiro_registro,id_usuario">
 
     <aside class="menu">
 
@@ -27,14 +27,14 @@
          <div class="caixa"></div>
 
         <nav>
-            <a href="${pageContext.request.contextPath}/adm.html">Dashboard</a>
-            <a href="${pageContext.request.contextPath}/empresas.html">Empresas</a>
-            <a href="${pageContext.request.contextPath}/usuarios.html" class="ativo">Usuários</a>
-            <a href="${pageContext.request.contextPath}/pev.html">PEV</a>
-            <a href="${pageContext.request.contextPath}/motoristas.html">Motoristas</a>
-            <a href="${pageContext.request.contextPath}/solicitacoes.html">Solicitações de coleta</a>
-            <a href="${pageContext.request.contextPath}/coletas.html">Coletas realizadas</a>
-            <a href="${pageContext.request.contextPath}/certificados.html">Certificados</a>
+            <a href="${pageContext.request.contextPath}/index.jsp">Dashboard</a>
+            <a href="${pageContext.request.contextPath}/Empresas/empresa.jsp">Empresas</a>
+            <a href="${pageContext.request.contextPath}/Usuarios/usuarios.jsp" class="ativo">Usuários</a>
+            <a href="${pageContext.request.contextPath}/PEV/pev.jsp">PEV</a>
+            <a href="${pageContext.request.contextPath}/Motoristas/motoristas.jsp">Motoristas</a>
+            <a href="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">Solicitações de coleta</a>
+            <a href="${pageContext.request.contextPath}/Coletas/coletas.jsp">Coletas realizadas</a>
+            <a href="${pageContext.request.contextPath}/Certificados/certificados.jsp">Certificados</a>
         </nav>
 
     </aside>
@@ -44,7 +44,7 @@
         <header class="topo">
             <h1>Usuários</h1>
 
-            <button class="adicionar" type="button" onclick="window.location.href='${pageContext.request.contextPath}/Certificados/formulario.jsp>'">
+            <button class="adicionar" type="button" onclick="window.location.href='${pageContext.request.contextPath}/Usuarios/formulario.jsp'">
                 + Adicionar Usuário
             </button>
         </header>
@@ -58,22 +58,22 @@
                         <th>E-mail</th>
                         <th>Telefone</th>
                         <th>Tipo de usuário</th>
-                        <th>Endereço</th>
-                        <th>Status</th>
+                        <th>Primeiro registro</th>
+                        <th>Usuário (ID)</th>
                         <th></th>
                     </tr>
                 </thead>
 
                 <tbody>
 
-                    <c: forEach var="usuário" items ="${usuarios}">
+                    <c:forEach var="usuario" items ="${usuarios}">
                         <tr>
-                            <td><c:out value="${usuário.nome}"/></td>
-                            <td><c:out value="${usuário.email}"/></td>
-                            <td><c:out value="${usuário.telefone}"/></td>
-                            <td><c:out value="${usuário.tipoUsuario}"/></td>
-                            <td><c:out value="${usuário.endereco}"/></td>
-                            <td><c:out value="${usuário.status}"/></td>
+                            <td><c:out value="${usuario.nome}"/></td>
+                            <td><c:out value="${usuario.email}"/></td>
+                            <td><c:out value="${usuario.telefone}"/></td>
+                            <td><c:out value="${usuario.tipoUsuario}"/></td>
+                            <td><c:out value="${usuario.primeiroRegistro}"/></td>
+                            <td><c:out value="${usuario.id_usuario}"/></td>
                             <td class="acoes">
                                 <button class="editar" title="Editar" type="button" onclick="window.location.href='${pageContext.request.contextPath}/Usuarios/formulario.jsp?id=${usuario.id_usuario}'">
                                     <i class="fa-regular fa-pen-to-square"></i>
@@ -85,7 +85,7 @@
                             </td>
                         </tr>
 
-                    </c: forEach>
+                    </c:forEach>
 
                 </tbody>
             </table>
@@ -93,6 +93,8 @@
         </section>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>

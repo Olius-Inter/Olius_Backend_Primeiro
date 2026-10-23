@@ -16,31 +16,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-api="${pageContext.request.contextPath}/usuarios" data-id="id_usuario">
 
     <main class="formulario">
 
-        <h1>${empty usuario.id ? 'Novo Usuário' : 'Editar Usuário'}</h1>
+        <h1>${not empty param.id ? 'Editar Usuário' : 'Novo Usuário'}</h1>
 
 
         <!-- dados do usuário -->
-        <form id="formUsuario" action="${pageContext.request.contextPath}/PEV" method="post">
+        <form id="formUsuario" action="${pageContext.request.contextPath}/usuarios" method="post" data-retorno="${pageContext.request.contextPath}/Usuarios/usuarios.jsp">
 
             <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty usuario.id}">
-                <input type="hidden" name="id" value="${usuario.id}">
+            <c:if test = "${not empty param.id}">
+                <input type="hidden" name="id" value="${param.id}">
             </c:if>
 
             <div class="campos">
 
                 <div class="campo">
                     <label for="nome">Nome *</label>
-                    <input type="text" id="nome" name="nome" value="<c:out value='${usuario.nome}'/>" required>
+                    <input type="text" id="nome" name="nome" maxlength="255" value="<c:out value='${usuario.nome}'/>" required>
                 </div>
 
                 <div class="campo">
                     <label for="email">E-mail *</label>
-                    <input type="email" id="email" name="email" value="<c:out value='${usuario.email}'/>" required>
+                    <input type="email" id="email" name="email" value="<c:out value='${usuario.email}'/>" maxlength="255" required>
                 </div>
 
                 <div class="campo">
@@ -50,28 +50,22 @@
 
                 <div class="campo">
                     <label for="tipoUsuario">Tipo de usuário *</label>
-                    <select id="tipoUsuario" name="tipoUsuario" required>
-                        <option value="" selected disabled ${empty usuario.tipoUsuario ? 'selected' : ''}>Selecione o tipo</option>
+                    <select id="tipoUsuario" name="tipo_usuario" required>
+                        <option value="" disabled ${empty usuario.tipoUsuario ? 'selected' : ''}>Selecione o tipo</option>
                         <option value="B2B" ${usuario.tipoUsuario == 'B2B' ? 'selected' : ''}>B2B - Empresa</option>
                         <option value="B2C" ${usuario.tipoUsuario == 'B2C' ? 'selected' : ''}>B2C - Usuário comum</option>
                     </select>
                 </div>
 
                 <div class="campo campo-completo">
-                    <label for="endereco">Endereço *</label>
-                    <input type="text" id="endereco" name="endereco" required>
+                    <label for="endereco">Primeiro registro *</label>
+                    <input type="date" id="endereco" name="primeiro_registro" required>
                 </div>
 
                 <div class="campo campo-completo">
-                    <label for="status">Status *</label>
-                    <select id="status" name="status" value="<c:out value='${usuario.status}'/>" required>
-                        <option value="" selected disabled>Selecione o status</option>
-                        <option value="ativo" ${usuario.status == 'ativo' ? 'selected' : ''}>Ativo</option>
-                        <option value="inativo" ${usuario.status == 'inativo' ? 'selected' : ''}>Inativo</option>
-                        <option value="pendente" ${usuario.status == 'pendente' ? 'selected' : ''}>Pendente</option>
-                    </select>
+                    <label for="status">Senha *</label>
+                    <input type="password" id="status" name="senha" required maxlength="18">
                 </div>
-
             </div>
 
             <!-- botões do formulário -->
@@ -80,7 +74,7 @@
                 <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/Usuarios/usuarios.jsp'">Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                     ${empty usuario.id ? 'Adicionar' : 'Salvar'}
+                     ${empty param.id ? 'Adicionar' : 'Salvar'}
                 </button>
 
             </div>
@@ -88,6 +82,8 @@
         </form>
 
     </main>
+
+    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 
 </body>
 </html>
