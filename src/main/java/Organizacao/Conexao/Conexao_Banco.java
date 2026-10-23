@@ -32,15 +32,14 @@ public class Conexao_Banco {
         } catch (ClassNotFoundException erro) {
 
             System.out.println("Driver não localizado");
-            erro.printStackTrace();
+            throw new IllegalStateException("Driver não localizado.", erro);
 
         // trata falhas ao abrir a conexao ou executar operacoes sql
         } catch (SQLException erro) {
             System.out.println("Erro ao conectar com o banco");
-            erro.printStackTrace();
+            throw new IllegalStateException("Não foi possível conectar ao banco de dados. Confira as variáveis de ambiente do Tomcat.", erro);
         }
 
-        // informa que nenhuma conexao pode ser devolvida
-        return null;
+
     }
 }
