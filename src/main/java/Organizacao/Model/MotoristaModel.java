@@ -1,98 +1,81 @@
 package Organizacao.Model;
 
+import Organizacao.Model.Enum.StatusMotorista;
 
-// representa os dados da entidade motorista
 public class MotoristaModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_motorista;
-    private String nome;
-    private String cpf;
+    // Atributos
+    private int idMotorista;
+    private StatusMotorista status;
+    private String empresaResp;
     private String telefone;
-    private String cnh;
-    private String empresa;
-    private String status;
+    private String nome;
+    private String licenca;
 
-    // inicializa os dados de motorista
-    public MotoristaModel(String nome, String cpf,
-                          String telefone, String cnh,
-                          String empresa, String status) {
-
-        this.nome = nome;
-        this.cpf = cpf;
+    // Construtores
+    public MotoristaModel(StatusMotorista status, String empresaResp, String telefone, String nome, String licenca) {
+        this.status = status;
+        this.empresaResp = empresaResp;
         this.telefone = telefone;
-        this.cnh = cnh;
-        this.empresa = empresa;
+        this.nome = nome;
+        this.licenca = licenca;
+    }
+
+    public MotoristaModel(int idMotorista, StatusMotorista status, String empresaResp, String telefone, String nome, String licenca) {
+        this.idMotorista = idMotorista;
+        this.status = status;
+        this.empresaResp = empresaResp;
+        this.telefone = telefone;
+        this.nome = nome;
+        this.licenca = licenca;
+    }
+
+    // Getters e Setters
+    public int getIdMotorista() {
+        return idMotorista;
+    }
+
+    public void setIdMotorista(int idMotorista) {
+        this.idMotorista = idMotorista;
+    }
+
+    public StatusMotorista getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusMotorista status) {
         this.status = status;
     }
 
-    // retorna o valor de id motorista
-    public int getId_motorista() {
-        return id_motorista;
+    public String getEmpresaResp() {
+        return empresaResp;
     }
 
-    // atualiza o valor de id motorista
-    public void setId_motorista(int id_motorista) {
-        this.id_motorista = id_motorista;
+    public void setEmpresaResp(String empresaResp) {
+        this.empresaResp = empresaResp;
     }
 
-    // retorna o valor de nome
-    public String getNome() {
-        return nome;
-    }
-
-    // retorna o valor de cpf
-    public String getCpf() {
-        return cpf;
-    }
-
-    // retorna o valor de telefone
     public String getTelefone() {
         return telefone;
     }
 
-    // retorna o valor de cnh
-    public String getCnh() {
-        return cnh;
-    }
-
-    // retorna o valor de empresa
-    public String getEmpresa() {
-        return empresa;
-    }
-
-    // retorna o valor de status
-    public String getStatus() {
-        return status;
-    }
-
-    // atualiza o valor de nome
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    // atualiza o valor de cpf
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    // atualiza o valor de telefone
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
 
-    // atualiza o valor de cnh
-    public void setCnh(String cnh) {
-        this.cnh = cnh;
+    public String getNome() {
+        return nome;
     }
 
-    // atualiza o valor de empresa
-    public void setEmpresa(String empresa) {
-        this.empresa = empresa;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    // atualiza o valor de status
-    public void setStatus(String status) {
-        this.status = status;
+    public String getLicenca() {
+        return licenca;
+    }
+
+    public void setLicenca(String licenca) {
+        this.licenca = licenca;
     }
 }

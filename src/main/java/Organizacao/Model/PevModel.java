@@ -1,100 +1,61 @@
 package Organizacao.Model;
 
+import Organizacao.Model.Enum.StatusPev;
+
 import java.time.LocalDate;
 
-
-// representa os dados da entidade ponto de entrega voluntaria
 public class PevModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_pev;
-    private int id_endereco;
-    private int id_usuario_b2b;
-    private int id_usuario_b2c;
-    private String qr_code;
-    private String status;
-    private LocalDate dt_aprovacao;
+    // Atributos
+    private int idPev;
+    private StatusPev status;
+    private LocalDate dtAprovacao;
+    private int idUsuario;
 
-    // inicializa os dados de ponto de entrega voluntaria com identificador
-    public PevModel(int id_endereco, int id_usuario_b2b,
-                    int id_usuario_b2c, String qr_code,
-                    String status, LocalDate dt_aprovacao) {
-
-        this.id_endereco = id_endereco;
-        this.id_usuario_b2b = id_usuario_b2b;
-        this.id_usuario_b2c = id_usuario_b2c;
-        this.qr_code = qr_code;
+    // Construtores
+    public PevModel(StatusPev status, LocalDate dtAprovacao, int idUsuario) {
         this.status = status;
-        this.dt_aprovacao = dt_aprovacao;
+        this.dtAprovacao = dtAprovacao;
+        this.idUsuario = idUsuario;
     }
 
-    // retorna o valor de id pev
-    public int getId_pev() {
-        return id_pev;
+    public PevModel(int idPev, StatusPev status, LocalDate dtAprovacao, int idUsuario) {
+        this.idPev = idPev;
+        this.status = status;
+        this.dtAprovacao = dtAprovacao;
+        this.idUsuario = idUsuario;
     }
 
-    // atualiza o valor de id pev
-    public void setId_pev(int id_pev) {
-        this.id_pev = id_pev;
+    // Getters e Setters
+    public int getIdPev() {
+        return idPev;
     }
 
-    // retorna o valor de id endereco
-    public int getId_endereco() {
-        return id_endereco;
+    public void setIdPev(int idPev) {
+        this.idPev = idPev;
     }
 
-    // retorna o valor de id usuario b b
-    public int getId_usuario_b2b() {
-        return id_usuario_b2b;
-    }
-
-    // retorna o valor de id usuario b c
-    public int getId_usuario_b2c() {
-        return id_usuario_b2c;
-    }
-
-    // retorna o valor de qr code
-    public String getQr_code() {
-        return qr_code;
-    }
-
-    // retorna o valor de status
-    public String getStatus() {
+    public StatusPev getStatus() {
         return status;
     }
 
-    // retorna o valor de dt aprovacao
-    public LocalDate getDt_aprovacao() {
-        return dt_aprovacao;
-    }
-
-    // atualiza o valor de id endereco
-    public void setId_endereco(int id_endereco) {
-        this.id_endereco = id_endereco;
-    }
-
-    // atualiza o valor de id usuario b b
-    public void setId_usuario_b2b(int id_usuario_b2b) {
-        this.id_usuario_b2b = id_usuario_b2b;
-    }
-
-    // atualiza o valor de id usuario b c
-    public void setId_usuario_b2c(int id_usuario_b2c) {
-        this.id_usuario_b2c = id_usuario_b2c;
-    }
-
-    // atualiza o valor de qr code
-    public void setQr_code(String qr_code) {
-        this.qr_code = qr_code;
-    }
-
-    // atualiza o valor de status
-    public void setStatus(String status) {
+    public void setStatus(StatusPev status) {
         this.status = status;
     }
 
-    // atualiza o valor de dt aprovacao
-    public void setDt_aprovacao(LocalDate dt_aprovacao) {
-        this.dt_aprovacao = dt_aprovacao;
+    public LocalDate getDtAprovacao() {
+        return dtAprovacao;
+    }
+
+    public void setDtAprovacao(LocalDate dtAprovacao) {
+        this.dtAprovacao = dtAprovacao;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 }
