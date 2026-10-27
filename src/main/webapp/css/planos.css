@@ -1,0 +1,253 @@
+/* ========================================================================== 
+   1. CONFIGURAÇÕES GERAIS E PREVENÇÃO DE OVERFLOW
+   ========================================================================== */
+html, body {
+    overflow-x: hidden; /* Elimina a barra de rolagem horizontal de forma definitiva */
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* ========================================================================== 
+   2. SEÇÃO HERO DA PÁGINA DE PLANOS (.planos-hero)
+   ========================================================================== */
+
+/* Seção base do hero */
+.hero-section {
+    position: relative;
+    background-color: #fcf5e6; /* Cor bege base */
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden; /* Garante que elementos filhos absolutos não vazem */
+}
+
+/* Mancha amarela desfocada (Efeito de brilho no canto superior direito) */
+.luz-amarela {
+    position: absolute;
+    top: -150px;             /* Sobe um pouco para fora da tela */
+    right: -100px;           /* Ajustado para limitar o transbordo */
+    left: auto;              /* Reseta o alinhamento da esquerda */
+    width: 500px;            /* Largura ajustada */
+    height: 500px;           /* Altura ajustada */
+    background-color: #fdb705; 
+    opacity: 0.4;            /* Transparência suave */
+    border-radius: 50%;      /* Forma circular */
+    filter: blur(100px);     /* Desfoca para criar o efeito de brilho */
+    pointer-events: none;    /* Não interfere nos cliques */
+    z-index: 0;              /* Fica por trás do texto e do logo */
+}
+
+/* Garante que o conteúdo e o logo fiquem sobrepostos ao brilho */
+.header, 
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Bloco principal do Hero com imagem de fundo */
+.planos-hero {
+    position: relative;
+    max-width: 1440px;
+    width: 100%;
+    margin: 40px auto 30px;
+    padding: 60px 80px 30px;
+    background-image: url('../assets/planos/oleo.png');
+    background-repeat: no-repeat;
+    background-position: top right; /* Posiciona a onda de óleo no canto superior direito */
+    background-size: contain;      /* Ajusta o tamanho proporcionalmente */
+}
+
+.hero-texto h1 {
+    font-size: 38px;
+    font-weight: 700;
+    max-width: 700px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.highlight {
+    color: #febd02; /* Palavra em destaque */
+}
+
+.hero-texto p {
+    font-size: 15px;
+    color: #666666;
+    max-width: 500px;
+}
+
+/* ========================================================================== 
+   3. SEÇÃO DE CARDS DE PLANOS (.planos-container)
+   ========================================================================== */
+
+/* Container flexível dos cards */
+.planos-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Deixa todos os cards alinhados na mesma altura */
+    gap: 30px;
+    max-width: 1280px;
+    width: 100%;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Estrutura base do cartão do plano */
+.plano-card {
+    background-color: #fefefe;
+    border-radius: 21px;
+    padding: 40px 30px;
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-width: 380px;
+    transition: transform 0.3s ease;
+}
+
+.plano-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Card em Destaque (Plano Profissional) */
+.plano-destaque {
+    background-color: #faf5ec;
+    border: 4px solid #fdb705;
+    padding: 48px 30px;
+}
+
+/* Cabeçalho do Card */
+.plano-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.plano-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+}
+
+.plano-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.plano-descricao {
+    font-size: 12px;
+    color: #666666;
+    min-height: 36px;
+}
+
+/* Bloco de Valor / Preço */
+.plano-preco {
+    background-color: rgba(253, 183, 5, 0.12);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.plano-preco .moeda {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.plano-preco .valor {
+    font-size: 36px;
+    font-weight: 700;
+    color: #febd02;
+    margin: 0 2px;
+}
+
+.plano-preco .periodo {
+    font-size: 14px;
+    color: #666666;
+}
+
+/* Lista de Recursos e Vantagens */
+.plano-recursos {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    flex-grow: 1;
+}
+
+.plano-recursos li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e3d6d6;
+    color: #333333;
+}
+
+.plano-recursos li:last-child {
+    border-bottom: none;
+}
+
+.plano-recursos img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Botões de Assinatura */
+.btn-plano {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+/* Botão Secundário / Contorno */
+.btn-outline {
+    background-color: #fffde4;
+    border: 2px solid #febe04;
+    color: #161a1c;
+}
+
+.btn-outline:hover {
+    background-color: #fdb705;
+    color: #ffffff;
+}
+
+/* Botão Preenchido / Destaque */
+.btn-filled {
+    background-color: #fdb803;
+    color: #161a1c;
+}
+
+.btn-filled:hover {
+    background-color: #e0a100;
+}
+
+/* ========================================================================== 
+   4. RESPONSIVIDADE (TABLET / MOBILE)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .planos-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .plano-card {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .planos-hero {
+        padding: 40px 30px;
+        background-size: cover;
+    }
+}

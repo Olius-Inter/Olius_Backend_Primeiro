@@ -1,0 +1,284 @@
+/* ========================================================================== 
+   1. VARIÁVEIS GLOBAIS & RESET CSS
+   ========================================================================== */
+
+:root {
+    --primary-color: #FEBD1D;      /* Cor primária (Amarelo/Dourado) */
+    --primary-hover: #FC9000;      /* Cor para efeito hover/destaque */
+    --bg-light: #FCF5E6;           /* Fundo geral da página (Tom bege suave) */
+    --text-color: #333333;         /* Cor do texto principal */
+    --text-muted: #666666;         /* Cor dos subtítulos e textos secundários */
+    --font-main: 'Poppins', sans-serif;
+}
+
+/* Reset Universal: Remove margens/paddings padrão e padroniza o cálculo de tamanhos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Configurações globais do corpo da página */
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+
+/* ========================================================================== 
+   2. CABEÇALHO (.header)
+   ========================================================================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background-color: #ffffff;
+}
+
+/* Estrutura do Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    height: 35px;
+}
+
+.logo-texto {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Links de Navegação */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+/* Botão de Destaque no Cabeçalho */
+.btn-agendar {
+    background-color: var(--primary-color);
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-agendar:hover {
+    background-color: var(--primary-hover);
+}
+
+
+/* ==========================================================================
+   3. CTA BANNER (.cta-banner) - Com respingo ultrapassando a borda e botão ajustado
+   ========================================================================== */
+.cta-banner {
+    position: relative;
+    background-color: #fdb705;
+    padding: 60px 80px;
+    margin: 80px auto -60px auto; /* Aumenta o margin-top para dar espaço à gota no topo */
+    max-width: 1400px;
+    width: 92%;
+    border-radius: 32px 32px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: visible; /* IMPORTANTE: Permite que a gota saia para fora do retângulo amarelo */
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+/* Conteúdo de Texto do CTA */
+.cta-conteudo {
+    max-width: 500px;
+    text-align: left;
+    position: relative;
+    z-index: 3;
+}
+
+.cta-conteudo h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 12px;
+}
+
+.cta-conteudo p {
+    font-size: 1.1rem;
+    color: #111111;
+    line-height: 1.5;
+}
+
+/* Botão CTA (Ajustado mais para a esquerda via margem) */
+.btn-cta {
+    background-color: #FFFDF0;
+    color: #000000;
+    padding: 18px 40px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    position: relative;
+    z-index: 4; /* Fica acima de tudo para poder ser clicado facilmente */
+    margin-right: 400px; /* Empurra o botão mais para a esquerda */
+    transition: all 0.2s ease;
+}
+
+.btn-cta:hover {
+    background-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Posicionamento do Respingo de Óleo (Saindo para cima) */
+.cta-imagem-oleo {
+    position: absolute;
+    right: 1px;
+    top: -30px; /* Valor negativo faz a gota ultrapassar a borda amarela no topo */
+    height: 100%; /* Aumenta a altura para subir além do limite */
+    width: auto;
+    object-fit: contain;
+    z-index: 2;
+    pointer-events: none; /* Evita que a imagem bloqueie os cliques */
+}
+
+
+/* ==========================================================================
+   4. RODAPÉ (.footer) - Sobrepõe a parte inferior do CTA
+   ========================================================================== */
+.footer {
+    background-color: #181C1E;
+    color: #ffffff;
+    padding: 100px 5% 40px;
+    position: relative;
+    z-index: 2; /* Camada SUPERIOR: a faixa preta passa por cima da base do CTA */
+}
+
+/* Grid de 4 colunas */
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1.5fr;
+    gap: 35px;
+    align-items: start;
+}
+
+/* Coluna 1: Marca & Logo */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.footer-brand .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.footer-brand .logo-icon {
+    height: 34px;
+    width: auto;
+    display: block;
+}
+
+.footer-brand .logo-texto {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.footer-brand .tagline {
+    color: #cccccc;
+    font-size: 0.9rem;
+    margin-top: 2px;
+}
+
+/* Títulos das colunas do rodapé */
+.footer h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 16px;
+}
+
+/* Listas do Rodapé */
+.footer-links ul, 
+.footer-contato ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li,
+.footer-contato li {
+    margin-bottom: 8px;
+}
+
+.footer-links a,
+.footer-contato a,
+.footer-contato span {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover,
+.footer-contato a:hover {
+    color: #fdb705;
+}
+
+/* Coluna de Propósito e Acesso ADM */
+.footer-proposito h4 {
+    color: #fdb705; /* Amarelo de destaque no título */
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 18px;
+}
+
+.footer-proposito .copyright {
+    font-size: 0.75rem;
+    color: #888888;
+    margin-top: 12px;
+    display: block;
+}
+
+.footer-proposito .acesso-adm {
+    font-size: 0.7rem;
+    color: #666666;
+    text-decoration: none;
+    margin-top: 6px;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.footer-proposito .acesso-adm:hover {
+    color: #ffffff;
+}
