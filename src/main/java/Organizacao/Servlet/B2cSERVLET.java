@@ -13,13 +13,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
-<<<<<<< HEAD
-@WebServlet("/b2c-usuarios")
-// atende requisicoes http de usuario b dois c
-=======
 @WebServlet("/b2c")
 // atende requisicoes http de clientes B2C
->>>>>>> 051a540d2df5bb2e9853529f555660d2204c5b95
 public class B2cSERVLET extends HttpServlet {
 
     private static final Pattern CPF_PATTERN = Pattern.compile(
@@ -81,6 +76,7 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra um cliente B2C
         try {
@@ -105,6 +101,7 @@ public class B2cSERVLET extends HttpServlet {
             throws ServletException, IOException {
 
         prepararResposta(response);
+        request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e atualiza um cliente B2C
         try {
@@ -214,20 +211,26 @@ public class B2cSERVLET extends HttpServlet {
 
     // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        // devolve texto vazio quando o valor recebido e nulo
-        if (texto == null) {
-
-            return "";
+        StringBuilder escaped = new StringBuilder();
+        String value = texto == null ? "" : texto;
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            switch (character) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    if (character < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) character));
+                    } else {
+                        escaped.append(character);
+                    }
+            }
         }
-
-
-        return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\f", "\\f");
+        return escaped.toString();
     }
 }

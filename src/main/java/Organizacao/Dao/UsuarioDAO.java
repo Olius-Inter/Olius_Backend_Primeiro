@@ -126,4 +126,34 @@ public class UsuarioDAO {
             throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
         }
     }
+
+    // busca um usuario pelo e-mail informado no login (devolve null quando nao existe)
+    public UsuarioModel buscarPorEmail(String email) throws Exception {
+        // define a consulta sql de leitura por e-mail
+        String sql = "SELECT * FROM usuario WHERE LOWER(email) = LOWER(?)";
+
+        // abre a conexao e executa a consulta com fechamento automatico
+        try (Connection conn = Conexao_Banco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                // converte a linha encontrada em usuario
+                if (rs.next()) {
+                    return new UsuarioModel(
+                            rs.getInt("id_usuario"),
+                            rs.getString("nome"),
+                            rs.getString("email"),
+                            rs.getString("senha"),
+                            rs.getDate("primeiro_registro"),
+                            rs.getString("tipo_usuario"),
+                            rs.getString("telefone")
+                    );
+                }
+            }
+        }
+        // nenhum usuario com esse e-mail
+        return null;
+    }
 }
