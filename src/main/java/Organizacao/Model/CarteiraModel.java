@@ -1,80 +1,38 @@
 package Organizacao.Model;
 
-
-// representa os dados da entidade carteira de pontos
+// Carteira de pontos: pertence a um cliente B2C ou a uma empresa B2B (nunca aos dois)
 public class CarteiraModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_carteira;
-    private int pontuacao;
-    private String patente;
-    private String nivel;
-    private int id_b2c;
+    private int idCarteira;
+    private int pontosTotais;
+    private String patente;   // Ouro, Prata ou Bronze
+    private int nivel;
+    private Integer idB2c;    // null quando a carteira é de empresa
+    private Integer idB2b;    // null quando a carteira é de cliente
 
-    // inicializa os dados de carteira de pontos com identificador
-    public CarteiraModel(int pontuacao, String patente, String nivel, int id_b2c) {
-        this.pontuacao = pontuacao;
+    public CarteiraModel(int pontosTotais, String patente, int nivel, Integer idB2c, Integer idB2b) {
+        this.pontosTotais = pontosTotais;
         this.patente = patente;
         this.nivel = nivel;
-        this.id_b2c = id_b2c;
+        this.idB2c = idB2c;
+        this.idB2b = idB2b;
     }
 
-    // inicializa os dados de carteira de pontos com identificador
-    public CarteiraModel(int id_carteira, int pontuacao, String patente, String nivel, int id_b2c) {
-        this.id_carteira = id_carteira;
-        this.pontuacao = pontuacao;
-        this.patente = patente;
-        this.nivel = nivel;
-        this.id_b2c = id_b2c;
+    public CarteiraModel(int idCarteira, int pontosTotais, String patente, int nivel, Integer idB2c, Integer idB2b) {
+        this(pontosTotais, patente, nivel, idB2c, idB2b);
+        this.idCarteira = idCarteira;
     }
 
-    // retorna o valor de id carteira
-    public int getId_carteira() {
-        return id_carteira;
-    }
-
-    // retorna o valor de pontuacao
-    public int getPontuacao() {
-        return pontuacao;
-    }
-
-    // retorna o valor de patente
-    public String getPatente() {
-        return patente;
-    }
-
-    // retorna o valor de nivel
-    public String getNivel() {
-        return nivel;
-    }
-
-    // retorna o valor de id b c
-    public int getId_b2c() {
-        return id_b2c;
-    }
-
-    // atualiza o valor de id carteira
-    public void setId_carteira(int id_carteira) {
-        this.id_carteira = id_carteira;
-    }
-
-    // atualiza o valor de pontuacao
-    public void setPontuacao(int pontuacao) {
-        this.pontuacao = pontuacao;
-    }
-
-    // atualiza o valor de patente
-    public void setPatente(String patente) {
-        this.patente = patente;
-    }
-
-    // atualiza o valor de nivel
-    public void setNivel(String nivel) {
-        this.nivel = nivel;
-    }
-
-    // atualiza o valor de id b c
-    public void setId_b2c(int id_b2c) {
-        this.id_b2c = id_b2c;
-    }
+    public int getIdCarteira() { return idCarteira; }
+    public void setIdCarteira(int idCarteira) { this.idCarteira = idCarteira; }
+    public int getPontosTotais() { return pontosTotais; }
+    public void setPontosTotais(int pontosTotais) { this.pontosTotais = pontosTotais; }
+    public String getPatente() { return patente; }
+    public void setPatente(String patente) { this.patente = patente; }
+    public int getNivel() { return nivel; }
+    public void setNivel(int nivel) { this.nivel = nivel; }
+    public Integer getIdB2c() { return idB2c; }
+    public void setIdB2c(Integer idB2c) { this.idB2c = idB2c; }
+    public Integer getIdB2b() { return idB2b; }
+    public void setIdB2b(Integer idB2b) { this.idB2b = idB2b; }
 }

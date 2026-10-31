@@ -1,90 +1,37 @@
 package Organizacao.Model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
-// representa os dados da entidade entrega em ponto voluntario
+// Entrega de óleo feita por um cliente B2C em um ponto de entrega (PEV)
 public class EntregaPevModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_entrega;
-    private int id_usuario_b2c;
-    private int id_pev;
-    private double qtd_litros;
-    private int pontos_gerados;
-    private LocalDate dt_entrega;
+    private int idEntrega;
+    private LocalDate dtEntrega;
+    private BigDecimal volumeEntrega; // em litros
+    private int idPev;
+    private int idB2c;
 
-    // inicializa os dados de entrega em ponto voluntario com identificador
-    public EntregaPevModel(int id_usuario_b2c,
-                           int id_pev,
-                           double qtd_litros,
-                           int pontos_gerados,
-                           LocalDate dt_entrega) {
-
-        this.id_usuario_b2c = id_usuario_b2c;
-        this.id_pev = id_pev;
-        this.qtd_litros = qtd_litros;
-        this.pontos_gerados = pontos_gerados;
-        this.dt_entrega = dt_entrega;
+    public EntregaPevModel(LocalDate dtEntrega, BigDecimal volumeEntrega, int idPev, int idB2c) {
+        this.dtEntrega = dtEntrega;
+        this.volumeEntrega = volumeEntrega;
+        this.idPev = idPev;
+        this.idB2c = idB2c;
     }
 
-    // retorna o valor de id entrega
-    public int getId_entrega() {
-        return id_entrega;
+    public EntregaPevModel(int idEntrega, LocalDate dtEntrega, BigDecimal volumeEntrega, int idPev, int idB2c) {
+        this(dtEntrega, volumeEntrega, idPev, idB2c);
+        this.idEntrega = idEntrega;
     }
 
-    // atualiza o valor de id entrega
-    public void setId_entrega(int id_entrega) {
-        this.id_entrega = id_entrega;
-    }
-
-    // retorna o valor de id usuario b c
-    public int getId_usuario_b2c() {
-        return id_usuario_b2c;
-    }
-
-    // retorna o valor de id pev
-    public int getId_pev() {
-        return id_pev;
-    }
-
-    // retorna o valor de qtd litros
-    public double getQtd_litros() {
-        return qtd_litros;
-    }
-
-    // retorna o valor de pontos gerados
-    public int getPontos_gerados() {
-        return pontos_gerados;
-    }
-
-    // retorna o valor de dt entrega
-    public LocalDate getDt_entrega() {
-        return dt_entrega;
-    }
-
-    // atualiza o valor de id usuario b c
-    public void setId_usuario_b2c(int id_usuario_b2c) {
-        this.id_usuario_b2c = id_usuario_b2c;
-    }
-
-    // atualiza o valor de id pev
-    public void setId_pev(int id_pev) {
-        this.id_pev = id_pev;
-    }
-
-    // atualiza o valor de qtd litros
-    public void setQtd_litros(double qtd_litros) {
-        this.qtd_litros = qtd_litros;
-    }
-
-    // atualiza o valor de pontos gerados
-    public void setPontos_gerados(int pontos_gerados) {
-        this.pontos_gerados = pontos_gerados;
-    }
-
-    // atualiza o valor de dt entrega
-    public void setDt_entrega(LocalDate dt_entrega) {
-        this.dt_entrega = dt_entrega;
-    }
+    public int getIdEntrega() { return idEntrega; }
+    public void setIdEntrega(int idEntrega) { this.idEntrega = idEntrega; }
+    public LocalDate getDtEntrega() { return dtEntrega; }
+    public void setDtEntrega(LocalDate dtEntrega) { this.dtEntrega = dtEntrega; }
+    public BigDecimal getVolumeEntrega() { return volumeEntrega; }
+    public void setVolumeEntrega(BigDecimal volumeEntrega) { this.volumeEntrega = volumeEntrega; }
+    public int getIdPev() { return idPev; }
+    public void setIdPev(int idPev) { this.idPev = idPev; }
+    public int getIdB2c() { return idB2c; }
+    public void setIdB2c(int idB2c) { this.idB2c = idB2c; }
 }

@@ -2,241 +2,174 @@ package Organizacao.Servlet;
 
 import Organizacao.Dao.SolicitacaoColetaDAO;
 import Organizacao.Model.SolicitacaoColetaModel;
-import jakarta.servlet.ServletException;
+import Organizacao.Model.Enum.StatusSolicitacao;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "SolicitacaoColetaSERVLET", value = "/solicitacoes-coleta")
-// atende requisicoes http de solicitacao de coleta
-public class SolicitacaoColetaSERVLET extends HttpServlet {
-
-    // mantem o acesso aos dados das solicitacoes
+@WebServlet("/solicitacoes-coleta")
+public class SolicitacaoColetaServlet extends HttpServlet {
     private SolicitacaoColetaDAO solicitacaoDAO;
 
     @Override
-    // prepara o acesso ao banco de dados
-    public void init() throws ServletException {
+    public void init() {
         solicitacaoDAO = new SolicitacaoColetaDAO();
     }
 
+    // Lista as solicitações de coleta (GET)
     @Override
-    // lista as solicitacoes e devolve os dados em json
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            List<SolicitacaoColetaModel> items = solicitacaoDAO.listarSolicitacoes();
+            List<SolicitacaoColetaModel> lista = solicitacaoDAO.listarSolicitacao();
             StringBuilder json = new StringBuilder("[");
-            // percorre as solicitacoes e monta cada objeto da resposta
-            for (int i = 0; i < items.size(); i++) {
-                SolicitacaoColetaModel item = items.get(i);
-                json.append("{\"id_solicitacao\":").append(item.getId_solicitacao())
-                        .append(",\"litros_estimados\":").append(item.getLitros_estimados())
-                        .append(",\"dt_solicitacao\":").append(json(item.getDt_solicitacao()))
-                        .append(",\"status\":").append(json(item.getStatus()))
-                        .append(",\"id_b2b\":").append(item.getId_b2b())
-                        .append(",\"id_pev\":").append(item.getId_pev()).append("}");
-                // separa os objetos sem acrescentar virgula no final
-                if (i < items.size() - 1) json.append(',');
+            for (int i = 0; i < lista.size(); i++) {
+                SolicitacaoColetaModel s = lista.get(i);
+                if (i > 0) json.append(",");
+                json.append("{\"id_solicitacao\":").append(s.getIdSolicitacao())
+                        .append(",\"status\":\"").append(s.getStatus().name())
+                        .append("\",\"volume_estimado\":").append(s.getVolumeEstimado())
+                        .append(",\"dt_solicitacao\":\"").append(s.getDtSolicitacao())
+                        .append("\",\"id_b2b\":").append(s.getIdB2B()).append("}");
             }
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(json.append(']').toString());
+            resp.setStatus(200);
+            resp.getWriter().write(json.append("]").toString());
         } catch (Exception e) {
-            // informa falhas ocorridas ao consultar as solicitacoes
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar solicitações: " + message(e));
+            enviarErro(resp, 500, "Erro ao listar solicitações: " + mensagem(e));
         }
     }
 
+    // Cadastra uma solicitação de coleta (POST)
     @Override
-    // valida os dados recebidos e cadastra uma solicitacao
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
-        prepareRequest(request);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            solicitacaoDAO.inserirSolicitacao(criar(request));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Solicitação cadastrada com sucesso!\"}");
+            solicitacaoDAO.inserirSolicitacao(criar(req));
+            resp.setStatus(201);
+            resp.getWriter().write("{\"mensagem\":\"Solicitação cadastrada com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar solicitação: " + message(e));
+            enviarErro(resp, 500, "Erro ao cadastrar solicitação: " + mensagem(e));
         }
     }
 
+    // Atualiza uma solicitação de coleta (PUT)
     @Override
-    // valida os dados recebidos e atualiza uma solicitacao
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
-        prepareRequest(request);
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            SolicitacaoColetaModel item = criar(request);
-            item.setId_solicitacao(requiredInt(request, "id_solicitacao"));
-            solicitacaoDAO.atualizarSolicitacao(item);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Solicitação atualizada com sucesso!\"}");
+            int id = inteiro(req, "id_solicitacao");
+            SolicitacaoColetaModel s = criar(req);
+            s.setIdSolicitacao(id);
+            solicitacaoDAO.atualizarSolicitacao(s);
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Solicitação atualizada com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar solicitação: " + message(e));
+            enviarErro(resp, 500, "Erro ao atualizar solicitação: " + mensagem(e));
         }
     }
 
+    // Remove uma solicitação de coleta (DELETE)
     @Override
-    // valida o identificador e remove uma solicitacao
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            solicitacaoDAO.deletarSolicitacao(
-                    requiredInt(request, "id_solicitacao"));
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Solicitação removida com sucesso!\"}");
+            solicitacaoDAO.deletarSolicitacao(inteiro(req, "id_solicitacao"));
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Solicitação deletada com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            // informa quando o identificador enviado e invalido
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao remover solicitação: " + message(e));
+            enviarErro(resp, 500, "Erro ao deletar solicitação: " + mensagem(e));
         }
     }
 
-    // valida os campos recebidos e cria o objeto da solicitacao
-    private SolicitacaoColetaModel criar(HttpServletRequest request) {
-        String date = requiredDate(request, "dt_solicitacao").toString();
-        return new SolicitacaoColetaModel(
-                requiredNonNegativeDouble(request, "litros_estimados"),
-                date,
-                validarStatus(requiredText(request, "status")),
-                requiredInt(request, "id_b2b"),
-                requiredInt(request, "id_pev"));
+    private SolicitacaoColetaModel criar(HttpServletRequest req) {
+        double volume = decimal(req, "volume_estimado");
+        if (volume <= 0) throw new IllegalArgumentException("O volume estimado deve ser maior que zero.");
+        return new SolicitacaoColetaModel(enumeracao(StatusSolicitacao.class, req, "status"), volume, data(req, "dt_solicitacao"), inteiro(req, "id_b2b"));
     }
 
-
-    // configura o formato e a codificacao da resposta
-    private void prepare(HttpServletResponse response) {
+    private void prepararResposta(HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
     }
 
-    // configura a codificacao dos dados recebidos
-    private void prepareRequest(HttpServletRequest request) throws IOException {
-        request.setCharacterEncoding("UTF-8");
+    private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
+        response.setStatus(status);
+        response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");
     }
 
-    // valida e devolve um parametro de texto obrigatorio
-    private String requiredText(HttpServletRequest request, String name) {
-        String value = request.getParameter(name);
-        // rejeita parametros ausentes ou vazios
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
-        }
-        return value.trim();
-    }
-
-    private String validarStatus(String status) {
-        if (!status.matches("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*")) {
-            throw new IllegalArgumentException("Status contém caracteres inválidos.");
-        }
-        return status;
-    }
-
-    // valida e converte um parametro para inteiro positivo
-    private int requiredInt(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            int number = Integer.parseInt(value);
-            // rejeita valores iguais ou menores que zero
-            if (number <= 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e converte um parametro para numero nao negativo
-    private double requiredNonNegativeDouble(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            double number = Double.parseDouble(value);
-            // rejeita valores negativos e valores que nao representam um numero finito
-            if (!Double.isFinite(number) || number < 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
-        }
-    }
-
-    // valida e converte um parametro para data
-    private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
-        try {
-            return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
-            // informa o formato esperado para a data
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
-        }
-    }
-
-    // protege os caracteres especiais antes de montar o json
-    private String json(String value) {
-        // representa valores ausentes como nulo em json
-        if (value == null) return "null";
-        StringBuilder result = new StringBuilder("\"");
-        // percorre os caracteres para aplicar o escape correspondente
-        for (int i = 0; i < value.length(); i++) {
-            char character = value.charAt(i);
-            switch (character) {
-                case '"': result.append("\\\""); break;
-                case '\\': result.append("\\\\"); break;
-                case '\b': result.append("\\b"); break;
-                case '\f': result.append("\\f"); break;
-                case '\n': result.append("\\n"); break;
-                case '\r': result.append("\\r"); break;
-                case '\t': result.append("\\t"); break;
+    private String escape(String texto) {
+        if (texto == null) return "";
+        StringBuilder saida = new StringBuilder();
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+            switch (c) {
+                case '"': saida.append("\\\""); break;
+                case '\\': saida.append("\\\\"); break;
+                case '\b': saida.append("\\b"); break;
+                case '\f': saida.append("\\f"); break;
+                case '\n': saida.append("\\n"); break;
+                case '\r': saida.append("\\r"); break;
+                case '\t': saida.append("\\t"); break;
                 default:
-                    // converte caracteres de controle para a representacao unicode
-                    if (character < 0x20) {
-                        result.append(String.format("\\u%04x", (int) character));
-                    } else {
-                        result.append(character);
-                    }
+                    if (c < 0x20) saida.append(String.format("\\u%04x", (int) c));
+                    else saida.append(c);
             }
         }
-        return result.append('"').toString();
+        return saida.toString();
     }
 
-    // envia uma resposta de erro em formato json
-    private void error(HttpServletResponse response, int status, String message)
-            throws IOException {
-        response.setStatus(status);
-        response.getWriter().write("{\"erro\":" + json(message == null ? "Erro interno." : message) + "}");
+    private String parametro(HttpServletRequest request, String nome) {
+        String valor = request.getParameter(nome);
+        if (valor == null || valor.trim().isEmpty())
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+        return valor.trim();
     }
 
-    // devolve uma mensagem util da excecao
-    private String message(Exception exception) {
-        return exception.getMessage() == null
-                ? exception.getClass().getSimpleName() : exception.getMessage();
+    private int inteiro(HttpServletRequest request, String nome) {
+        try {
+            return Integer.parseInt(parametro(request, nome));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número inteiro.");
+        }
+    }
+
+    private double decimal(HttpServletRequest request, String nome) {
+        try {
+            double valor = Double.parseDouble(parametro(request, nome));
+            if (!Double.isFinite(valor)) throw new NumberFormatException();
+            return valor;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número válido.");
+        }
+    }
+
+    private java.time.LocalDate data(HttpServletRequest request, String nome) {
+        try {
+            return java.time.LocalDate.parse(parametro(request, nome));
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new IllegalArgumentException("Data inválida no parâmetro '" + nome + "'. Use AAAA-MM-DD.");
+        }
+    }
+
+    private <E extends Enum<E>> E enumeracao(Class<E> tipo, HttpServletRequest request, String nome) {
+        try {
+            return Enum.valueOf(tipo, parametro(request, nome));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valor inválido para '" + nome + "'. Valores aceitos: "
+                    + java.util.Arrays.toString(tipo.getEnumConstants()));
+        }
+    }
+
+    private String mensagem(Exception e) {
+        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
 }

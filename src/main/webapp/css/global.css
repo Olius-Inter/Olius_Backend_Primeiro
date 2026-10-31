@@ -255,7 +255,7 @@ body {
     color: #fdb705;
 }
 
-/* Coluna de Propósito e Acesso ADM */
+/* Coluna de Propósito */
 .footer-proposito h4 {
     color: #fdb705; /* Amarelo de destaque no título */
     font-size: 1rem;
@@ -270,15 +270,19 @@ body {
     display: block;
 }
 
+/* "Acesso adm": link discreto no fim do rodapé (quase invisível até passar o mouse) */
 .footer-proposito .acesso-adm {
+    display: inline-block;
+    margin-top: 10px;
     font-size: 0.7rem;
     color: #666666;
+    opacity: 0.45;
     text-decoration: none;
-    margin-top: 6px;
-    display: inline-block;
-    transition: color 0.2s ease;
+    transition: opacity 0.2s ease, color 0.2s ease;
 }
 
-.footer-proposito .acesso-adm:hover {
-    color: #ffffff;
+.footer-proposito .acesso-adm:hover,
+.footer-proposito .acesso-adm:focus-visible {
+    opacity: 1;
+    color: #fdb705;
 }

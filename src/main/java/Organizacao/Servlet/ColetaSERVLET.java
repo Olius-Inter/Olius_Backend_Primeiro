@@ -2,241 +2,183 @@ package Organizacao.Servlet;
 
 import Organizacao.Dao.ColetaDAO;
 import Organizacao.Model.ColetaModel;
-
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
-// atende requisicoes http relacionadas as coletas
-@WebServlet(name = "ColetaSERVLET", value = "/coleta")
-public class ColetaSERVLET extends HttpServlet {
+@WebServlet("/coletas")
+public class ColetaServlet extends HttpServlet {
 
     private ColetaDAO coletaDAO;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         coletaDAO = new ColetaDAO();
     }
 
-    // lista as coletas e devolve os dados em json
+    // Listar coletas (GET)
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            List<ColetaModel> coletas = coletaDAO.listarColetas();
-            StringBuilder json = new StringBuilder();
-            json.append("[");
+            List<ColetaModel> lista = coletaDAO.listarColeta();
+            StringBuilder json = new StringBuilder("[");
 
-            for (int i = 0; i < coletas.size(); i++) {
-                ColetaModel coleta = coletas.get(i);
-                json.append("{");
-                json.append("\"id_coleta\":").append(coleta.getId_coleta()).append(",");
-                json.append("\"id_solicitacao\":").append(coleta.getId_solicitacao()).append(",");
-                json.append("\"id_motorista\":").append(coleta.getId_motorista()).append(",");
-                json.append("\"dt_coleta\":\"").append(coleta.getDt_coleta()).append("\",");
-                json.append("\"volume\":").append(coleta.getVolume()).append(",");
-                json.append("\"observacao\":\"").append(escape(coleta.getObservacao())).append("\"");
-                json.append("}");
+            for (int i = 0; i < lista.size(); i++) {
+                ColetaModel c = lista.get(i);
+                if (i > 0) json.append(",");
 
-                if (i < coletas.size() - 1) {
-                    json.append(",");
-                }
+                json.append("{\"id_coleta\":").append(c.getIdColeta())
+                        .append(",\"dt_coleta\":\"").append(c.getDtColeta())
+                        .append("\",\"volume_coletado\":").append(c.getVolumeColetado())
+                        .append(",\"avaliacao_coleta\":").append(c.getAvaliacaoColeta())
+                        .append(",\"id_solicitacao\":").append(c.getIdSolicitacao())
+                        .append(",\"id_motorista\":").append(c.getIdMotorista())
+                        .append(",\"id_b2b\":").append(c.getIdB2B())
+                        .append("}");
             }
-
-            json.append("]");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(json.toString());
-
-            // informa falhas ocorridas ao consultar as coletas
+            resp.setStatus(200);
+            resp.getWriter().write(json.append("]").toString());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar coletas: " + e.getMessage());
+            enviarErro(resp, 500, "Erro ao listar coletas: " + mensagem(e));
         }
     }
 
-
-    // valida os dados recebidos e cadastra uma coleta
+    // Cadastrar nova coleta (POST)
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
+        try {
+            coletaDAO.inserirColeta(criar(req));
+            resp.setStatus(201);
+            resp.getWriter().write("{\"mensagem\":\"Coleta cadastrada com sucesso!\"}");
+        } catch (IllegalArgumentException e) {
+            enviarErro(resp, 400, e.getMessage());
+        } catch (Exception e) {
+            enviarErro(resp, 500, "Erro ao cadastrar coleta: " + mensagem(e));
+        }
+    }
 
+    // Atualizar registro de coleta (PUT)
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
+        try {
+            int id = inteiro(req, "id_coleta");
+            ColetaModel c = criar(req);
+            c.setIdColeta(id);
+            coletaDAO.atualizarColeta(c);
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Coleta atualizada com sucesso!\"}");
+        } catch (IllegalArgumentException e) {
+            enviarErro(resp, 400, e.getMessage());
+        } catch (Exception e) {
+            enviarErro(resp, 500, "Erro ao atualizar coleta: " + mensagem(e));
+        }
+    }
+
+    // Remover coleta (DELETE)
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        try {
+            coletaDAO.deletarColeta(inteiro(req, "id_coleta"));
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Coleta deletada com sucesso!\"}");
+        } catch (IllegalArgumentException e) {
+            enviarErro(resp, 400, e.getMessage());
+        } catch (Exception e) {
+            enviarErro(resp, 500, "Erro ao deletar coleta: " + mensagem(e));
+        }
+    }
+
+    // Validação de dados da coleta
+    private ColetaModel criar(HttpServletRequest req) {
+        double volume = decimal(req, "volume_coletado");
+        if (volume <= 0) {
+            throw new IllegalArgumentException("O volume coletado deve ser maior que zero.");
+        }
+
+        int avaliacao = inteiro(req, "avaliacao_coleta");
+        if (avaliacao < 1 || avaliacao > 5) {
+            throw new IllegalArgumentException("A avaliação deve estar entre 1 e 5.");
+        }
+
+        return new ColetaModel(
+                data(req, "dt_coleta"), volume, avaliacao,
+                inteiro(req, "id_solicitacao"), inteiro(req, "id_motorista"), inteiro(req, "id_b2b")
+        );
+    }
+
+    private void prepararResposta(HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        request.setCharacterEncoding("UTF-8");
-
-        try {
-            int idSolicitacao = obterParametroInt(request, "id_solicitacao");
-            int idMotorista = obterParametroInt(request, "id_motorista");
-            LocalDate dtColeta = obterData(request.getParameter("dt_coleta"));
-            double volume = obterParametroDouble(request, "volume");
-            String observacao = request.getParameter("observacao");
-
-            ColetaModel coleta = new ColetaModel(idSolicitacao, idMotorista, dtColeta, volume, observacao);
-
-            coletaDAO.inserirColeta(coleta);
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Coleta cadastrada com sucesso!\"}");
-
-            // informa quando os dados enviados sao invalidos
-        } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            // informa falhas ocorridas durante o cadastro
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar coleta: " + e.getMessage());
-        }
     }
 
-    // valida os dados recebidos e atualiza uma coleta
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        request.setCharacterEncoding("UTF-8");
-
-        try {
-            int idColeta = obterParametroInt(request, "id_coleta");
-            int idSolicitacao = obterParametroInt(request, "id_solicitacao");
-            int idMotorista = obterParametroInt(request, "id_motorista");
-            LocalDate dtColeta = obterData(request.getParameter("dt_coleta"));
-            double volume = obterParametroDouble(request, "volume");
-            String observacao = request.getParameter("observacao");
-
-            ColetaModel coleta = new ColetaModel(idSolicitacao, idMotorista, dtColeta, volume, observacao);
-            coleta.setId_coleta(idColeta);
-
-            coletaDAO.atualizarColeta(coleta);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Coleta atualizada com sucesso!\"}");
-
-        } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            // informa falhas ocorridas durante a atualizacao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar coleta: " + e.getMessage());
-        }
-    }
-
-    // valida o identificador e remove uma coleta
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        try {
-            int idColeta = obterParametroInt(request, "id_coleta");
-            coletaDAO.deletarColeta(idColeta);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Coleta deletada com sucesso!\"}");
-
-        } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        } catch (Exception e) {
-            // informa falhas ocorridas durante a remocao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao deletar coleta: " + e.getMessage());
-        }
-    }
-
-    // valida e converte um parametro obrigatorio para inteiro
-
-    private int obterParametroInt(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
-        try {
-            int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
-            return numero;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e converte um parametro obrigatorio para numero decimal
-
-    private double obterParametroDouble(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
-
-        try {
-            double numero = Double.parseDouble(valor.trim());
-            if (!Double.isFinite(numero) || numero < 0) {
-                throw new NumberFormatException();
-            }
-            return numero;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número válido não negativo.", e);
-        }
-    }
-
-    // valida e converte a data recebida para data local
-
-    private LocalDate obterData(String valor) {
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("A data da coleta é obrigatória.");
-        }
-
-        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
-        }
-        try {
-            return LocalDate.parse(valor.trim());
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
-        }
-    }
-
-    private String escape(String texto) {
-        StringBuilder escaped = new StringBuilder();
-        String value = texto == null ? "" : texto;
-        for (int i = 0; i < value.length(); i++) {
-            char character = value.charAt(i);
-            switch (character) {
-                case '"': escaped.append("\\\""); break;
-                case '\\': escaped.append("\\\\"); break;
-                case '\b': escaped.append("\\b"); break;
-                case '\f': escaped.append("\\f"); break;
-                case '\n': escaped.append("\\n"); break;
-                case '\r': escaped.append("\\r"); break;
-                case '\t': escaped.append("\\t"); break;
-                default:
-                    if (character < 0x20) {
-                        escaped.append(String.format("\\u%04x", (int) character));
-                    } else {
-                        escaped.append(character);
-                    }
-            }
-        }
-        return escaped.toString();
-    }
-
-    // monta e envia uma resposta de erro em json
     private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
         response.setStatus(status);
         response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");
+    }
+
+    private String escape(String texto) {
+        if (texto == null) return "";
+        StringBuilder saida = new StringBuilder();
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+            switch (c) {
+                case '"': saida.append("\\\""); break;
+                case '\\': saida.append("\\\\"); break;
+                case '\b': saida.append("\\b"); break;
+                case '\f': saida.append("\\f"); break;
+                case '\n': saida.append("\\n"); break;
+                case '\r': saida.append("\\r"); break;
+                case '\t': saida.append("\\t"); break;
+                default:
+                    if (c < 0x20) saida.append(String.format("\\u%04x", (int) c));
+                    else saida.append(c);
+            }
+        }
+        return saida.toString();
+    }
+
+    private String parametro(HttpServletRequest request, String nome) {
+        String valor = request.getParameter(nome);
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+        }
+        return valor.trim();
+    }
+
+    private int inteiro(HttpServletRequest request, String nome) {
+        try {
+            return Integer.parseInt(parametro(request, nome));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número inteiro.");
+        }
+    }
+
+    private double decimal(HttpServletRequest request, String nome) {
+        try {
+            double valor = Double.parseDouble(parametro(request, nome));
+            if (!Double.isFinite(valor)) throw new NumberFormatException();
+            return valor;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número válido.");
+        }
+    }
+
+    private java.time.LocalDate data(HttpServletRequest request, String nome) {
+        try {
+            return java.time.LocalDate.parse(parametro(request, nome));
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new IllegalArgumentException("Data inválida no parâmetro '" + nome + "'. Use AAAA-MM-DD.");
+        }
+    }
+
+    private String mensagem(Exception e) {
+        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
 }

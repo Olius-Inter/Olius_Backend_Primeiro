@@ -3,7 +3,6 @@ package Organizacao.Servlet;
 import Organizacao.Dao.CarteiraDAO;
 import Organizacao.Model.CarteiraModel;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,226 +10,102 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+
+import static Organizacao.Utilitarios.ServletUtil.*;
 
 @WebServlet(name = "CarteiraSERVLET", value = "/carteira")
-// gerencia as requisicoes de carteiras de pontos
 public class CarteiraSERVLET extends HttpServlet {
 
+    private static final Set<String> PATENTES = Set.of("Ouro", "Prata", "Bronze");
     private CarteiraDAO carteiraDAO;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         carteiraDAO = new CarteiraDAO();
     }
 
-    // lista as carteiras em formato json
+    // Lista as carteiras (GET)
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            List<CarteiraModel> carteiras = carteiraDAO.listarCarteiras();
+            List<CarteiraModel> lista = carteiraDAO.listarCarteiras();
             StringBuilder json = new StringBuilder("[");
-
-            for (int i = 0; i < carteiras.size(); i++) {
-                CarteiraModel carteira = carteiras.get(i);
-                json.append("{")
-                        .append("\"id_carteira\":").append(carteira.getId_carteira()).append(",")
-                        .append("\"pontuacao\":").append(carteira.getPontuacao()).append(",")
-                        .append("\"patente\":").append(jsonString(carteira.getPatente())).append(",")
-                        .append("\"nivel\":").append(jsonString(carteira.getNivel())).append(",")
-                        .append("\"id_b2c\":").append(carteira.getId_b2c())
-                        .append("}");
-
-                if (i < carteiras.size() - 1) {
-                    json.append(",");
-                }
+            for (int i = 0; i < lista.size(); i++) {
+                CarteiraModel c = lista.get(i);
+                if (i > 0) json.append(",");
+                json.append("{\"id_carteira\":").append(c.getIdCarteira())
+                        .append(",\"pontos_totais\":").append(c.getPontosTotais())
+                        .append(",\"patente\":").append(json(c.getPatente()))
+                        .append(",\"nivel\":").append(c.getNivel())
+                        .append(",\"id_b2c\":").append(c.getIdB2c())
+                        .append(",\"id_b2b\":").append(c.getIdB2b()).append("}");
             }
-
-            json.append("]");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(json.toString());
+            enviar(resp, 200, json.append("]").toString());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar carteiras: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao listar carteiras: " + mensagem(e));
         }
     }
 
-    // cadastra uma nova carteira
+    // Cadastra uma carteira (POST)
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            carteiraDAO.inserirCarteira(criarCarteira(request));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Carteira cadastrada com sucesso!\"}");
+            carteiraDAO.inserirCarteira(criar(req));
+            enviarMensagem(resp, 201, "Carteira cadastrada com sucesso!");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar carteira: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao cadastrar carteira: " + mensagem(e));
         }
     }
 
-    // atualiza os dados de uma carteira
+    // Atualiza uma carteira (PUT)
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
-
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            CarteiraModel carteira = criarCarteira(request);
-            carteira.setId_carteira(obterInteiroObrigatorio(request, "id_carteira"));
+            CarteiraModel carteira = criar(req);
+            carteira.setIdCarteira(inteiro(req, "id_carteira"));
             carteiraDAO.atualizarCarteira(carteira);
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Carteira atualizada com sucesso!\"}");
+            enviarMensagem(resp, 200, "Carteira atualizada com sucesso!");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar carteira: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao atualizar carteira: " + mensagem(e));
         }
     }
 
-    // remove uma carteira pelo identificador
+    // Remove uma carteira (DELETE)
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            carteiraDAO.deletarCarteira(obterInteiroObrigatorio(request, "id_carteira"));
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Carteira deletada com sucesso!\"}");
+            carteiraDAO.deletarCarteira(inteiro(req, "id_carteira"));
+            enviarMensagem(resp, 200, "Carteira deletada com sucesso!");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao deletar carteira: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao deletar carteira: " + mensagem(e));
         }
     }
 
-    // cria uma carteira com os dados recebidos
-    private CarteiraModel criarCarteira(HttpServletRequest request) {
-        return new CarteiraModel(
-                obterInteiroNaoNegativo(request, "pontuacao"),
-                obterParametroObrigatorio(request, "patente"),
-                obterParametroObrigatorio(request, "nivel"),
-                obterInteiroObrigatorio(request, "id_b2c")
-        );
-    }
-
-    // valida e converte um parâmetro para número inteiro
-    private int obterInteiroObrigatorio(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+    // Valida os parâmetros e monta o modelo
+    private CarteiraModel criar(HttpServletRequest req) {
+        String patente = texto(req, "patente");
+        if (!PATENTES.contains(patente)) {
+            throw new IllegalArgumentException("Patente inválida. Valores aceitos: Ouro, Prata ou Bronze.");
         }
-        try {
-            int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
-            return numero;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
+        Integer idB2c = inteiroOpcional(req, "id_b2c");
+        Integer idB2b = inteiroOpcional(req, "id_b2b");
+        if ((idB2c == null) == (idB2b == null)) {
+            throw new IllegalArgumentException("Informe somente um dos campos: id_b2c (cliente) ou id_b2b (empresa).");
         }
-    }
-
-    private int obterInteiroNaoNegativo(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
-
-        try {
-            int numero = Integer.parseInt(valor.trim());
-            if (numero < 0) {
-                throw new NumberFormatException();
-            }
-            return numero;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro não negativo.", e);
-        }
-    }
-
-    // valida e retorna um parâmetro de texto
-    private String obterParametroObrigatorio(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
-        return valor.trim();
-    }
-
-    // configura o formato e a codificação da resposta
-    private void prepararResposta(HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-    }
-
-    // envia uma resposta de erro em formato json
-    private void enviarErro(HttpServletResponse response, int status, String mensagem)
-            throws IOException {
-        response.setStatus(status);
-        response.getWriter().write("{\"erro\":" + jsonString(
-                mensagem == null ? "Erro interno." : mensagem) + "}");
-    }
-
-    // converte um texto para uma string json segura
-    private String jsonString(String valor) {
-        if (valor == null) {
-            return "null";
-        }
-
-        StringBuilder json = new StringBuilder("\"");
-        for (int i = 0; i < valor.length(); i++) {
-            char caractere = valor.charAt(i);
-            switch (caractere) {
-                case '"':
-                    json.append("\\\"");
-                    break;
-                case '\\':
-                    json.append("\\\\");
-                    break;
-                case '\b':
-                    json.append("\\b");
-                    break;
-                case '\f':
-                    json.append("\\f");
-                    break;
-                case '\n':
-                    json.append("\\n");
-                    break;
-                case '\r':
-                    json.append("\\r");
-                    break;
-                case '\t':
-                    json.append("\\t");
-                    break;
-                default:
-                    if (caractere < 0x20) {
-                        json.append(String.format("\\u%04x", (int) caractere));
-                    } else {
-                        json.append(caractere);
-                    }
-            }
-        }
-        return json.append('"').toString();
-    }
-
-    // obtem uma mensagem util da excecao
-    private String mensagem(Exception e) {
-        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+        return new CarteiraModel(inteiroNaoNegativo(req, "pontos_totais"), patente,
+                inteiro(req, "nivel"), idB2c, idB2b);
     }
 }

@@ -1,123 +1,103 @@
 package Organizacao.Model;
 
+import Organizacao.Model.Enum.Estados;
 
-// representa os dados da entidade endereco
 public class EnderecoModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_endereco;
+    // Atributos
+    private int idEndereco;
+    private String rua;
+    private String cidade;
+    private String bairro;
     private String cep;
-    private String logradouro;
     private String numero;
     private String complemento;
-    private String bairro;
-    private String cidade;
-    private String estado;
-    private String pais;
+    private Estados estado;
 
-    // inicializa os dados de endereco
-    public EnderecoModel(String cep, String logradouro,
-                         String numero, String complemento,
-                         String bairro, String cidade,
-                         String estado, String pais) {
-
+    // Construtores
+    public EnderecoModel(String rua, String cidade, String bairro, String cep, String numero, String complemento, Estados estado) {
+        this.rua = rua;
+        this.cidade = cidade;
+        this.bairro = bairro;
         this.cep = cep;
-        this.logradouro = logradouro;
         this.numero = numero;
         this.complemento = complemento;
-        this.bairro = bairro;
-        this.cidade = cidade;
         this.estado = estado;
-        this.pais = pais;
     }
 
-    // retorna o valor de id endereco
-    public int getId_endereco() {
-        return id_endereco;
+    public EnderecoModel(int idEndereco, String rua, String cidade, String bairro, String cep, String numero, String complemento, Estados estado) {
+        this.idEndereco = idEndereco;
+        this.rua = rua;
+        this.cidade = cidade;
+        this.bairro = bairro;
+        this.cep = cep;
+        this.numero = numero;
+        this.complemento = complemento;
+        this.estado = estado;
     }
 
-    // atualiza o valor de id endereco
-    public void setId_endereco(int id_endereco) {
-        this.id_endereco = id_endereco;
+    // Getters e Setters
+    public int getIdEndereco() {
+        return idEndereco;
     }
 
-    // retorna o valor de cep
-    public String getCep() {
-        return cep;
+    public void setIdEndereco(int idEndereco) {
+        this.idEndereco = idEndereco;
     }
 
-    // retorna o valor de logradouro
-    public String getLogradouro() {
-        return logradouro;
+    public String getRua() {
+        return rua;
     }
 
-    // retorna o valor de numero
-    public String getNumero() {
-        return numero;
+    public void setRua(String rua) {
+        this.rua = rua;
     }
 
-    // retorna o valor de complemento
-    public String getComplemento() {
-        return complemento;
-    }
-
-    // retorna o valor de bairro
-    public String getBairro() {
-        return bairro;
-    }
-
-    // retorna o valor de cidade
     public String getCidade() {
         return cidade;
     }
 
-    // retorna o valor de estado
-    public String getEstado() {
-        return estado;
-    }
-
-    // retorna o valor de pais
-    public String getPais() {
-        return pais;
-    }
-
-    // atualiza o valor de cep
-    public void setCep(String cep) {
-        this.cep = cep;
-    }
-
-    // atualiza o valor de logradouro
-    public void setLogradouro(String logradouro) {
-        this.logradouro = logradouro;
-    }
-
-    // atualiza o valor de numero
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    // atualiza o valor de complemento
-    public void setComplemento(String complemento) {
-        this.complemento = complemento;
-    }
-
-    // atualiza o valor de bairro
-    public void setBairro(String bairro) {
-        this.bairro = bairro;
-    }
-
-    // atualiza o valor de cidade
     public void setCidade(String cidade) {
         this.cidade = cidade;
     }
 
-    // atualiza o valor de estado
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public String getBairro() {
+        return bairro;
     }
 
-    // atualiza o valor de pais
-    public void setPais(String pais) {
-        this.pais = pais;
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+
+    public Estados getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estados estado) {
+        this.estado = estado;
     }
 }

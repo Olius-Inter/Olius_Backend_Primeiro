@@ -45,15 +45,6 @@ main {
     z-index: 10;
 }
 
-/* Elemento decorativo de iluminação */
-.header .luz-amarela {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: -1;
-}
-
 .header .logo {
     display: flex;
     align-items: center;

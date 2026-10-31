@@ -7,6 +7,9 @@
     <title>Olius - Como Funciona</title>
     
     <!-- Arquivos de estilos CSS globais e específicos da página "Como Funciona" -->
+    <link rel="icon"
+          type="image/svg+xml"
+          href="${pageContext.request.contextPath}/assets/global/logo-normal.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,11 +19,9 @@
 <body>
 
     <!-- ========================================================================= -->
-    <!-- CABEÇALHO (HEADER): Logo, iluminação de fundo e navegação principal        -->
+    <!-- CABEÇALHO (HEADER): Logo e navegação principal        -->
     <!-- ========================================================================= -->
     <header class="header">
-        <div class="luz-amarela"></div>
-
         <a href="${pageContext.request.contextPath}/index.jsp" class="logo">
             <img class="logo-icon" src="${pageContext.request.contextPath}/assets/global/logo-normal.svg" alt="Logotipo Olius">
             <span class="logo-texto">Olius</span>
@@ -31,7 +32,6 @@
             <a href="${pageContext.request.contextPath}/planos.jsp">Planos</a>
             <a href="${pageContext.request.contextPath}/contato.jsp">Sobre</a>
             <a href="#agendar" class="btn-agendar">Agendar coleta</a>
-            <a href="${pageContext.request.contextPath}/login?sair=1">Sair</a>
         </nav>
     </header>
     
@@ -346,11 +346,11 @@
                 </ul>
             </div>
 
-            <!-- Créditos e Acesso ADM -->
+            <!-- Créditos -->
             <div class="footer-proposito">
                 <h4>Desenvolvido com propósito para um futuro sustentável.</h4>
                 <p class="copyright">© 2026 Olius. Todos os direitos reservados.</p>
-                <a href="#" class="acesso-adm">Acesso ADM</a>
+                <a href="${pageContext.request.contextPath}/login-adm" class="acesso-adm">Acesso adm</a>
             </div>
         </div>
     </footer>

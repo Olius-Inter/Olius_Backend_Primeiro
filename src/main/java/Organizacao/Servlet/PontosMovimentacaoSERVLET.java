@@ -2,7 +2,7 @@ package Organizacao.Servlet;
 
 import Organizacao.Dao.PontosMovimentacaoDAO;
 import Organizacao.Model.PontosMovimentacaoModel;
-import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,240 +11,99 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static Organizacao.Utilitarios.ServletUtil.*;
+
 @WebServlet(name = "PontosMovimentacaoSERVLET", value = "/pontos-movimentacao")
-// atende requisicoes http de movimentacao de pontos
 public class PontosMovimentacaoSERVLET extends HttpServlet {
 
-    // mantem o acesso aos dados das movimentacoes
     private PontosMovimentacaoDAO movimentacaoDAO;
 
     @Override
-    // prepara o acesso ao banco de dados
-    public void init() throws ServletException {
+    public void init() {
         movimentacaoDAO = new PontosMovimentacaoDAO();
     }
 
+    // Lista as movimentações (GET)
     @Override
-    // lista as movimentacoes e devolve os dados em json
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            List<PontosMovimentacaoModel> items = movimentacaoDAO.listarPontosMovimentacao();
+            List<PontosMovimentacaoModel> lista = movimentacaoDAO.listarMovimentacoes();
             StringBuilder json = new StringBuilder("[");
-            // percorre as movimentacoes e monta cada objeto da resposta
-            for (int i = 0; i < items.size(); i++) {
-                PontosMovimentacaoModel item = items.get(i);
-                json.append("{\"id_movimentacao\":").append(item.getId_movimentacao())
-                        .append(",\"pontos_ganhos\":").append(item.getPontos_ganhos())
-                        .append(",\"tipo_movimentacao\":").append(json(item.getTipo_movimentacao()))
-                        .append(",\"dt_movimentacao\":").append(json(item.getDt_movimentacao()))
-                        .append(",\"id_entrega\":").append(item.getId_entrega())
-                        .append(",\"id_carteira\":").append(item.getId_carteira())
-                        .append(",\"id_participacao\":").append(item.getId_participacao()).append("}");
-                // separa os objetos sem acrescentar virgula no final
-                if (i < items.size() - 1) json.append(',');
+            for (int i = 0; i < lista.size(); i++) {
+                PontosMovimentacaoModel m = lista.get(i);
+                if (i > 0) json.append(",");
+                json.append("{\"id_movimentacao\":").append(m.getIdMovimentacao())
+                        .append(",\"quantidade_pontos\":").append(m.getQuantidadePontos())
+                        .append(",\"id_carteira\":").append(m.getIdCarteira())
+                        .append(",\"id_coleta\":").append(m.getIdColeta())
+                        .append(",\"id_entrega\":").append(m.getIdEntrega()).append("}");
             }
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(json.append(']').toString());
+            enviar(resp, 200, json.append("]").toString());
         } catch (Exception e) {
-            // informa falhas ocorridas ao consultar as movimentacoes
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar movimentações: " + message(e));
+            enviarErro(resp, 500, "Erro ao listar movimentações de pontos: " + mensagem(e));
         }
     }
 
+    // Cadastra uma movimentação (POST)
     @Override
-    // valida os dados recebidos e cadastra uma movimentacao
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
-        prepareRequest(request);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            movimentacaoDAO.inserirPontosMovimentacao(criar(request));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Movimentação cadastrada com sucesso!\"}");
+            movimentacaoDAO.inserirMovimentacao(criar(req));
+            enviarMensagem(resp, 201, "Movimentação de pontos cadastrada com sucesso!");
         } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar movimentação: " + message(e));
+            enviarErro(resp, 500, "Erro ao cadastrar movimentação de pontos: " + mensagem(e));
         }
     }
 
+    // Atualiza uma movimentação (PUT)
     @Override
-    // valida os dados recebidos e atualiza uma movimentacao
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
-        prepareRequest(request);
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            PontosMovimentacaoModel item = criar(request);
-            item.setId_movimentacao(requiredInt(request, "id_movimentacao"));
-            movimentacaoDAO.atualizarPontosMovimentacao(item);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Movimentação atualizada com sucesso!\"}");
+            PontosMovimentacaoModel mov = criar(req);
+            mov.setIdMovimentacao(inteiro(req, "id_movimentacao"));
+            movimentacaoDAO.atualizarMovimentacao(mov);
+            enviarMensagem(resp, 200, "Movimentação de pontos atualizada com sucesso!");
         } catch (IllegalArgumentException e) {
-            // informa quando os dados enviados sao invalidos
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar movimentação: " + message(e));
+            enviarErro(resp, 500, "Erro ao atualizar movimentação de pontos: " + mensagem(e));
         }
     }
 
+    // Remove uma movimentação (DELETE)
     @Override
-    // valida o identificador e remove uma movimentacao
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        prepare(response);
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            movimentacaoDAO.deletarPontosMovimentacao(
-                    requiredInt(request, "id_movimentacao"));
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Movimentação removida com sucesso!\"}");
+            movimentacaoDAO.deletarMovimentacao(inteiro(req, "id_movimentacao"));
+            enviarMensagem(resp, 200, "Movimentação de pontos deletada com sucesso!");
         } catch (IllegalArgumentException e) {
-            // informa quando o identificador enviado e invalido
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao remover movimentação: " + message(e));
+            enviarErro(resp, 500, "Erro ao deletar movimentação de pontos: " + mensagem(e));
         }
     }
 
-    // valida os campos recebidos e cria o objeto da movimentacao
-    private PontosMovimentacaoModel criar(HttpServletRequest request) {
-        int points;
+    // Valida os parâmetros e monta o modelo (a origem é coleta OU entrega)
+    private PontosMovimentacaoModel criar(HttpServletRequest req) {
+        Integer idColeta = inteiroOpcional(req, "id_coleta");
+        Integer idEntrega = inteiroOpcional(req, "id_entrega");
+        if ((idColeta == null) == (idEntrega == null)) {
+            throw new IllegalArgumentException("Informe somente um dos campos: id_coleta ou id_entrega.");
+        }
+        int pontos;
         try {
-            points = Integer.parseInt(requiredText(request, "pontos_ganhos"));
+            pontos = Integer.parseInt(texto(req, "quantidade_pontos"));
         } catch (NumberFormatException e) {
-            // informa quando a quantidade de pontos nao e um numero inteiro
-            throw new IllegalArgumentException("O parâmetro 'pontos_ganhos' deve ser inteiro.", e);
+            throw new IllegalArgumentException("O parâmetro 'quantidade_pontos' deve ser um número inteiro.");
         }
-        return new PontosMovimentacaoModel(
-                points,
-                validarTipoMovimentacao(requiredText(request, "tipo_movimentacao")),
-                requiredDate(request, "dt_movimentacao").toString(),
-                requiredInt(request, "id_entrega"),
-                requiredInt(request, "id_carteira"),
-                requiredInt(request, "id_participacao"));
-    }
-
-
-    // configura o formato e a codificacao da resposta
-    private void prepare(HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-    }
-
-    // configura a codificacao dos dados recebidos
-    private void prepareRequest(HttpServletRequest request) throws IOException {
-        request.setCharacterEncoding("UTF-8");
-    }
-
-    // valida e devolve um parametro de texto obrigatorio
-    private String requiredText(HttpServletRequest request, String name) {
-        String value = request.getParameter(name);
-        // rejeita parametros ausentes ou vazios
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
-        }
-        return value.trim();
-    }
-
-    private String validarTipoMovimentacao(String tipo) {
-        if (!tipo.matches("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*")) {
-            throw new IllegalArgumentException("Tipo de movimentação contém caracteres inválidos.");
-        }
-        return tipo;
-    }
-
-    // valida e converte um parametro para inteiro positivo
-    private int requiredInt(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            int number = Integer.parseInt(value);
-            // rejeita valores iguais ou menores que zero
-            if (number <= 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e converte um parametro para numero nao negativo
-    private double requiredNonNegativeDouble(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            double number = Double.parseDouble(value);
-            // rejeita valores negativos e valores que nao representam um numero finito
-            if (!Double.isFinite(number) || number < 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
-        }
-    }
-
-    // valida e converte um parametro para data
-    private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
-        try {
-            return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
-            // informa o formato esperado para a data
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
-        }
-    }
-
-    // protege os caracteres especiais antes de montar o json
-    private String json(String value) {
-        // representa valores ausentes como nulo em json
-        if (value == null) return "null";
-        StringBuilder result = new StringBuilder("\"");
-        // percorre os caracteres para aplicar o escape correspondente
-        for (int i = 0; i < value.length(); i++) {
-            char character = value.charAt(i);
-            switch (character) {
-                case '"': result.append("\\\""); break;
-                case '\\': result.append("\\\\"); break;
-                case '\b': result.append("\\b"); break;
-                case '\f': result.append("\\f"); break;
-                case '\n': result.append("\\n"); break;
-                case '\r': result.append("\\r"); break;
-                case '\t': result.append("\\t"); break;
-                default:
-                    // converte caracteres de controle para a representacao unicode
-                    if (character < 0x20) {
-                        result.append(String.format("\\u%04x", (int) character));
-                    } else {
-                        result.append(character);
-                    }
-            }
-        }
-        return result.append('"').toString();
-    }
-
-    // envia uma resposta de erro em formato json
-    private void error(HttpServletResponse response, int status, String message)
-            throws IOException {
-        response.setStatus(status);
-        response.getWriter().write("{\"erro\":" + json(message == null ? "Erro interno." : message) + "}");
-    }
-
-    // devolve uma mensagem util da excecao
-    private String message(Exception exception) {
-        return exception.getMessage() == null
-                ? exception.getClass().getSimpleName() : exception.getMessage();
+        return new PontosMovimentacaoModel(pontos, inteiro(req, "id_carteira"), idColeta, idEntrega);
     }
 }

@@ -1,7 +1,8 @@
 package Organizacao.Dao;
 
-import Organizacao.Model.B2bModel;
 import Organizacao.Conexao.Conexao_Banco;
+import Organizacao.Model.B2BModel;
+import Organizacao.Model.Enum.Plano;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,125 +11,99 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+public class B2BDAO {
 
-// acessa e administra os registros de empresas B2B
-public class B2bDAO {
+    // Metodo para cadastrar uma empresa B2B
+    public void inserirB2B(B2BModel b2b) {
+        String sql = "INSERT INTO B2B (CNPJ, Plano, ID_usuario) VALUES (?, ?, ?);";
 
-    // grava os dados de uma empresa B2B no banco de dados
-    public void inserirB2b(B2bModel b2b) {
-        // define a consulta sql de insercao para empresa B2B
-        String sql = "INSERT INTO B2b (cnpj, razao_social, nome_fantasia, telefone, id_endereco) VALUES (?, ?, ?, ?, ?)";
-
-        // abre a conexao e prepara a insercao de empresa B2B com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            // associa os campos da empresa B2B aos parametros da insercao
             stmt.setString(1, b2b.getCnpj());
-            stmt.setString(2, b2b.getRazao_social());
-            stmt.setString(3, b2b.getNome_fantasia());
-            stmt.setString(4, b2b.getTelefone());
-            stmt.setInt(5, b2b.getId_endereco());
-
-            // executa a gravacao dos dados da empresa B2B
+            stmt.setString(2, b2b.getPlano().name());
+            stmt.setInt(3, b2b.getIdUsuario());
             stmt.executeUpdate();
-            System.out.println("Usuário B2b cadastrado com sucesso!");
+            System.out.println("B2B cadastrado com sucesso!");
 
-        // propaga a falha ao gravar empresa B2B para informar o erro ao chamador
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir B2b: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao inserir B2B: " + e.getMessage(), e);
         }
     }
 
+    // Método para listar os cadastros B2B
+    public List<B2BModel> listarB2B() {
+        List<B2BModel> listaB2B = new ArrayList<>();
+        String sql = "SELECT * FROM B2B ORDER BY ID_B2B";
 
-    // consulta os registros de empresas B2B e devolve a lista
-    public List<B2bModel> listarB2b() {
-        List<B2bModel> listaB2b = new ArrayList<>();
-        // define a consulta sql de leitura para empresas B2B
-        String sql = "SELECT * FROM B2b ORDER BY id_usuario";
-
-        // abre a conexao e executa a consulta de empresas B2B com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            // converte os campos de cada linha consultada em uma empresa B2B
             while (rs.next()) {
-                int id_usuario = rs.getInt("id_usuario");
-                String cnpj = rs.getString("cnpj");
-                String razaoSocial = rs.getString("razao_social");
-                String nome_Fantasia = rs.getString("nome_fantasia");
-                String telefone = rs.getString("telefone");
-                int id_endereco = rs.getInt("id_endereco");
-                B2bModel novoB2b = new B2bModel(id_usuario, cnpj, razaoSocial, nome_Fantasia, telefone, id_endereco);
-                listaB2b.add(novoB2b);
+                int id_B2B = rs.getInt("ID_B2B");
+                String cnpj = rs.getString("CNPJ");
+                Plano plano = Plano.valueOf(rs.getString("Plano"));
+                int id_usuario = rs.getInt("ID_usuario");
+
+                B2BModel novoB2B = new B2BModel(
+                        id_B2B, cnpj, plano, id_usuario
+                );
+
+                listaB2B.add(novoB2B);
             }
 
-        // propaga a falha ao consultar empresas B2B para informar o erro ao chamador
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar B2b: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao listar B2Bs: " + e.getMessage(), e);
         }
 
-        // devolve os registros encontrados pela consulta
-        return listaB2b;
+        return listaB2B;
     }
-    // atualiza os dados de uma empresa B2B no banco de dados
-    public void atualizarB2b(B2bModel b2b) {
-        // define a consulta sql de atualizacao para empresa B2B
-        String sql = "UPDATE B2b SET cnpj = ?, razao_social = ?, nome_fantasia = ?, telefone = ?, id_endereco = ? WHERE id_usuario = ?";
 
-        // abre a conexao e prepara a atualizacao de empresa B2B com fechamento automatico
+    // Método para atualizar dados de uma empresa B2B
+    public void atualizarB2B(B2BModel b2b) {
+        String sql = "UPDATE B2B SET CNPJ = ?, Plano = ?, ID_usuario = ? WHERE ID_B2B = ?";
+
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            // associa os campos da empresa B2B aos parametros da atualizacao
             stmt.setString(1, b2b.getCnpj());
-            stmt.setString(2, b2b.getRazao_social());
-            stmt.setString(3, b2b.getNome_fantasia());
-            stmt.setString(4, b2b.getTelefone());
-            stmt.setInt(5, b2b.getId_endereco());
-            stmt.setInt(6, b2b.getId_usuario());
+            stmt.setString(2, b2b.getPlano().name());
+            stmt.setInt(3, b2b.getIdUsuario());
+            stmt.setInt(4, b2b.getIdB2B());
 
-            // executa a atualizacao dos dados da empresa B2B
             int linhasAfetadas = stmt.executeUpdate();
 
-            // verifica se algum registro de empresa B2B foi atualizado
             if (linhasAfetadas > 0) {
-                System.out.println("Empresa B2b atualizada com sucesso!");
+                System.out.println("B2B atualizado com sucesso!");
             } else {
-                System.out.println("Nenhum registro B2b encontrado com o ID informado.");
+                System.out.println("Nenhum B2B encontrado com o ID informado.");
             }
 
-        // propaga a falha ao atualizar empresa B2B para informar o erro ao chamador
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar B2b: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar B2B: " + e.getMessage(), e);
         }
     }
-    // remove o registro de uma empresa B2B do banco de dados
-    public void deletarB2b(int id) {
-        // define a consulta sql de exclusao para empresa B2B
-        String sql = "DELETE FROM B2b WHERE id_usuario = ?";
 
-        // abre a conexao e prepara a exclusao de empresa B2B com fechamento automatico
+    // Método para remover um registro B2B
+    public void deletarB2B(int id) {
+        String sql = "DELETE FROM B2B WHERE ID_B2B = ?";
+
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            // associa o identificador do registro aos parametros da exclusao
             stmt.setInt(1, id);
 
-            // executa a exclusao do registro de empresa B2B
             int linhasAfetadas = stmt.executeUpdate();
 
-            // verifica se algum registro de empresa B2B foi removido
             if (linhasAfetadas > 0) {
-                System.out.println("Usuário B2b deletado com sucesso!");
+                System.out.println("B2B deletado com sucesso!");
             } else {
-                System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
+                System.out.println("Nenhum B2B encontrado com esse ID.");
             }
 
-        // propaga a falha ao remover empresa B2B para informar o erro ao chamador
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao deletar B2b: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao deletar B2B: " + e.getMessage(), e);
         }
     }
 }

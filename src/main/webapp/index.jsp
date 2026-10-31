@@ -7,6 +7,9 @@
     <title>Olius - Inicial</title>
 
     <!-- Arquivos de estilos CSS globais e específicos da página inicial -->
+    <link rel="icon"
+          type="image/svg+xml"
+          href="${pageContext.request.contextPath}/assets/global/logo-normal.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,7 +31,6 @@
             <a href="${pageContext.request.contextPath}/planos.jsp">Planos</a>
             <a href="${pageContext.request.contextPath}/contato.jsp">Sobre</a>
             <a href="#agendar" class="btn-agendar">Agendar coleta</a>
-            <a href="${pageContext.request.contextPath}/login?sair=1">Sair</a>
         </nav>
     </header>
 
@@ -641,11 +643,11 @@
                 </ul>
             </div>
 
-            <!-- Créditos e Acesso Administrativo -->
+            <!-- Créditos -->
             <div class="footer-proposito">
                 <h4>Desenvolvido com propósito para um futuro sustentável.</h4>
                 <p class="copyright">© 2026 Olius. Todos os direitos reservados.</p>
-                <a href="${pageContext.request.contextPath}/adm/index.jsp" class="acesso-adm">Acesso ADM</a>
+                <a href="${pageContext.request.contextPath}/login-adm" class="acesso-adm">Acesso adm</a>
             </div>
         </div>
     </footer>

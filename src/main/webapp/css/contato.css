@@ -11,21 +11,6 @@
     overflow: hidden; /* Evita que o brilho crie barras de rolagem */
 }
 
-/* Mancha amarela desfocada (Efeito de brilho no canto superior esquerdo) */
-.luz-amarela {
-    position: absolute;
-    top: -150px;            /* Sobe parcialmente para fora da tela */
-    left: -150px;           /* Desloca para a esquerda fora da tela */
-    width: 600px;           /* Largura do círculo de iluminação */
-    height: 600px;          /* Altura do círculo de iluminação */
-    background-color: #fdb705;
-    opacity: 0.4;           /* Transparência suave */
-    border-radius: 50%;     /* Forma circular */
-    filter: blur(100px);    /* Desfoca o círculo para criar o efeito de luz */
-    pointer-events: none;   /* Impede interação ou bloqueio de cliques */
-    z-index: 0;             /* Mantém no fundo, atrás do conteúdo */
-}
-
 /* Garante que o cabeçalho e o conteúdo fiquem sobrepostos ao brilho */
 .header, 
 .hero-content {

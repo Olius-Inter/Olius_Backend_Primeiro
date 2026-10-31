@@ -1,0 +1,332 @@
+/* ==========================================================================
+   LOGIN DO ADMINISTRADOR OLIUS
+   Medidas copiadas do Figma (frame "Tela Login"): cartão de 1289 x 706 px.
+   O lado visual (esquerda) e o formulário (direita) usam posições absolutas
+   dentro do cartão; os valores de left/top são as coordenadas do Figma.
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --amarelo: #f9c601;
+    --fundo-pagina: #fffbe7;
+    --fundo-campo: #efefef;
+    --texto-campo: #8f8f8f;
+    /* sombras em camadas, iguais às do Figma */
+    --sombra-campo: 0 1px 2px rgba(0, 0, 0, .10), 0 3px 3px rgba(0, 0, 0, .09),
+                    0 8px 5px rgba(0, 0, 0, .05), 0 14px 6px rgba(0, 0, 0, .01);
+    --sombra-botao: 0 1px 3px rgba(0, 0, 0, .10), 0 5px 5px rgba(0, 0, 0, .09),
+                    0 11px 7px rgba(0, 0, 0, .05), 0 20px 8px rgba(0, 0, 0, .01);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: var(--fundo-pagina);
+    font-family: 'Poppins', sans-serif;
+    color: #000;
+}
+
+/* área que reserva o espaço do cartão (o JavaScript ajusta a escala) */
+.palco {
+    width: 1289px;
+    height: 706px;
+}
+
+/* ---------- Cartão ---------- */
+.cartao {
+    position: relative;
+    width: 1289px;
+    height: 706px;
+    transform-origin: 0 0;
+    border-radius: 25px;
+    background: #cbc7b8;          /* aparece só na linha de 2px entre os dois lados */
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .26);
+}
+
+/* ---------- Lado visual ---------- */
+.lado-visual {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 644px;
+    height: 706px;
+    border-radius: 25px 0 0 25px;
+    background: linear-gradient(221.74deg, #feed92 0%, #fff5d6 32.849%, #fffdf5 53.797%, #fffadf 71.412%, #fdec82 99.024%);
+}
+
+.frase {
+    position: absolute;
+    left: 64px;
+    top: 130px;
+    width: 266px;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: normal;
+}
+
+/* 4 colunas x 4 linhas de bolinhas de 6px; o ::after repete o bloco mais abaixo (como no Figma) */
+.pontos,
+.pontos::after {
+    width: 66px;
+    height: 67px;
+    background-image: radial-gradient(circle, var(--amarelo) 2.6px, transparent 3px);
+    background-size: 20px 20.33px;
+    background-position: -7px -7.2px;
+}
+
+.pontos {
+    position: absolute;
+    left: 59px;
+    top: 382px;
+    opacity: .39;
+}
+
+.pontos::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 84px;
+}
+
+.planta {
+    position: absolute;
+    left: 110px;
+    top: 369px;
+    width: 264px;
+    height: 382px;
+}
+
+/* a imagem já tem a sombra do Figma embutida (por isso 433 x 488) */
+.celular {
+    position: absolute;
+    left: 238px;
+    top: 278px;
+    width: 433px;
+    height: 488px;
+}
+
+/* ---------- Lado do formulário ---------- */
+.lado-form {
+    position: absolute;
+    left: 646px;
+    top: 0;
+    width: 643px;
+    height: 706px;
+    border-radius: 0 25px 25px 0;
+    background: #fdfefd;
+}
+
+.logo {
+    position: absolute;
+    left: 50px;
+    top: 32px;
+    width: 32px;
+    height: 42.667px;
+}
+
+.conteudo {
+    position: absolute;
+    left: 131px;
+    top: 96px;
+    width: 395px;
+}
+
+h1 {
+    margin: 0 0 12px 3px;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.163;
+    letter-spacing: .48px;
+}
+
+.subtitulo {
+    margin: 0 0 25px 3px;
+    font-size: 18px;
+    line-height: 1.163;
+    letter-spacing: .36px;
+}
+
+/* rótulos escondidos: o leitor de tela lê, o visual segue o Figma (só placeholder) */
+.so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.campo {
+    display: block;
+    width: 395px;
+    height: 44px;
+    margin-bottom: 22px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--fundo-campo);
+    box-shadow: var(--sombra-campo);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.campo::placeholder {
+    color: var(--texto-campo);
+    opacity: 1;
+}
+
+.botoes {
+    display: flex;
+    gap: 36px;
+    margin: 3px 0 0 3px;
+}
+
+.botao {
+    width: 178px;
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .28px;
+    cursor: pointer;
+    box-shadow: var(--sombra-botao);
+    transition: filter .15s;
+}
+
+.botao:hover {
+    filter: brightness(.96);
+}
+
+.cancelar {
+    background: var(--fundo-campo);
+    color: var(--texto-campo);
+}
+
+.entrar {
+    background: var(--amarelo);
+    color: #fff;
+}
+
+.campo:focus-visible,
+.botao:focus-visible,
+.voltar a:focus-visible {
+    outline: 2px solid #b88e00;
+    outline-offset: 2px;
+}
+
+/* mensagem de erro (login recusado) e aviso padrão */
+.alerta,
+.aviso {
+    margin: 28px 0 0 3px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.alerta {
+    background: #fff1f0;
+    border: 1px solid #f3b9b4;
+    color: #a12b22;
+    font-weight: 500;
+}
+
+.aviso {
+    background: #fff9dd;
+    border: 1px solid #f6e49a;
+    color: #7a6410;
+}
+
+/* mesma posição do "Ainda não tem uma conta? Cadastre-se" do Figma */
+.voltar {
+    position: absolute;
+    left: 172px;
+    top: 614px;
+    font-size: 13px;
+    line-height: 1.163;
+    letter-spacing: .26px;
+    white-space: nowrap;
+}
+
+.voltar a {
+    margin-left: 4px;
+    font-weight: 700;
+    color: var(--amarelo);
+    text-decoration: none;
+}
+
+.voltar a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Telas pequenas: uma coluna, sem a parte visual ---------- */
+@media (max-width: 800px) {
+    body {
+        align-items: flex-start;
+    }
+
+    .palco,
+    .cartao {
+        width: 100%;
+        height: auto;
+    }
+
+    .cartao {
+        background: #fdfefd;
+    }
+
+    .lado-visual {
+        display: none;
+    }
+
+    .lado-form {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 28px 22px 32px;
+        border-radius: 25px;
+    }
+
+    .logo,
+    .conteudo,
+    .voltar {
+        position: static;
+    }
+
+    .logo {
+        display: block;
+        margin-bottom: 28px;
+    }
+
+    .conteudo,
+    .campo {
+        width: 100%;
+    }
+
+    .botoes {
+        gap: 16px;
+    }
+
+    .botao {
+        flex: 1;
+        width: auto;
+    }
+
+    .voltar {
+        margin-top: 28px;
+        text-align: center;
+        white-space: normal;
+    }
+}

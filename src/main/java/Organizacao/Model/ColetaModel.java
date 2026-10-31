@@ -2,89 +2,91 @@ package Organizacao.Model;
 
 import java.time.LocalDate;
 
-
-// representa os dados da entidade coleta
 public class ColetaModel {
-    // armazena os atributos e relacionamentos da entidade
 
-    private int id_coleta;
-    private int id_solicitacao;
-    private int id_motorista;
-    private LocalDate dt_coleta;
-    private double volume;
-    private String observacao;
+    // Atributos
+    private int idColeta;
+    private LocalDate dtColeta;
+    private double volumeColetado;
+    private int avaliacaoColeta;
+    private int idSolicitacao;
+    private int idMotorista;
+    private int idB2B;
 
-    // inicializa os dados de coleta com identificador
-    public ColetaModel(int id_solicitacao,
-                       int id_motorista,
-                       LocalDate dt_coleta,
-                       double volume,
-                       String observacao) {
-
-        this.id_solicitacao = id_solicitacao;
-        this.id_motorista = id_motorista;
-        this.dt_coleta = dt_coleta;
-        this.volume = volume;
-        this.observacao = observacao;
+    // Construtores
+    public ColetaModel(LocalDate dtColeta, double volumeColetado, int avaliacaoColeta, int idSolicitacao, int idMotorista, int idB2B) {
+        this.dtColeta = dtColeta;
+        this.volumeColetado = volumeColetado;
+        this.avaliacaoColeta = avaliacaoColeta;
+        this.idSolicitacao = idSolicitacao;
+        this.idMotorista = idMotorista;
+        this.idB2B = idB2B;
     }
 
-    // retorna o valor de id coleta
-    public int getId_coleta() {
-        return id_coleta;
+    public ColetaModel(int idColeta, LocalDate dtColeta, double volumeColetado, int avaliacaoColeta, int idSolicitacao, int idMotorista, int idB2B) {
+        this.idColeta = idColeta;
+        this.dtColeta = dtColeta;
+        this.volumeColetado = volumeColetado;
+        this.avaliacaoColeta = avaliacaoColeta;
+        this.idSolicitacao = idSolicitacao;
+        this.idMotorista = idMotorista;
+        this.idB2B = idB2B;
     }
 
-    // atualiza o valor de id coleta
-    public void setId_coleta(int id_coleta) {
-        this.id_coleta = id_coleta;
+    // Getters e Setters
+    public int getIdColeta() {
+        return idColeta;
     }
 
-    // retorna o valor de id solicitacao
-    public int getId_solicitacao() {
-        return id_solicitacao;
+    public void setIdColeta(int idColeta) {
+        this.idColeta = idColeta;
     }
 
-    // retorna o valor de id motorista
-    public int getId_motorista() {
-        return id_motorista;
+    public LocalDate getDtColeta() {
+        return dtColeta;
     }
 
-    // retorna o valor de dt coleta
-    public LocalDate getDt_coleta() {
-        return dt_coleta;
+    public void setDtColeta(LocalDate dtColeta) {
+        this.dtColeta = dtColeta;
     }
 
-    // retorna o valor de volume
-    public Double getVolume() {
-        return volume;
+    public double getVolumeColetado() {
+        return volumeColetado;
     }
 
-    // retorna o valor de observacao
-    public String getObservacao() {
-        return observacao;
+    public void setVolumeColetado(double volumeColetado) {
+        this.volumeColetado = volumeColetado;
     }
 
-    // atualiza o valor de id solicitacao
-    public void setId_solicitacao(int id_solicitacao) {
-        this.id_solicitacao = id_solicitacao;
+    public int getAvaliacaoColeta() {
+        return avaliacaoColeta;
     }
 
-    // atualiza o valor de id motorista
-    public void setId_motorista(int id_motorista) {
-        this.id_motorista = id_motorista;
+    public void setAvaliacaoColeta(int avaliacaoColeta) {
+        this.avaliacaoColeta = avaliacaoColeta;
     }
 
-    // atualiza o valor de dt coleta
-    public void setDt_coleta(LocalDate dt_coleta) {
-        this.dt_coleta = dt_coleta;
+    public int getIdSolicitacao() {
+        return idSolicitacao;
     }
 
-    // atualiza o valor de volume
-    public void setVolume(double volume) {
-        this.volume = volume;
+    public void setIdSolicitacao(int idSolicitacao) {
+        this.idSolicitacao = idSolicitacao;
     }
 
-    // atualiza o valor de observacao
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
+    public int getIdMotorista() {
+        return idMotorista;
+    }
+
+    public void setIdMotorista(int idMotorista) {
+        this.idMotorista = idMotorista;
+    }
+
+    public int getIdB2B() {
+        return idB2B;
+    }
+
+    public void setIdB2B(int idB2B) {
+        this.idB2B = idB2B;
     }
 }

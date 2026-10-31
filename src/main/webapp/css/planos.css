@@ -26,22 +26,6 @@ html, body {
     overflow: hidden; /* Garante que elementos filhos absolutos não vazem */
 }
 
-/* Mancha amarela desfocada (Efeito de brilho no canto superior direito) */
-.luz-amarela {
-    position: absolute;
-    top: -150px;             /* Sobe um pouco para fora da tela */
-    right: -100px;           /* Ajustado para limitar o transbordo */
-    left: auto;              /* Reseta o alinhamento da esquerda */
-    width: 500px;            /* Largura ajustada */
-    height: 500px;           /* Altura ajustada */
-    background-color: #fdb705; 
-    opacity: 0.4;            /* Transparência suave */
-    border-radius: 50%;      /* Forma circular */
-    filter: blur(100px);     /* Desfoca para criar o efeito de brilho */
-    pointer-events: none;    /* Não interfere nos cliques */
-    z-index: 0;              /* Fica por trás do texto e do logo */
-}
-
 /* Garante que o conteúdo e o logo fiquem sobrepostos ao brilho */
 .header, 
 .hero-content {

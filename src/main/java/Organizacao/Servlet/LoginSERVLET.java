@@ -70,7 +70,7 @@ public class LoginSERVLET extends HttpServlet {
                 antiga.invalidate();
             }
             HttpSession sessao = request.getSession(true);
-            sessao.setAttribute("usuarioId", usuario.getId_usuario());
+            sessao.setAttribute("usuarioId", usuario.getIdUsuario());
             sessao.setAttribute("usuarioNome", usuario.getNome());
             sessao.setAttribute("usuarioTipo", usuario.getTipoUsuario());
             sessao.setMaxInactiveInterval(30 * 60);

@@ -1,156 +1,99 @@
 package Organizacao.Dao;
 
-import Organizacao.Model.CarteiraModel;
 import Organizacao.Conexao.Conexao_Banco;
+import Organizacao.Model.CarteiraModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-
-// acessa e administra os registros de carteira de pontos
 public class CarteiraDAO {
 
-    // grava os dados de carteira de pontos no banco de dados
+    // Cadastra uma carteira (id_b2c ou id_b2b pode ser nulo, mas não os dois)
     public void inserirCarteira(CarteiraModel carteira) {
+        String sql = "INSERT INTO carteira (pontos_totais, patente, nivel, id_b2c, id_b2b) VALUES (?, ?, ?, ?, ?)";
 
-        // define a consulta sql de insercao para carteira de pontos
-        String sql = "INSERT INTO carteira (pontuacao, patente, nivel, id_b2c) VALUES (?, ?, ?, ?)";
+        try (Connection conexao = Conexao_Banco.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-        // abre a conexao e prepara a insercao de carteira de pontos com fechamento automatico
-        try (
-                Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql)
-        ) {
-
-            // associa os campos de carteira de pontos aos parametros da insercao
-            stmt.setInt(1, carteira.getPontuacao());
+            stmt.setInt(1, carteira.getPontosTotais());
             stmt.setString(2, carteira.getPatente());
-            stmt.setString(3, carteira.getNivel());
-            stmt.setInt(4, carteira.getId_b2c());
+            stmt.setInt(3, carteira.getNivel());
+            stmt.setObject(4, carteira.getIdB2c(), Types.INTEGER);
+            stmt.setObject(5, carteira.getIdB2b(), Types.INTEGER);
 
-            // executa a gravacao dos dados de carteira de pontos
             stmt.executeUpdate();
-
             System.out.println("Carteira cadastrada com sucesso!");
-
-        // registra a falha ao gravar carteira de pontos e informa o ocorrido
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir carteira: " + e.getMessage(), e);
         }
     }
 
-    // consulta os registros de carteira de pontos e devolve a lista
+    // Lista todas as carteiras
     public List<CarteiraModel> listarCarteiras() {
+        List<CarteiraModel> lista = new ArrayList<>();
+        String sql = "SELECT id_carteira, pontos_totais, patente, nivel, id_b2c, id_b2b FROM carteira ORDER BY id_carteira";
 
-        List<CarteiraModel> listaCarteiras = new ArrayList<>();
+        try (Connection conexao = Conexao_Banco.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
-        // define a consulta sql de leitura para carteira de pontos
-        String sql = "SELECT * FROM carteira ORDER BY id_carteira";
-
-        // abre a conexao e executa a consulta de carteira de pontos com fechamento automatico
-        try (
-                Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()
-        ) {
-
-            // converte os campos de cada linha consultada em carteira de pontos
             while (rs.next()) {
-
-                int id_carteira = rs.getInt("id_carteira");
-                int pontuacao = rs.getInt("pontuacao");
-                String patente = rs.getString("patente");
-                String nivel = rs.getString("nivel");
-                int id_b2c = rs.getInt("id_b2c");
-
-                CarteiraModel carteira = new CarteiraModel(
-                        pontuacao,
-                        patente,
-                        nivel,
-                        id_b2c
-                );
-
-                carteira.setId_carteira(id_carteira);
-
-                listaCarteiras.add(carteira);
+                lista.add(new CarteiraModel(
+                        rs.getInt("id_carteira"),
+                        rs.getInt("pontos_totais"),
+                        rs.getString("patente"),
+                        rs.getInt("nivel"),
+                        rs.getObject("id_b2c", Integer.class),
+                        rs.getObject("id_b2b", Integer.class)
+                ));
             }
 
-        // propaga a falha ao consultar carteira de pontos para informar o erro ao chamador
         } catch (SQLException e) {
-            System.out.println("Erro ao listar carteiras: " + e.getMessage());
+            throw new RuntimeException("Erro ao listar carteiras: " + e.getMessage(), e);
         }
 
-        // devolve os registros encontrados pela consulta
-        return listaCarteiras;
+        return lista;
     }
 
-    // atualiza os dados de carteira de pontos no banco de dados
+    // Atualiza uma carteira pelo ID
     public void atualizarCarteira(CarteiraModel carteira) {
+        String sql = "UPDATE carteira SET pontos_totais = ?, patente = ?, nivel = ?, id_b2c = ?, id_b2b = ? WHERE id_carteira = ?";
 
-        // define a consulta sql de atualizacao para carteira de pontos
-        String sql = "UPDATE carteira SET pontuacao = ?, patente = ?, nivel = ?, id_b2c = ? WHERE id_carteira = ?";
+        try (Connection conexao = Conexao_Banco.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-        // abre a conexao e prepara a atualizacao de carteira de pontos com fechamento automatico
-        try (
-                Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql)
-        ) {
-
-            // associa os campos de carteira de pontos aos parametros da atualizacao
-            stmt.setInt(1, carteira.getPontuacao());
+            stmt.setInt(1, carteira.getPontosTotais());
             stmt.setString(2, carteira.getPatente());
-            stmt.setString(3, carteira.getNivel());
-            stmt.setInt(4, carteira.getId_b2c());
-            stmt.setInt(5, carteira.getId_carteira());
+            stmt.setInt(3, carteira.getNivel());
+            stmt.setObject(4, carteira.getIdB2c(), Types.INTEGER);
+            stmt.setObject(5, carteira.getIdB2b(), Types.INTEGER);
+            stmt.setInt(6, carteira.getIdCarteira());
 
-            // executa a atualizacao dos dados de carteira de pontos
             int linhasAfetadas = stmt.executeUpdate();
-
-            // verifica se algum registro de carteira de pontos foi atualizado
-            if (linhasAfetadas > 0) {
-                System.out.println("Carteira atualizada com sucesso!");
-            } else {
-                System.out.println("Carteira não encontrada.");
-            }
-
-        // registra a falha ao atualizar carteira de pontos e informa o ocorrido
+            System.out.println(linhasAfetadas > 0 ? "Carteira atualizada com sucesso!" : "Carteira não encontrada.");
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar carteira: " + e.getMessage(), e);
         }
     }
 
-    // remove o registro de carteira de pontos do banco de dados
-    public void deletarCarteira(int id_carteira) {
-
-        // define a consulta sql de exclusao para carteira de pontos
+    // Remove uma carteira pelo ID
+    public void deletarCarteira(int idCarteira) {
         String sql = "DELETE FROM carteira WHERE id_carteira = ?";
 
-        // abre a conexao e prepara a exclusao de carteira de pontos com fechamento automatico
-        try (
-                Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql)
-        ) {
+        try (Connection conexao = Conexao_Banco.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            // associa o identificador do registro aos parametros da exclusao
-            stmt.setInt(1, id_carteira);
+            stmt.setInt(1, idCarteira);
 
-            // executa a exclusao do registro de carteira de pontos
             int linhasAfetadas = stmt.executeUpdate();
-
-            // verifica se algum registro de carteira de pontos foi removido
-            if (linhasAfetadas > 0) {
-                System.out.println("Carteira deletada com sucesso!");
-            } else {
-                System.out.println("Carteira não encontrada.");
-            }
-
-        // registra a falha ao remover carteira de pontos e informa o ocorrido
+            System.out.println(linhasAfetadas > 0 ? "Carteira deletada com sucesso!" : "Carteira não encontrada.");
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar carteira: " + e.getMessage(), e);

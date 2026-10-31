@@ -2,264 +2,167 @@ package Organizacao.Servlet;
 
 import Organizacao.Dao.MotoristaDAO;
 import Organizacao.Model.MotoristaModel;
-
-import jakarta.servlet.ServletException;
+import Organizacao.Model.Enum.StatusMotorista;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @WebServlet("/motoristas")
-// atende requisicoes http de motorista
-public class MotoristaSERVLET extends HttpServlet {
-
-    private static final Pattern CPF_PATTERN = Pattern.compile(
-            "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
-    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
-            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
-    private static final Pattern CNH_PATTERN = Pattern.compile("\\d{11}");
-    private static final Pattern NOME_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*");
-    private static final Pattern TEXTO_EMPRESARIAL_PATTERN = Pattern.compile(
-            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&()/-]*");
-    private static final Pattern TEXTO_CURTO_PATTERN = Pattern.compile(
-            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*");
-
-    // mantem as dependencias e configuracoes usadas nas requisicoes
+public class MotoristaServlet extends HttpServlet {
     private MotoristaDAO motoristaDAO;
 
     @Override
-    // inicializa o acesso aos dados usado pelas requisicoes
-    public void init() throws ServletException {
+    public void init() {
         motoristaDAO = new MotoristaDAO();
     }
 
+    // Lista os motoristas (GET)
     @Override
-    // consulta os registros de motorista e devolve a resposta json
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-
-        // consulta os registros e monta a resposta json
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            List<MotoristaModel> motoristas = motoristaDAO.listarMotoristas();
+            List<MotoristaModel> lista = motoristaDAO.listarMotorista();
             StringBuilder json = new StringBuilder("[");
-
-            // percorre os registros e acrescenta cada objeto a resposta json
-            for (int i = 0; i < motoristas.size(); i++) {
-                MotoristaModel motorista = motoristas.get(i);
-
-                json.append("{")
-                        .append("\"id_motorista\":").append(motorista.getId_motorista()).append(",")
-                        .append("\"nome\":\"").append(escape(motorista.getNome())).append("\",")
-                        .append("\"cpf\":\"").append(escape(motorista.getCpf())).append("\",")
-                        .append("\"telefone\":\"").append(escape(motorista.getTelefone())).append("\",")
-                        .append("\"cnh\":\"").append(escape(motorista.getCnh())).append("\",")
-                        .append("\"empresa\":\"").append(escape(motorista.getEmpresa())).append("\",")
-                        .append("\"status\":\"").append(escape(motorista.getStatus())).append("\"")
-                        .append("}");
-
-                // acrescenta uma virgula somente entre objetos json
-                if (i < motoristas.size() - 1) {
-                    json.append(",");
-                }
+            for (int i = 0; i < lista.size(); i++) {
+                MotoristaModel m = lista.get(i);
+                if (i > 0) json.append(",");
+                json.append("{\"id_motorista\":").append(m.getIdMotorista())
+                        .append(",\"status\":\"").append(escape(m.getStatus().name()))
+                        .append("\",\"empresa_resp\":\"").append(escape(m.getEmpresaResp()))
+                        .append("\",\"telefone\":\"").append(escape(m.getTelefone()))
+                        .append("\",\"nome\":\"").append(escape(m.getNome()))
+                        .append("\",\"licenca\":\"").append(escape(m.getLicenca())).append("\"}");
             }
-
-            json.append("]");
-            // define o status de sucesso e envia a lista json consultada
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(json.toString());
-
-        // devolve erro interno quando a operacao da requisicao falha
+            resp.setStatus(200);
+            resp.getWriter().write(json.append("]").toString());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar motoristas: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao listar motoristas: " + mensagem(e));
         }
     }
 
+    // Cadastra um motorista (POST)
     @Override
-    // valida os dados recebidos e cadastra motorista
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
-
-        // valida os campos da requisicao e cadastra motorista
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            motoristaDAO.inserirMotorista(criarMotorista(request));
-            // define o status de criacao e confirma o cadastro em json
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write(
-                    "{\"mensagem\":\"Motorista cadastrado com sucesso!\"}"
-            );
-
-        // devolve erro de requisicao quando os dados recebidos sao invalidos
+            MotoristaModel m = criar(req);
+            motoristaDAO.inserirMotorista(m);
+            resp.setStatus(201);
+            resp.getWriter().write("{\"mensagem\":\"Motorista cadastrado com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        // devolve erro interno quando a operacao da requisicao falha
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar motorista: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao cadastrar motorista: " + mensagem(e));
         }
     }
 
+    // Atualiza dados do motorista (PUT)
     @Override
-    // valida os dados recebidos e atualiza motorista
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-        request.setCharacterEncoding("UTF-8");
-
-        // valida os campos da requisicao e atualiza motorista
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
+        req.setCharacterEncoding("UTF-8");
         try {
-            MotoristaModel motorista = criarMotorista(request);
-            motorista.setId_motorista(obterId(request));
-            motoristaDAO.atualizarMotorista(motorista);
-
-            // define o status de atualizacao e confirma a alteracao em json
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(
-                    "{\"mensagem\":\"Motorista atualizado com sucesso!\"}"
-            );
-
-        // devolve erro de requisicao quando os dados recebidos sao invalidos
+            int id = inteiro(req, "id_motorista");
+            MotoristaModel m = criar(req);
+            m.setIdMotorista(id);
+            motoristaDAO.atualizarMotorista(m);
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Motorista atualizado com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        // devolve erro interno quando a operacao da requisicao falha
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar motorista: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao atualizar motorista: " + mensagem(e));
         }
     }
 
+    // Remove um motorista (DELETE)
     @Override
-    // valida o identificador e remove motorista
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        prepararResposta(response);
-
-        // valida o identificador da requisicao e remove motorista
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        prepararResposta(resp);
         try {
-            motoristaDAO.deletarMotorista(obterId(request));
-            // define o status de exclusao e confirma a remocao em json
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(
-                    "{\"mensagem\":\"Motorista deletado com sucesso!\"}"
-            );
-
-        // devolve erro de requisicao quando os dados recebidos sao invalidos
+            motoristaDAO.deletarMotorista(inteiro(req, "id_motorista"));
+            resp.setStatus(200);
+            resp.getWriter().write("{\"mensagem\":\"Motorista deletado com sucesso!\"}");
         } catch (IllegalArgumentException e) {
-            enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        // devolve erro interno quando a operacao da requisicao falha
+            enviarErro(resp, 400, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao deletar motorista: " + mensagem(e));
+            enviarErro(resp, 500, "Erro ao deletar motorista: " + mensagem(e));
         }
     }
 
-    // monta os dados do motorista com os campos obrigatorios da requisicao
-    private MotoristaModel criarMotorista(HttpServletRequest request) {
-        return new MotoristaModel(
-                validarFormato(obterParametroObrigatorio(request, "nome"), NOME_PATTERN,
-                        "Nome deve conter apenas letras, espaços, apóstrofos, pontos ou hífens."),
-                validarFormato(obterParametroObrigatorio(request, "cpf"), CPF_PATTERN,
-                        "CPF inválido. Informe 11 dígitos, com ou sem pontuação."),
-                validarFormato(obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
-                        "Telefone inválido. Informe DDD e um telefone brasileiro válido."),
-                validarFormato(obterParametroObrigatorio(request, "cnh"), CNH_PATTERN,
-                        "CNH inválida. Informe os 11 dígitos."),
-                validarFormato(obterParametroObrigatorio(request, "empresa"),
-                        TEXTO_EMPRESARIAL_PATTERN, "Empresa contém caracteres inválidos."),
-                validarFormato(obterParametroObrigatorio(request, "status"),
-                        TEXTO_CURTO_PATTERN, "Status contém caracteres inválidos.")
-        );
+    private MotoristaModel criar(HttpServletRequest req) {
+        StatusMotorista status = enumeracao(StatusMotorista.class, req, "status");
+        String empresa = parametro(req, "empresa_resp");
+        String telefone = parametro(req, "telefone");
+        String nome = parametro(req, "nome");
+        String licenca = parametro(req, "licenca");
+
+        if (telefone.length() > 15) throw new IllegalArgumentException("Telefone deve ter no máximo 15 caracteres.");
+        if (!Organizacao.Utilitarios.ValidarDocumentos.validarTelefone(telefone)) {
+            throw new IllegalArgumentException("Telefone inválido. Informe o DDD e o número. Ex.: (11) 98765-4321.");
+        }
+        if (licenca.length() > 50) throw new IllegalArgumentException("Licença deve ter no máximo 50 caracteres.");
+        return new MotoristaModel(status, empresa, telefone, nome, licenca);
     }
 
-    // valida e converte o identificador recebido na requisicao
-    private int obterId(HttpServletRequest request) {
-        String valor = request.getParameter("id_motorista");
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("ID do motorista é obrigatório.");
-        }
-        try {
-            int id = Integer.parseInt(valor.trim());
-            if (id <= 0) throw new NumberFormatException();
-            return id;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do motorista deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e devolve um parametro de texto obrigatorio
-    private String obterParametroObrigatorio(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-
-        // rejeita a requisicao quando o parametro obrigatorio esta ausente
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' é obrigatório."
-            );
-        }
-
-        return valor.trim();
-    }
-
-    private String validarFormato(String valor, Pattern padrao, String mensagem) {
-        if (!padrao.matcher(valor).matches()) {
-            throw new IllegalArgumentException(mensagem);
-        }
-        return valor;
-    }
-
-    // define o formato json e a codificacao da resposta
     private void prepararResposta(HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
     }
 
-    // define o status de erro e devolve uma resposta json
-    private void enviarErro(HttpServletResponse response, int status, String mensagem)
-            throws IOException {
+    private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
         response.setStatus(status);
-        response.getWriter().write(
-                "{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}"
-        );
+        response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");
     }
 
-    // devolve a mensagem da falha ou o nome da excecao
-    private String mensagem(Exception e) {
-        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-    }
-
-    // protege caracteres especiais do texto antes de incluir no json
     private String escape(String texto) {
-        StringBuilder escaped = new StringBuilder();
-        String value = texto == null ? "" : texto;
-        for (int i = 0; i < value.length(); i++) {
-            char character = value.charAt(i);
-            switch (character) {
-                case '"': escaped.append("\\\""); break;
-                case '\\': escaped.append("\\\\"); break;
-                case '\b': escaped.append("\\b"); break;
-                case '\f': escaped.append("\\f"); break;
-                case '\n': escaped.append("\\n"); break;
-                case '\r': escaped.append("\\r"); break;
-                case '\t': escaped.append("\\t"); break;
+        if (texto == null) return "";
+        StringBuilder saida = new StringBuilder();
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+            switch (c) {
+                case '"': saida.append("\\\""); break;
+                case '\\': saida.append("\\\\"); break;
+                case '\b': saida.append("\\b"); break;
+                case '\f': saida.append("\\f"); break;
+                case '\n': saida.append("\\n"); break;
+                case '\r': saida.append("\\r"); break;
+                case '\t': saida.append("\\t"); break;
                 default:
-                    if (character < 0x20) {
-                        escaped.append(String.format("\\u%04x", (int) character));
-                    } else {
-                        escaped.append(character);
-                    }
+                    if (c < 0x20) saida.append(String.format("\\u%04x", (int) c));
+                    else saida.append(c);
             }
         }
-        return escaped.toString();
+        return saida.toString();
+    }
+
+    private String parametro(HttpServletRequest request, String nome) {
+        String valor = request.getParameter(nome);
+        if (valor == null || valor.trim().isEmpty())
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
+        return valor.trim();
+    }
+
+    private int inteiro(HttpServletRequest request, String nome) {
+        try {
+            return Integer.parseInt(parametro(request, nome));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número inteiro.");
+        }
+    }
+
+    private <E extends Enum<E>> E enumeracao(Class<E> tipo, HttpServletRequest request, String nome) {
+        try {
+            return Enum.valueOf(tipo, parametro(request, nome));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valor inválido para '" + nome + "'. Valores aceitos: "
+                    + java.util.Arrays.toString(tipo.getEnumConstants()));
+        }
+    }
+
+    private String mensagem(Exception e) {
+        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
 }
