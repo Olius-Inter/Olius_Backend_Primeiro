@@ -49,6 +49,8 @@ public class B2bSERVLET extends HttpServlet {
                         .append("\"razao_social\":\"").append(escape(empresa.getRazao_social())).append("\",")
                         .append("\"nome_empresa\":\"").append(escape(empresa.getNome_empresa())).append("\",")
                         .append("\"telefone\":\"").append(escape(empresa.getTelefone())).append("\",")
+                        .append("\"email\":\"").append(escape(empresa.getEmail())).append("\",")
+                        .append("\"id_usuario_vinculado\":").append(empresa.getId_usuario_vinculado()).append(",")
                         .append("\"id_endereco\":").append(empresa.getId_endereco())
                         .append("}");
 
@@ -171,6 +173,11 @@ public class B2bSERVLET extends HttpServlet {
         if (nome.length() > 255) throw new IllegalArgumentException("Nome da empresa muito longo.");
         B2bModel empresa = new B2bModel(cnpj, nome, nome, telefone, null);
         empresa.setPlano(plano);
+        String email = obterParametroObrigatorio(request, "email");
+        if (!ValidarDocumentos.validarEmail(email)) throw new IllegalArgumentException("Informe um e-mail válido.");
+        if (email.length() > 255) throw new IllegalArgumentException("E-mail muito longo.");
+        empresa.setEmail(email);
+        empresa.setSenha(request.getParameter("senha"));
         return empresa;
     }
 
