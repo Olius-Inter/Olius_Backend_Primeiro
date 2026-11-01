@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 // Login do painel administrativo. É aberto ao clicar na logo do Olius no topo do site.
-// Só entra quem tem registro ATIVO na tabela adm e acerta nome, e-mail e senha.
+// Só entra qgituem tem registro ATIVO na tabela adm e acerta nome, e-mail e senha.
 //   GET  /login-adm          -> mostra a tela de login (ou vai direto ao painel se já estiver logado)
 //   GET  /login-adm?sair=1   -> encerra a sessão do administrador
 //   POST /login-adm          -> valida nome, e-mail e senha no banco

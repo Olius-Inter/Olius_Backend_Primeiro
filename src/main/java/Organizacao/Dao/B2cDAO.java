@@ -7,19 +7,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.util.Base64;
 import java.util.ArrayList;
 import java.util.List;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 public class B2cDAO {
 
-    // Cadastra o CPF de um usuário B2C
+    // cadastra um usuario b2c com o cpf protegido
     public void inserirB2c(B2cModel b2c) {
         String sql = "INSERT INTO b2c (cpf, id_usuario) VALUES (?, ?)";
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            stmt.setString(1, b2c.getCpf());
+            stmt.setString(1, hashCpf(b2c.getCpf()));
             stmt.setInt(2, b2c.getIdUsuario());
 
             stmt.executeUpdate();
@@ -30,7 +35,7 @@ public class B2cDAO {
         }
     }
 
-    // Lista todos os clientes B2C
+    // lista clientes e retorna apenas os hashes dos cpfs
     public List<B2cModel> listarB2c() {
         List<B2cModel> lista = new ArrayList<>();
         String sql = "SELECT id_b2c, cpf, id_usuario FROM b2c ORDER BY id_b2c";
@@ -40,7 +45,14 @@ public class B2cDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                lista.add(new B2cModel(rs.getInt("id_b2c"), rs.getInt("id_usuario"), rs.getString("cpf")));
+                String cpfArmazenado = rs.getString("cpf");
+                String cpf;
+                if (cpfArmazenado != null && cpfArmazenado.startsWith("hmac:v1:")) {
+                    cpf = cpfArmazenado;
+                } else {
+                    cpf = cpfArmazenado == null ? null : hashCpf(cpfArmazenado);
+                }
+                lista.add(new B2cModel(rs.getInt("id_b2c"), rs.getInt("id_usuario"), cpf));
             }
 
         } catch (SQLException e) {
@@ -50,14 +62,14 @@ public class B2cDAO {
         return lista;
     }
 
-    // Atualiza o CPF, localizando o cliente pelo usuário
+    // atualiza o cpf protegido pelo identificador do usuario
     public void atualizarB2c(B2cModel b2c) {
         String sql = "UPDATE b2c SET cpf = ? WHERE id_usuario = ?";
 
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            stmt.setString(1, b2c.getCpf());
+            stmt.setString(1, hashCpf(b2c.getCpf()));
             stmt.setInt(2, b2c.getIdUsuario());
 
             int linhasAfetadas = stmt.executeUpdate();
@@ -69,7 +81,7 @@ public class B2cDAO {
         }
     }
 
-    // Remove o cliente B2C pelo usuário
+    // remove o cliente pelo identificador do usuario
     public void deletarB2c(int idUsuario) {
         String sql = "DELETE FROM b2c WHERE id_usuario = ?";
 
@@ -84,6 +96,26 @@ public class B2cDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar B2C: " + e.getMessage(), e);
+        }
+    }
+
+    // cria uma identificacao irreversivel do cpf com chave secreta
+    private String hashCpf(String cpf) {
+        String chaveConfigurada = System.getenv("CPF_HASH_KEY");
+        if (chaveConfigurada == null || chaveConfigurada.trim().isEmpty()) {
+            throw new IllegalStateException("A variável CPF_HASH_KEY não está configurada.");
+        }
+        try {
+            byte[] chave = Base64.getDecoder().decode(chaveConfigurada.trim());
+            if (chave.length != 32) {
+                throw new IllegalStateException("A chave CPF_HASH_KEY deve ter 32 bytes em base64.");
+            }
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(chave, "HmacSHA256"));
+            byte[] digest = mac.doFinal(cpf.getBytes(StandardCharsets.UTF_8));
+            return "hmac:v1:" + Base64.getEncoder().withoutPadding().encodeToString(digest);
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            throw new IllegalStateException("Não foi possível gerar a identificação protegida do CPF.", e);
         }
     }
 }

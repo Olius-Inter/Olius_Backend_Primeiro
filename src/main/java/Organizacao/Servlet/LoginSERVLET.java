@@ -2,6 +2,7 @@ package Organizacao.Servlet;
 
 import Organizacao.Dao.UsuarioDAO;
 import Organizacao.Model.UsuarioModel;
+import Organizacao.Utilitarios.SenhaUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,11 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 
 @WebServlet("/login")
-// atende o login (POST) e o logout (GET /login?sair=1) de usuario
+// controla o acesso e o encerramento da sessao do usuario
 public class LoginSERVLET extends HttpServlet {
 
     private UsuarioDAO usuarioDAO;
@@ -26,7 +25,7 @@ public class LoginSERVLET extends HttpServlet {
     }
 
     @Override
-    // encerra a sessao quando pedido; do contrario mostra a pagina de login
+    // encerra a sessao ou exibe a pagina de acesso
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -42,7 +41,7 @@ public class LoginSERVLET extends HttpServlet {
     }
 
     @Override
-    // valida e-mail e senha e abre a sessao do usuario
+    // valida as credenciais e inicia a sessao do usuario
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -58,13 +57,13 @@ public class LoginSERVLET extends HttpServlet {
         try {
             UsuarioModel usuario = usuarioDAO.buscarPorEmail(email);
 
-            // mesma mensagem para e-mail inexistente e senha errada (nao revela qual falhou)
+            // usa uma mensagem unica para falhas de autenticacao
             if (usuario == null || !senhaConfere(senha, usuario.getSenha())) {
                 voltarComErro(request, response, "E-mail ou senha incorretos.", email);
                 return;
             }
 
-            // troca o id de sessao ao autenticar (evita fixacao de sessao)
+            // cria um novo identificador de sessao apos o acesso
             HttpSession antiga = request.getSession(false);
             if (antiga != null) {
                 antiga.invalidate();
@@ -83,21 +82,16 @@ public class LoginSERVLET extends HttpServlet {
         }
     }
 
-    // compara as senhas em tempo constante
+    // usa o mesmo hash do cadastro de usuarios e administradores
     private boolean senhaConfere(String informada, String armazenada) {
-        if (armazenada == null) {
-            return false;
-        }
-        return MessageDigest.isEqual(
-                informada.getBytes(StandardCharsets.UTF_8),
-                armazenada.getBytes(StandardCharsets.UTF_8));
+        return SenhaUtil.conferir(informada, armazenada);
     }
 
     private String limpar(String valor) {
         return valor == null ? "" : valor.trim();
     }
 
-    // reabre a pagina de login com a mensagem de erro e o e-mail digitado
+    // devolve a pagina com o erro e o email informado
     private void voltarComErro(HttpServletRequest request, HttpServletResponse response,
                                String mensagem, String email) throws ServletException, IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

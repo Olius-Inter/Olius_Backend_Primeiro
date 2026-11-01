@@ -36,7 +36,7 @@ public class B2cSERVLET extends HttpServlet {
                 if (i > 0) json.append(",");
                 json.append("{\"id_b2c\":").append(c.getIdB2c())
                         .append(",\"id_usuario\":").append(c.getIdUsuario())
-                        .append(",\"cpf\":").append(json(c.getCpf())).append("}");
+                        .append(",\"cpf_hash\":").append(json(c.getCpf())).append("}");
             }
             enviar(resp, 200, json.append("]").toString());
         } catch (Exception e) {
