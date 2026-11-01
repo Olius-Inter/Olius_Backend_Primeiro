@@ -36,7 +36,7 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
             for (int i = 0; i < items.size(); i++) {
                 SolicitacaoColetaModel item = items.get(i);
                 json.append("{\"id_solicitacao\":").append(item.getId_solicitacao())
-                        .append(",\"litros_estimados\":").append(item.getLitros_estimados())
+                        .append(",\"litros_estimados\":").append(Double.isFinite(item.getLitros_estimados()) ? Double.toString(item.getLitros_estimados()) : "null")
                         .append(",\"dt_solicitacao\":").append(json(item.getDt_solicitacao()))
                         .append(",\"status\":").append(json(item.getStatus()))
                         .append(",\"id_b2b\":").append(item.getId_b2b())
@@ -48,7 +48,7 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
             response.getWriter().write(json.append(']').toString());
         } catch (Exception e) {
             // informa falhas ocorridas ao consultar as solicitacoes
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar solicitações: " + message(e));
         }
     }
@@ -60,15 +60,18 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
         prepare(response);
         prepareRequest(request);
         try {
-            solicitacaoDAO.inserirSolicitacao(criar(request));
+            SolicitacaoColetaModel item = criar(request);
+            solicitacaoDAO.inserirSolicitacao(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Solicitação cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Solicitação cadastrada com sucesso!\",\"id_solicitacao\":" + item.getId_solicitacao() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar solicitação: " + message(e));
         }
     }
@@ -85,12 +88,14 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
             solicitacaoDAO.atualizarSolicitacao(item);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Solicitação atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar solicitação: " + message(e));
         }
     }
@@ -105,25 +110,33 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
                     requiredInt(request, "id_solicitacao"));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Solicitação removida com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando o identificador enviado e invalido
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao remover solicitação: " + message(e));
         }
     }
 
     // valida os campos recebidos e cria o objeto da solicitacao
     private SolicitacaoColetaModel criar(HttpServletRequest request) {
-        String date = requiredDate(request, "dt_solicitacao").toString();
+        String date = java.time.LocalDate.now().toString();
+        double litros = requiredNonNegativeDouble(request, "litros_estimados");
+        if (litros <= 0) throw new IllegalArgumentException("Informe um volume maior que zero.");
+        String status = requiredText(request, "status");
+        if (!java.util.Arrays.asList("Pendente", "Realizada", "Cancelada").contains(status)) {
+            throw new IllegalArgumentException("Status da solicitação inválido.");
+        }
         return new SolicitacaoColetaModel(
-                requiredNonNegativeDouble(request, "litros_estimados"),
+                litros,
                 date,
-                validarStatus(requiredText(request, "status")),
+                status,
                 requiredInt(request, "id_b2b"),
-                requiredInt(request, "id_pev"));
+                null);
     }
 
 
@@ -143,16 +156,9 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
         String value = request.getParameter(name);
         // rejeita parametros ausentes ou vazios
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
+            throw new IllegalArgumentException("O par?metro '" + name + "' ? obrigat?rio.");
         }
         return value.trim();
-    }
-
-    private String validarStatus(String status) {
-        if (!status.matches("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*")) {
-            throw new IllegalArgumentException("Status contém caracteres inválidos.");
-        }
-        return status;
     }
 
     // valida e converte um parametro para inteiro positivo
@@ -165,7 +171,7 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
+                    "O par?metro '" + name + "' deve ser um inteiro positivo.", e);
         }
     }
 
@@ -179,23 +185,7 @@ public class SolicitacaoColetaSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
-        }
-    }
-
-    // valida e converte um parametro para data
-    private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
-        try {
-            return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
-            // informa o formato esperado para a data
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
+                    "O par?metro '" + name + "' deve ser um n?mero v?lido n?o negativo.", e);
         }
     }
 

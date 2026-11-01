@@ -51,7 +51,7 @@ public class PontuacaoSERVLET extends HttpServlet {
             response.getWriter().write(json.append(']').toString());
         } catch (Exception e) {
             // informa falhas ocorridas ao consultar as pontuacoes
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar pontuações: " + message(e));
         }
     }
@@ -63,15 +63,18 @@ public class PontuacaoSERVLET extends HttpServlet {
         prepare(response);
         prepareRequest(request);
         try {
-            pontuacaoDAO.inserirPontuacao(criar(request));
+            PontuacaoModel item = criar(request);
+            pontuacaoDAO.inserirPontuacao(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Pontuação cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Pontuação cadastrada com sucesso!\",\"id_pontuacao\":" + item.getId_pontuacao() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar pontuação: " + message(e));
         }
     }
@@ -88,12 +91,14 @@ public class PontuacaoSERVLET extends HttpServlet {
             pontuacaoDAO.atualizarPontuacao(item);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Pontuação atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar pontuação: " + message(e));
         }
     }
@@ -107,12 +112,14 @@ public class PontuacaoSERVLET extends HttpServlet {
             pontuacaoDAO.deletarPontuacao(requiredInt(request, "id_pontuacao"));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Pontuação removida com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando o identificador enviado e invalido
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao remover pontuação: " + message(e));
         }
     }
@@ -151,7 +158,7 @@ public class PontuacaoSERVLET extends HttpServlet {
         String value = request.getParameter(name);
         // rejeita parametros ausentes ou vazios
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
+            throw new IllegalArgumentException("O par?metro '" + name + "' ? obrigat?rio.");
         }
         return value.trim();
     }
@@ -166,37 +173,19 @@ public class PontuacaoSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e converte um parametro para numero nao negativo
-    private double requiredNonNegativeDouble(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            double number = Double.parseDouble(value);
-            // rejeita valores negativos e valores que nao representam um numero finito
-            if (!Double.isFinite(number) || number < 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
+                    "O par?metro '" + name + "' deve ser um inteiro positivo.", e);
         }
     }
 
     // valida e converte um parametro para data
     private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
         try {
             return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
+        } catch (RuntimeException e) {
             // informa o formato esperado para a data
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
+                    "O par?metro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
         }
     }
 

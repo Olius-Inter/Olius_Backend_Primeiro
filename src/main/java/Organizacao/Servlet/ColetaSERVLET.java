@@ -44,7 +44,8 @@ public class ColetaSERVLET extends HttpServlet {
                 json.append("\"id_solicitacao\":").append(coleta.getId_solicitacao()).append(",");
                 json.append("\"id_motorista\":").append(coleta.getId_motorista()).append(",");
                 json.append("\"dt_coleta\":\"").append(coleta.getDt_coleta()).append("\",");
-                json.append("\"volume\":").append(coleta.getVolume()).append(",");
+                json.append("\"volume\":").append(Double.isFinite(coleta.getVolume()) ? Double.toString(coleta.getVolume()) : "null").append(",");
+                json.append("\"avaliacao_coleta\":").append(coleta.getAvaliacao_coleta()).append(",");
                 json.append("\"observacao\":\"").append(escape(coleta.getObservacao())).append("\"");
                 json.append("}");
 
@@ -59,7 +60,7 @@ public class ColetaSERVLET extends HttpServlet {
 
             // informa falhas ocorridas ao consultar as coletas
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar coletas: " + e.getMessage());
         }
     }
@@ -83,16 +84,19 @@ public class ColetaSERVLET extends HttpServlet {
 
             ColetaModel coleta = new ColetaModel(idSolicitacao, idMotorista, dtColeta, volume, observacao);
 
+            coleta.setAvaliacao_coleta(obterAvaliacao(request));
             coletaDAO.inserirColeta(coleta);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Coleta cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Coleta cadastrada com sucesso!\",\"id_coleta\":" + coleta.getId_coleta() + "}");
 
             // informa quando os dados enviados sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar coleta: " + e.getMessage());
         }
     }
@@ -117,16 +121,19 @@ public class ColetaSERVLET extends HttpServlet {
             ColetaModel coleta = new ColetaModel(idSolicitacao, idMotorista, dtColeta, volume, observacao);
             coleta.setId_coleta(idColeta);
 
+            coleta.setAvaliacao_coleta(obterAvaliacao(request));
             coletaDAO.atualizarColeta(coleta);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Coleta atualizada com sucesso!\"}");
 
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar coleta: " + e.getMessage());
         }
     }
@@ -145,12 +152,14 @@ public class ColetaSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Coleta deletada com sucesso!\"}");
 
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao deletar coleta: " + e.getMessage());
         }
     }
@@ -159,16 +168,19 @@ public class ColetaSERVLET extends HttpServlet {
 
     private int obterParametroInt(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
+
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
+
         try {
             int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
+            if (numero <= 0) {
+                throw new IllegalArgumentException("Identificador deve ser maior que zero.");
+            }
             return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número inteiro.", e);
         }
     }
 
@@ -183,13 +195,12 @@ public class ColetaSERVLET extends HttpServlet {
 
         try {
             double numero = Double.parseDouble(valor.trim());
-            if (!Double.isFinite(numero) || numero < 0) {
-                throw new NumberFormatException();
+            if (!Double.isFinite(numero) || numero <= 0) {
+                throw new IllegalArgumentException("Volume deve ser um número maior que zero.");
             }
             return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número válido não negativo.", e);
+            throw new IllegalArgumentException("O parâmetro '" + nome + "' deve ser um número.", e);
         }
     }
 
@@ -200,12 +211,9 @@ public class ColetaSERVLET extends HttpServlet {
             throw new IllegalArgumentException("A data da coleta é obrigatória.");
         }
 
-        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
-        }
         try {
             return LocalDate.parse(valor.trim());
-        } catch (java.time.format.DateTimeParseException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
         }
     }
@@ -238,5 +246,10 @@ public class ColetaSERVLET extends HttpServlet {
     private void enviarErro(HttpServletResponse response, int status, String mensagem) throws IOException {
         response.setStatus(status);
         response.getWriter().write("{\"erro\":\"" + escape(mensagem == null ? "Erro interno." : mensagem) + "\"}");
+    }
+    private int obterAvaliacao(HttpServletRequest request) {
+        int avaliacao = obterParametroInt(request, "avaliacao_coleta");
+        if (avaliacao < 1 || avaliacao > 5) throw new IllegalArgumentException("Informe uma avaliação de 1 a 5.");
+        return avaliacao;
     }
 }

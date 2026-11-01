@@ -38,7 +38,7 @@ public class EntregaPevSERVLET extends HttpServlet {
                 json.append("{\"id_entrega\":").append(item.getId_entrega())
                         .append(",\"id_usuario_b2c\":").append(item.getId_usuario_b2c())
                         .append(",\"id_pev\":").append(item.getId_pev())
-                        .append(",\"qtd_litros\":").append(item.getQtd_litros())
+                        .append(",\"qtd_litros\":").append(Double.isFinite(item.getQtd_litros()) ? Double.toString(item.getQtd_litros()) : "null")
                         .append(",\"pontos_gerados\":").append(item.getPontos_gerados())
                         .append(",\"dt_entrega\":").append(json(
                                 item.getDt_entrega() == null ? null : item.getDt_entrega().toString()))
@@ -50,7 +50,7 @@ public class EntregaPevSERVLET extends HttpServlet {
             response.getWriter().write(json.append(']').toString());
         } catch (Exception e) {
             // informa falhas ocorridas ao consultar as entregas
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar entregas PEV: " + message(e));
         }
     }
@@ -62,15 +62,18 @@ public class EntregaPevSERVLET extends HttpServlet {
         prepare(response);
         prepareRequest(request);
         try {
-            entregaDAO.inserirEntregaPev(criar(request));
+            EntregaPevModel item = criar(request);
+            entregaDAO.inserirEntregaPev(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Entrega PEV cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Entrega PEV cadastrada com sucesso!\",\"id_entrega\":" + item.getId_entrega() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar entrega PEV: " + message(e));
         }
     }
@@ -87,12 +90,14 @@ public class EntregaPevSERVLET extends HttpServlet {
             entregaDAO.atualizarEntregaPev(item);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Entrega PEV atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar entrega PEV: " + message(e));
         }
     }
@@ -106,12 +111,14 @@ public class EntregaPevSERVLET extends HttpServlet {
             entregaDAO.deletarEntregaPev(requiredInt(request, "id_entrega"));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Entrega PEV removida com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando o identificador enviado e invalido
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao remover entrega PEV: " + message(e));
         }
     }
@@ -186,13 +193,9 @@ public class EntregaPevSERVLET extends HttpServlet {
     // valida e converte um parametro para data
     private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
         try {
             return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
+        } catch (RuntimeException e) {
             // informa o formato esperado para a data
             throw new IllegalArgumentException(
                     "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);

@@ -3,6 +3,8 @@ package Organizacao.Servlet;
 import Organizacao.Dao.B2bDAO;
 import Organizacao.Model.B2bModel;
 
+import Organizacao.Utilitarios.ValidarDocumentos;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,18 +13,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @WebServlet("/empresas")
-// atende requisicoes http de empresas B2B
+// atende requisicoes http de empresa b dois b
 public class B2bSERVLET extends HttpServlet {
-
-    private static final Pattern CNPJ_PATTERN = Pattern.compile(
-            "\\d{14}|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
-    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
-            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
-    private static final Pattern TEXTO_EMPRESARIAL_PATTERN = Pattern.compile(
-            "[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&()/-]*");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private B2bDAO empresasDAO;
@@ -34,7 +28,7 @@ public class B2bSERVLET extends HttpServlet {
     }
 
     @Override
-    // consulta os registros de empresas B2B e devolve a resposta json
+    // consulta os registros de empresa b dois b e devolve a resposta json
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -50,9 +44,10 @@ public class B2bSERVLET extends HttpServlet {
                 B2bModel empresa = empresas.get(i);
                 json.append("{")
                         .append("\"id_usuario\":").append(empresa.getId_usuario()).append(",")
+                        .append("\"plano\":\"").append(escape(empresa.getPlano())).append("\",")
                         .append("\"cnpj\":\"").append(escape(empresa.getCnpj())).append("\",")
                         .append("\"razao_social\":\"").append(escape(empresa.getRazao_social())).append("\",")
-                        .append("\"nome_fantasia\":\"").append(escape(empresa.getNome_fantasia())).append("\",")
+                        .append("\"nome_empresa\":\"").append(escape(empresa.getNome_empresa())).append("\",")
                         .append("\"telefone\":\"").append(escape(empresa.getTelefone())).append("\",")
                         .append("\"id_endereco\":").append(empresa.getId_endereco())
                         .append("}");
@@ -70,79 +65,82 @@ public class B2bSERVLET extends HttpServlet {
 
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar empresas B2B: " + mensagem(e));
         }
     }
 
     @Override
-    // valida os dados recebidos e cadastra uma empresa B2B
+    // valida os dados recebidos e cadastra empresa b dois b
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e cadastra uma empresa B2B
+        // valida os campos da requisicao e cadastra empresa b dois b
+        if ("PUT".equals(request.getParameter("_metodo"))) {
+            doPut(request, response);
+            return;
+        }
         try {
-            empresasDAO.inserirB2b(criarEmpresa(request));
+            B2bModel item = criarEmpresa(request);
+            empresasDAO.salvarComEndereco(item, EnderecoSERVLET.criarEndereco(request), false);
             // define o status de criacao e confirma o cadastro em json
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Empresa B2B cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Empresa B2B cadastrada com sucesso!\",\"id_usuario\":" + item.getId_usuario() + "}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar empresa B2B: " + mensagem(e));
         }
     }
 
     @Override
-    // valida os dados recebidos e atualiza uma empresa B2B
+    // valida os dados recebidos e atualiza empresa b dois b
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
         request.setCharacterEncoding("UTF-8");
 
-        // valida os campos da requisicao e atualiza empresa b2b
+        // valida os campos da requisicao e atualiza empresa b dois b
         try {
             int idUsuario = obterId(request);
             B2bModel empresa = criarEmpresa(request);
-            empresasDAO.atualizarB2b(new B2bModel(
-                    idUsuario,
-                    empresa.getCnpj(),
-                    empresa.getRazao_social(),
-                    empresa.getNome_fantasia(),
-                    empresa.getTelefone(),
-                    empresa.getId_endereco()
-            ));
+            empresa.setId_usuario(idUsuario);
+            empresasDAO.salvarComEndereco(empresa, EnderecoSERVLET.criarEndereco(request), true);
 
             // define o status de atualizacao e confirma a alteracao em json
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Empresa B2B atualizada com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar empresa B2B: " + mensagem(e));
         }
     }
 
     @Override
-    // valida o identificador e remove empresa b2b
+    // valida o identificador e remove empresa b dois b
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         prepararResposta(response);
 
-        // valida o identificador da requisicao e remove empresa b doib
+        // valida o identificador da requisicao e remove empresa b dois b
         try {
             empresasDAO.deletarB2b(obterId(request));
             // define o status de exclusao e confirma a remocao em json
@@ -150,28 +148,30 @@ public class B2bSERVLET extends HttpServlet {
             response.getWriter().write("{\"mensagem\":\"Empresa B2B deletada com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao deletar empresa B2B: " + mensagem(e));
         }
     }
 
     // monta os dados da empresa com os campos obrigatorios da requisicao
     private B2bModel criarEmpresa(HttpServletRequest request) {
-        return new B2bModel(
-                validarFormato(obterParametroObrigatorio(request, "cnpj"), CNPJ_PATTERN,
-                        "CNPJ inválido. Informe 14 dígitos, com ou sem pontuação."),
-                validarFormato(obterParametroObrigatorio(request, "razao_social"),
-                        TEXTO_EMPRESARIAL_PATTERN, "Razão social contém caracteres inválidos."),
-                validarFormato(obterParametroObrigatorio(request, "nome_fantasia"),
-                        TEXTO_EMPRESARIAL_PATTERN, "Nome fantasia contém caracteres inválidos."),
-                validarFormato(obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
-                        "Telefone inválido. Informe DDD e um telefone brasileiro válido."),
-                obterIdEndereco(request)
-        );
+        String cnpj = obterParametroObrigatorio(request, "cnpj").replaceAll("[.\\-/\\s]", "");
+        if (!ValidarDocumentos.validarCnpj(cnpj)) throw new IllegalArgumentException("CNPJ inválido.");
+        String telefone = obterParametroObrigatorio(request, "telefone");
+        if (telefone.length() > 15) throw new IllegalArgumentException("Telefone deve ter no máximo 15 caracteres.");
+        String plano = obterParametroObrigatorio(request, "plano");
+        if (!java.util.Arrays.asList("Empresa", "Basico", "Profissional").contains(plano)) throw new IllegalArgumentException("Plano inválido.");
+        String nome = obterParametroObrigatorio(request, "nome_empresa");
+        if (nome.length() > 255) throw new IllegalArgumentException("Nome da empresa muito longo.");
+        B2bModel empresa = new B2bModel(cnpj, nome, nome, telefone, null);
+        empresa.setPlano(plano);
+        return empresa;
     }
 
     // valida e converte o identificador recebido na requisicao
@@ -179,31 +179,26 @@ public class B2bSERVLET extends HttpServlet {
         return obterInteiroObrigatorio(request, "id_usuario", "ID do usuário");
     }
 
-    // valida e converte o identificador do endereco recebido
-    private int obterIdEndereco(HttpServletRequest request) {
-        return obterInteiroObrigatorio(request, "id_endereco", "ID do endereço");
-    }
-
     // valida e converte um parametro obrigatorio para inteiro
     private int obterInteiroObrigatorio(HttpServletRequest request, String nome, String descricao) {
         String valor = request.getParameter(nome);
+
+        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException(descricao + " é obrigatório.");
         }
+
+        // valida e converte os dados recebidos antes de usa los
         try {
             int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
+            if (numero <= 0) {
+                throw new IllegalArgumentException("Identificador deve ser maior que zero.");
+            }
             return numero;
+        // converte erro de conversao em uma validacao clara do parametro
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(descricao + " deve ser um inteiro positivo.", e);
+            throw new IllegalArgumentException(descricao + " inválido.", e);
         }
-    }
-
-    private String validarFormato(String valor, Pattern padrao, String mensagem) {
-        if (!padrao.matcher(valor).matches()) {
-            throw new IllegalArgumentException(mensagem);
-        }
-        return valor;
     }
 
     // valida e devolve um parametro de texto obrigatorio
