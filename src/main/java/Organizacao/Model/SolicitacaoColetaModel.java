@@ -9,11 +9,11 @@ public class SolicitacaoColetaModel {
     private double litros_estimados;
     private String dt_solicitacao;
     private String status;
-    private int id_b2b;
-    private int id_pev;
+    private Integer id_b2b;
+    private Integer id_pev;
 
     // inicializa os dados de solicitacao de coleta com identificador
-    public SolicitacaoColetaModel(double litros_estimados, String dt_solicitacao, String status, int id_b2b, int id_pev) {
+    public SolicitacaoColetaModel(double litros_estimados, String dt_solicitacao, String status, Integer id_b2b, Integer id_pev) {
         this.litros_estimados = litros_estimados;
         this.dt_solicitacao = dt_solicitacao;
         this.status = status;
@@ -47,12 +47,12 @@ public class SolicitacaoColetaModel {
     }
 
     // retorna o valor de id b b
-    public int getId_b2b() {
+    public Integer getId_b2b() {
         return id_b2b;
     }
 
     // retorna o valor de id pev
-    public int getId_pev() {
+    public Integer getId_pev() {
         return id_pev;
     }
 
@@ -72,12 +72,12 @@ public class SolicitacaoColetaModel {
     }
 
     // atualiza o valor de id b b
-    public void setId_b2b(int id_b2b) {
+    public void setId_b2b(Integer id_b2b) {
         this.id_b2b = id_b2b;
     }
 
     // atualiza o valor de id pev
-    public void setId_pev(int id_pev) {
+    public void setId_pev(Integer id_pev) {
         this.id_pev = id_pev;
     }
 }

@@ -1,35 +1,35 @@
 package Organizacao.Model;
 
 
-// representa os dados da entidade empresa B2B
+// representa os dados da entidade empresa b dois b
 public class B2bModel {
     // armazena os atributos e relacionamentos da entidade
 
     private int id_usuario;
     private String cnpj;
     private String razao_social;
-    private String nome_fantasia;
+    private String nome_empresa;
     private String telefone;
-    private int id_endereco;
+    private Integer id_endereco;
 
-    // inicializa os dados de empresa B2B
+    // inicializa os dados de empresa b dois b
     public B2bModel(String cnpj, String razao_social,
-                    String nome_fantasia, String telefone,
-                    int id_endereco) {
+                    String nome_empresa, String telefone,
+                    Integer id_endereco) {
 
         this.cnpj = cnpj;
         this.razao_social = razao_social;
-        this.nome_fantasia = nome_fantasia;
+        this.nome_empresa = nome_empresa;
         this.telefone = telefone;
         this.id_endereco = id_endereco;
     }
 
-    // inicializa os dados de empresa B2B com identificador
-    public B2bModel(int id_usuario, String cnpj, String razao_social, String nome_fantasia, String telefone, int id_endereco) {
+    // inicializa os dados de empresa b dois b com identificador
+    public B2bModel(int id_usuario, String cnpj, String razao_social, String nome_empresa, String telefone, Integer id_endereco) {
         this.id_usuario = id_usuario;
         this.cnpj = cnpj;
         this.razao_social = razao_social;
-        this.nome_fantasia = nome_fantasia;
+        this.nome_empresa = nome_empresa;
         this.telefone = telefone;
         this.id_endereco = id_endereco;
     }
@@ -37,6 +37,11 @@ public class B2bModel {
     // retorna o valor de id usuario
     public int getId_usuario() {
         return id_usuario;
+    }
+
+    // atualiza o identificador gerado no cadastro
+    public void setId_usuario(int id_usuario) {
+        this.id_usuario = id_usuario;
     }
 
     // retorna o valor de cnpj
@@ -50,8 +55,8 @@ public class B2bModel {
     }
 
     // retorna o valor de nome fantasia
-    public String getNome_fantasia() {
-        return nome_fantasia;
+    public String getNome_empresa() {
+        return nome_empresa;
     }
 
     // retorna o valor de telefone
@@ -60,7 +65,7 @@ public class B2bModel {
     }
 
     // retorna o valor de id endereco
-    public int getId_endereco() {
+    public Integer getId_endereco() {
         return id_endereco;
     }
 
@@ -75,8 +80,8 @@ public class B2bModel {
     }
 
     // atualiza o valor de nome fantasia
-    public void setNome_fantasia(String nome_fantasia) {
-        this.nome_fantasia = nome_fantasia;
+    public void setNome_empresa(String nome_empresa) {
+        this.nome_empresa = nome_empresa;
     }
 
     // atualiza o valor de telefone
@@ -85,7 +90,17 @@ public class B2bModel {
     }
 
     // atualiza o valor de id endereco
-    public void setId_endereco(int id_endereco) {
+    public void setId_endereco(Integer id_endereco) {
         this.id_endereco = id_endereco;
     }
+    private String plano;
+
+    public String getPlano() {
+        return plano;
+    }
+
+    public void setPlano(String plano) {
+        this.plano = plano;
+    }
+
 }

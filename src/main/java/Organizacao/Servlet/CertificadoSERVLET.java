@@ -39,11 +39,12 @@ public class CertificadoSERVLET extends HttpServlet {
             for (int i = 0; i < certificados.size(); i++) {
                 CertificadoModel certificado = certificados.get(i);
                 json.append("{")
+                        .append("\"id_coleta\":").append(certificado.getId_coleta()).append(",")
                         .append("\"id_certificado\":").append(certificado.getId_certificado()).append(",")
                         .append("\"id_usuario_b2b\":").append(certificado.getId_usuario_b2b()).append(",")
                         .append("\"codigo\":").append(jsonString(certificado.getCodigo())).append(",")
                         .append("\"nivel\":").append(jsonString(certificado.getNivel())).append(",")
-                        .append("\"volume_total\":").append(certificado.getVolume_total()).append(",")
+                        .append("\"volume_total\":").append(Double.isFinite(certificado.getVolume_total()) ? Double.toString(certificado.getVolume_total()) : "null").append(",")
                         .append("\"dt_emissao\":").append(jsonString(
                                 certificado.getDt_emissao() == null
                                         ? null : certificado.getDt_emissao().toString())).append(",")
@@ -59,8 +60,8 @@ public class CertificadoSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(json.toString());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao listar certificados: " + mensagem(e));
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
+                    "Erro ao listar certificações: " + mensagem(e));
         }
     }
 
@@ -73,14 +74,17 @@ public class CertificadoSERVLET extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         try {
-            certificadoDAO.inserirCertificado(criarCertificado(request));
+            CertificadoModel item = criarCertificado(request);
+            certificadoDAO.inserirCertificado(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Certificado cadastrado com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Certificação cadastrada com sucesso!\",\"id_certificado\":" + item.getId_certificado() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao cadastrar certificado: " + mensagem(e));
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
+                    "Erro ao cadastrar certificação: " + mensagem(e));
         }
     }
 
@@ -98,12 +102,14 @@ public class CertificadoSERVLET extends HttpServlet {
             certificadoDAO.atualizarCertificado(certificado);
 
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Certificado atualizado com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Certificação atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao atualizar certificado: " + mensagem(e));
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
+                    "Erro ao atualizar certificação: " + mensagem(e));
         }
     }
 
@@ -117,25 +123,29 @@ public class CertificadoSERVLET extends HttpServlet {
         try {
             certificadoDAO.deletarCertificado(obterInteiroObrigatorio(request, "id_certificado"));
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"mensagem\":\"Certificado deletado com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Certificação excluída com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Erro ao deletar certificado: " + mensagem(e));
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
+                    "Erro ao excluir certificação: " + mensagem(e));
         }
     }
 
     // cria um certificado com os dados recebidos
     private CertificadoModel criarCertificado(HttpServletRequest request) {
-        return new CertificadoModel(
+        CertificadoModel certificado = new CertificadoModel(
                 obterInteiroObrigatorio(request, "id_usuario_b2b"),
-                obterParametroObrigatorio(request, "codigo"),
-                obterParametroObrigatorio(request, "nivel"),
+                null,
+                null,
                 obterDoubleObrigatorio(request, "volume_total"),
-                obterData(request.getParameter("dt_emissao")),
+                java.time.LocalDate.now(),
                 obterParametroObrigatorio(request, "arquivo_pdf")
         );
+        if (certificado.getArquivo_pdf().length() > 255) throw new IllegalArgumentException("Caminho do PDF muito longo.");
+        return certificado;
     }
 
     // valida e converte um parâmetro para número inteiro
@@ -144,13 +154,16 @@ public class CertificadoSERVLET extends HttpServlet {
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
+
         try {
             int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
+            if (numero <= 0) {
+                throw new IllegalArgumentException("Identificador deve ser maior que zero.");
+            }
             return numero;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
+                    "O parâmetro '" + nome + "' deve ser um número inteiro.", e);
         }
     }
 
@@ -163,13 +176,13 @@ public class CertificadoSERVLET extends HttpServlet {
 
         try {
             double numero = Double.parseDouble(valor.trim());
-            if (!Double.isFinite(numero) || numero < 0) {
+            if (Double.isNaN(numero) || Double.isInfinite(numero)) {
                 throw new NumberFormatException();
             }
             return numero;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um número válido não negativo.", e);
+                    "O parâmetro '" + nome + "' deve ser um número válido.", e);
         }
     }
 
@@ -183,21 +196,7 @@ public class CertificadoSERVLET extends HttpServlet {
     }
 
     // valida e converte a data de emissão
-    private LocalDate obterData(String valor) {
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("A data de emissão é obrigatória.");
-        }
 
-        if (!valor.trim().matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
-        }
-        try {
-            return LocalDate.parse(valor.trim());
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new IllegalArgumentException(
-                    "Data inválida. Use o formato yyyy-MM-dd.", e);
-        }
-    }
 
     // configura o formato e a codificação da resposta
     private void prepararResposta(HttpServletResponse response) {

@@ -8,15 +8,15 @@ public class ColetaModel {
     // armazena os atributos e relacionamentos da entidade
 
     private int id_coleta;
-    private int id_solicitacao;
-    private int id_motorista;
+    private Integer id_solicitacao;
+    private Integer id_motorista;
     private LocalDate dt_coleta;
     private double volume;
     private String observacao;
 
     // inicializa os dados de coleta com identificador
-    public ColetaModel(int id_solicitacao,
-                       int id_motorista,
+    public ColetaModel(Integer id_solicitacao,
+                       Integer id_motorista,
                        LocalDate dt_coleta,
                        double volume,
                        String observacao) {
@@ -39,12 +39,12 @@ public class ColetaModel {
     }
 
     // retorna o valor de id solicitacao
-    public int getId_solicitacao() {
+    public Integer getId_solicitacao() {
         return id_solicitacao;
     }
 
     // retorna o valor de id motorista
-    public int getId_motorista() {
+    public Integer getId_motorista() {
         return id_motorista;
     }
 
@@ -64,12 +64,12 @@ public class ColetaModel {
     }
 
     // atualiza o valor de id solicitacao
-    public void setId_solicitacao(int id_solicitacao) {
+    public void setId_solicitacao(Integer id_solicitacao) {
         this.id_solicitacao = id_solicitacao;
     }
 
     // atualiza o valor de id motorista
-    public void setId_motorista(int id_motorista) {
+    public void setId_motorista(Integer id_motorista) {
         this.id_motorista = id_motorista;
     }
 
@@ -87,4 +87,14 @@ public class ColetaModel {
     public void setObservacao(String observacao) {
         this.observacao = observacao;
     }
+    private int avaliacao_coleta;
+
+    public int getAvaliacao_coleta() {
+        return avaliacao_coleta;
+    }
+
+    public void setAvaliacao_coleta(int avaliacao_coleta) {
+        this.avaliacao_coleta = avaliacao_coleta;
+    }
+
 }

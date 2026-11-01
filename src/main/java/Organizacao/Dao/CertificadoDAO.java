@@ -18,22 +18,24 @@ public class CertificadoDAO {
     // grava os dados de certificado empresarial no banco de dados
     public void inserirCertificado(CertificadoModel certificado) {
         // define a consulta sql de insercao para certificado empresarial
-        String sql = "INSERT INTO certificado (id_usuario_b2b, codigo, nivel, volume_total, dt_emissao, arquivo_pdf) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"CERTIFICADO\" (\"ID_B2B\", volume_total, \"DT_emissao\", \"PDF\") VALUES (?, ?, CURRENT_DATE, ?)";
 
         // abre a conexao e prepara a insercao de certificado empresarial com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_certificado"})) {
 
             // associa os campos de certificado empresarial aos parametros da insercao
-            stmt.setInt(1, certificado.getId_usuario_b2b());
-            stmt.setString(2, certificado.getCodigo());
-            stmt.setString(3, certificado.getNivel());
-            stmt.setDouble(4, certificado.getVolume_total());
-            stmt.setDate(5, java.sql.Date.valueOf(certificado.getDt_emissao()));
-            stmt.setString(6, certificado.getArquivo_pdf());
+            stmt.setObject(1, certificado.getId_usuario_b2b(), java.sql.Types.INTEGER);
+            stmt.setDouble(2, certificado.getVolume_total());
+            stmt.setString(3, certificado.getArquivo_pdf());
 
             // executa a gravacao dos dados de certificado empresarial
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    certificado.setId_certificado(rs.getInt(1));
+                }
+            }
             System.out.println("Certificado cadastrado com sucesso!");
 
         // propaga a falha ao gravar certificado empresarial para informar o erro ao chamador
@@ -46,7 +48,7 @@ public class CertificadoDAO {
     public List<CertificadoModel> listarCertificados() {
         List<CertificadoModel> listaCertificados = new ArrayList<>();
         // define a consulta sql de leitura para certificado empresarial
-        String sql = "SELECT * FROM certificado ORDER BY id_certificado";
+        String sql = "SELECT \"ID_certificado\" AS id_certificado, \"ID_B2B\" AS id_usuario_b2b, \"ID_coleta\" AS id_coleta, NULL::text AS codigo, NULL::text AS nivel, volume_total, \"DT_emissao\" AS dt_emissao, \"PDF\" AS arquivo_pdf FROM \"CERTIFICADO\" ORDER BY \"ID_certificado\"";
 
         // abre a conexao e executa a consulta de certificado empresarial com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -56,7 +58,7 @@ public class CertificadoDAO {
             // converte os campos de cada linha consultada em certificado empresarial
             while (rs.next()) {
                 int id_certificado = rs.getInt("id_certificado");
-                int id_usuario_b2b = rs.getInt("id_usuario_b2b");
+                Integer id_usuario_b2b = rs.getObject("id_usuario_b2b", Integer.class);
                 String codigo = rs.getString("codigo");
                 String nivel = rs.getString("nivel");
                 double volume_total = rs.getDouble("volume_total");
@@ -67,6 +69,7 @@ public class CertificadoDAO {
                         id_usuario_b2b, codigo, nivel, volume_total, dt_emissao, arquivo_pdf
                 );
                 certificado.setId_certificado(id_certificado);
+                certificado.setId_coleta(rs.getInt("id_coleta"));
 
                 listaCertificados.add(certificado);
             }
@@ -83,20 +86,17 @@ public class CertificadoDAO {
     // atualiza os dados de certificado empresarial no banco de dados
     public void atualizarCertificado(CertificadoModel certificado) {
         // define a consulta sql de atualizacao para certificado empresarial
-        String sql = "UPDATE certificado SET id_usuario_b2b = ?, codigo = ?, nivel = ?, volume_total = ?, dt_emissao = ?, arquivo_pdf = ? WHERE id_certificado = ?";
+        String sql = "UPDATE \"CERTIFICADO\" SET \"ID_B2B\" = ?, volume_total = ?, \"PDF\" = ? WHERE \"ID_certificado\" = ?";
 
         // abre a conexao e prepara a atualizacao de certificado empresarial com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de certificado empresarial aos parametros da atualizacao
-            stmt.setInt(1, certificado.getId_usuario_b2b());
-            stmt.setString(2, certificado.getCodigo());
-            stmt.setString(3, certificado.getNivel());
-            stmt.setDouble(4, certificado.getVolume_total());
-            stmt.setDate(5, java.sql.Date.valueOf(certificado.getDt_emissao()));
-            stmt.setString(6, certificado.getArquivo_pdf());
-            stmt.setInt(7, certificado.getId_certificado());
+            stmt.setObject(1, certificado.getId_usuario_b2b(), java.sql.Types.INTEGER);
+            stmt.setDouble(2, certificado.getVolume_total());
+            stmt.setString(3, certificado.getArquivo_pdf());
+            stmt.setInt(4, certificado.getId_certificado());
 
             // executa a atualizacao dos dados de certificado empresarial
             int linhasAfetadas = stmt.executeUpdate();
@@ -105,7 +105,7 @@ public class CertificadoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Certificado atualizado com sucesso!");
             } else {
-                System.out.println("Certificado não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar certificado empresarial para informar o erro ao chamador
@@ -117,7 +117,7 @@ public class CertificadoDAO {
     // remove o registro de certificado empresarial do banco de dados
     public void deletarCertificado(int id_certificado) {
         // define a consulta sql de exclusao para certificado empresarial
-        String sql = "DELETE FROM certificado WHERE id_certificado = ?";
+        String sql = "DELETE FROM \"CERTIFICADO\" WHERE \"ID_certificado\" = ?";
 
         // abre a conexao e prepara a exclusao de certificado empresarial com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -133,7 +133,7 @@ public class CertificadoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Certificado deletado com sucesso!");
             } else {
-                System.out.println("Certificado não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover certificado empresarial e informa o ocorrido

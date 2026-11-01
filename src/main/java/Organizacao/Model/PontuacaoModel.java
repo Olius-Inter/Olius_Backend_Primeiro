@@ -8,15 +8,15 @@ public class PontuacaoModel {
     // armazena os atributos e relacionamentos da entidade
 
     private int id_pontuacao;
-    private int id_usuario_b2c;
-    private int id_entrega;
+    private Integer id_usuario_b2c;
+    private Integer id_entrega;
     private int pontos;
     private String tp_movimentacao;
     private String descricao;
     private LocalDate dt_movimentacao;
 
     // inicializa os dados de pontuacao de usuario com identificador
-    public PontuacaoModel(int id_usuario_b2c, int id_entrega,
+    public PontuacaoModel(Integer id_usuario_b2c, Integer id_entrega,
                           int pontos, String tp_movimentacao,
                           String descricao, LocalDate dt_movimentacao) {
 
@@ -39,12 +39,12 @@ public class PontuacaoModel {
     }
 
     // retorna o valor de id usuario b c
-    public int getId_usuario_b2c() {
+    public Integer getId_usuario_b2c() {
         return id_usuario_b2c;
     }
 
     // retorna o valor de id entrega
-    public int getId_entrega() {
+    public Integer getId_entrega() {
         return id_entrega;
     }
 
@@ -69,12 +69,12 @@ public class PontuacaoModel {
     }
 
     // atualiza o valor de id usuario b c
-    public void setId_usuario_b2c(int id_usuario_b2c) {
+    public void setId_usuario_b2c(Integer id_usuario_b2c) {
         this.id_usuario_b2c = id_usuario_b2c;
     }
 
     // atualiza o valor de id entrega
-    public void setId_entrega(int id_entrega) {
+    public void setId_entrega(Integer id_entrega) {
         this.id_entrega = id_entrega;
     }
 

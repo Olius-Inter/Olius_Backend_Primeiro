@@ -16,12 +16,19 @@ public class EnderecoDAO {
 
     // grava os dados de endereco no banco de dados
     public void inserirEndereco(EnderecoModel endereco) {
+        try (Connection conexao = Conexao_Banco.conectar()) {
+            inserirEndereco(endereco, conexao);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao acessar o banco: " + e.getMessage(), e);
+        }
+    }
+
+    public void inserirEndereco(EnderecoModel endereco, Connection conexao) {
         // define a consulta sql de insercao para endereco
-        String sql = "INSERT INTO endereco (cep, logradouro, numero, complemento, bairro, cidade, estado, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"ENDERECO\" (cep, rua, numero, complemento, bairro, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, CAST(? AS public.estados))";
 
         // abre a conexao e prepara a insercao de endereco com fechamento automatico
-        try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_endereco"})) {
 
             // associa os campos de endereco aos parametros da insercao
             stmt.setString(1, endereco.getCep());
@@ -31,10 +38,14 @@ public class EnderecoDAO {
             stmt.setString(5, endereco.getBairro());
             stmt.setString(6, endereco.getCidade());
             stmt.setString(7, endereco.getEstado());
-            stmt.setString(8, endereco.getPais());
 
             // executa a gravacao dos dados de endereco
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    endereco.setId_endereco(rs.getInt(1));
+                }
+            }
             System.out.println("Endereço cadastrado com sucesso!");
 
         // propaga a falha ao gravar endereco para informar o erro ao chamador
@@ -47,7 +58,7 @@ public class EnderecoDAO {
     public List<EnderecoModel> listarEnderecos() {
         List<EnderecoModel> listaEnderecos = new ArrayList<>();
         // define a consulta sql de leitura para endereco
-        String sql = "SELECT * FROM endereco ORDER BY id_endereco";
+        String sql = "SELECT \"ID_endereco\" AS id_endereco, cep, rua AS logradouro, numero, complemento, bairro, cidade, estado, 'Brasil' AS pais FROM \"ENDERECO\" ORDER BY \"ID_endereco\"";
 
         // abre a conexao e executa a consulta de endereco com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -85,12 +96,19 @@ public class EnderecoDAO {
 
     // atualiza os dados de endereco no banco de dados
     public void atualizarEndereco(EnderecoModel endereco) {
+        try (Connection conexao = Conexao_Banco.conectar()) {
+            atualizarEndereco(endereco, conexao);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao acessar o banco: " + e.getMessage(), e);
+        }
+    }
+
+    public void atualizarEndereco(EnderecoModel endereco, Connection conexao) {
         // define a consulta sql de atualizacao para endereco
-        String sql = "UPDATE endereco SET cep = ?, logradouro = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, pais = ? WHERE id_endereco = ?";
+        String sql = "UPDATE \"ENDERECO\" SET cep = ?, rua = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = CAST(? AS public.estados) WHERE \"ID_endereco\" = ?";
 
         // abre a conexao e prepara a atualizacao de endereco com fechamento automatico
-        try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de endereco aos parametros da atualizacao
             stmt.setString(1, endereco.getCep());
@@ -100,8 +118,7 @@ public class EnderecoDAO {
             stmt.setString(5, endereco.getBairro());
             stmt.setString(6, endereco.getCidade());
             stmt.setString(7, endereco.getEstado());
-            stmt.setString(8, endereco.getPais());
-            stmt.setInt(9, endereco.getId_endereco());
+            stmt.setInt(8, endereco.getId_endereco());
 
             // executa a atualizacao dos dados de endereco
             int linhasAfetadas = stmt.executeUpdate();
@@ -110,7 +127,7 @@ public class EnderecoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Endereço atualizado com sucesso!");
             } else {
-                System.out.println("Endereço não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar endereco para informar o erro ao chamador
@@ -122,7 +139,7 @@ public class EnderecoDAO {
     // remove o registro de endereco do banco de dados
     public void deletarEndereco(int id_endereco) {
         // define a consulta sql de exclusao para endereco
-        String sql = "DELETE FROM endereco WHERE id_endereco = ?";
+        String sql = "DELETE FROM \"ENDERECO\" WHERE \"ID_endereco\" = ?";
 
         // abre a conexao e prepara a exclusao de endereco com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -138,7 +155,7 @@ public class EnderecoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Endereço deletado com sucesso!");
             } else {
-                System.out.println("Endereço não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover endereco e informa o ocorrido
@@ -146,5 +163,35 @@ public class EnderecoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar endereço: " + e.getMessage(), e);
         }
+    }
+    // salva o endereco na mesma transacao do cadastro responsavel
+    public void salvarEndereco(EnderecoModel endereco, Integer id_endereco, Connection conexao)
+            throws SQLException {
+        if (id_endereco != null) {
+            String sql = "SELECT \"ID_endereco\" FROM \"ENDERECO\" WHERE \"ID_endereco\" = ? FOR UPDATE";
+            try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+                stmt.setInt(1, id_endereco);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new java.util.NoSuchElementException("Endereço não encontrado.");
+                    }
+                }
+            }
+            sql = "SELECT (SELECT COUNT(*) FROM \"B2B\" WHERE \"ID_endereco\" = ?) + "
+                    + "(SELECT COUNT(*) FROM \"PEV\" WHERE \"ID_endereco\" = ?) AS quantidade";
+            try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+                stmt.setInt(1, id_endereco);
+                stmt.setInt(2, id_endereco);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next() && rs.getInt("quantidade") <= 1) {
+                        endereco.setId_endereco(id_endereco);
+                        atualizarEndereco(endereco, conexao);
+                        return;
+                    }
+                }
+            }
+        }
+        // preserva enderecos antigos compartilhados ao editar apenas um titular
+        inserirEndereco(endereco, conexao);
     }
 }

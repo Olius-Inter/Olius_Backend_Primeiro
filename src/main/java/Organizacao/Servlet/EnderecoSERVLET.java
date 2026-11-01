@@ -3,6 +3,8 @@ package Organizacao.Servlet;
 import Organizacao.Dao.EnderecoDAO;
 import Organizacao.Model.EnderecoModel;
 
+import Organizacao.Model.Enum.Estados;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,29 +13,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 @WebServlet("/enderecos")
 // atende as requisicoes relacionadas aos enderecos
 public class EnderecoSERVLET extends HttpServlet {
-
-    // Aceita CEP com oito dígitos, com ou sem hífen entre os grupos.
-    private static final Pattern CEP_PATTERN = Pattern.compile("\\d{5}-?\\d{3}");
-
-    // Aceita números, complementos de letra, intervalos e a indicação S/N.
-    private static final Pattern NUMERO_PATTERN =
-            Pattern.compile("(?:\\d+[a-z]?(?:[-/]\\d+[a-z]?)?|s/?n)", Pattern.CASE_INSENSITIVE);
-
-    // Aceita somente siglas oficiais de estados brasileiros e do Distrito Federal.
-    private static final Pattern ESTADO_PATTERN = Pattern.compile(
-            "(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)",
-            Pattern.CASE_INSENSITIVE
-    );
-
-    // Aceita texto Unicode, números e pontuação comum em nomes e endereços.
-    private static final Pattern TEXTO_PATTERN =
-            Pattern.compile("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 .,'’ºª#&():;/\\-]*");
 
     // mantem o acesso aos dados dos enderecos
     private EnderecoDAO enderecoDAO;
@@ -82,7 +65,7 @@ public class EnderecoSERVLET extends HttpServlet {
             response.getWriter().write(json.toString());
         } catch (Exception e) {
             // informa falhas ocorridas ao consultar os enderecos
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar endereços: " + mensagem(e));
         }
     }
@@ -97,15 +80,18 @@ public class EnderecoSERVLET extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         try {
-            enderecoDAO.inserirEndereco(criarEndereco(request));
+            EnderecoModel item = criarEndereco(request);
+            enderecoDAO.inserirEndereco(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Endereço cadastrado com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Endereço cadastrado com sucesso!\",\"id_endereco\":" + item.getId_endereco() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar endereço: " + mensagem(e));
         }
     }
@@ -126,12 +112,14 @@ public class EnderecoSERVLET extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Endereço atualizado com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar endereço: " + mensagem(e));
         }
     }
@@ -147,91 +135,65 @@ public class EnderecoSERVLET extends HttpServlet {
             enderecoDAO.deletarEndereco(obterId(request));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Endereço deletado com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando o identificador enviado e invalido
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao deletar endereço: " + mensagem(e));
         }
     }
 
     // valida os campos recebidos e cria o objeto do endereco
-    private EnderecoModel criarEndereco(HttpServletRequest request) {
-        String cep = validarFormato(
-                obterParametroObrigatorio(request, "cep"),
-                CEP_PATTERN,
-                "CEP inválido. Use 00000-000 ou 00000000."
-        );
-        String logradouro = validarFormato(
-                obterParametroObrigatorio(request, "logradouro"),
-                TEXTO_PATTERN,
-                "O logradouro contém caracteres inválidos."
-        );
-        String numero = validarFormato(
-                obterParametroObrigatorio(request, "numero"),
-                NUMERO_PATTERN,
-                "Número inválido. Use números, como 123, 123A, ou S/N."
-        );
-        String complemento = obterParametroOpcional(request, "complemento");
-        if (!complemento.isEmpty()) {
-            complemento = validarFormato(
-                    complemento,
-                    TEXTO_PATTERN,
-                    "O complemento contém caracteres inválidos."
-            );
+    public static EnderecoModel criarEndereco(HttpServletRequest request) {
+        String cep = obterParametroObrigatorio(request, "cep").replaceAll("[\\s-]", "");
+        if (!cep.matches("\\d{8}")) throw new IllegalArgumentException("O CEP deve conter exatamente 8 números.");
+        String estado = obterParametroObrigatorio(request, "estado").toUpperCase(java.util.Locale.ROOT);
+        try {
+            Estados.valueOf(estado);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Informe a sigla do estado com 2 letras.");
         }
-        String bairro = validarFormato(
-                obterParametroObrigatorio(request, "bairro"),
-                TEXTO_PATTERN,
-                "O bairro contém caracteres inválidos."
-        );
-        String cidade = validarFormato(
-                obterParametroObrigatorio(request, "cidade"),
-                TEXTO_PATTERN,
-                "A cidade contém caracteres inválidos."
-        );
-        String estado = validarFormato(
-                obterParametroObrigatorio(request, "estado"),
-                ESTADO_PATTERN,
-                "Estado inválido. Informe a sigla de duas letras, como SP."
-        ).toUpperCase(Locale.ROOT);
-        String pais = validarFormato(
-                obterParametroObrigatorio(request, "pais"),
-                TEXTO_PATTERN,
-                "O país contém caracteres inválidos."
-        );
-
+        String numero = obterParametroObrigatorio(request, "numero");
+        if (numero.length() > 10) throw new IllegalArgumentException("Número aceita até 10 caracteres.");
         return new EnderecoModel(
                 cep,
-                logradouro,
+                obterParametroObrigatorio(request, "logradouro"),
                 numero,
-                complemento,
-                bairro,
-                cidade,
+                obterParametroOpcional(request, "complemento"),
+                obterParametroObrigatorio(request, "bairro"),
+                obterParametroObrigatorio(request, "cidade"),
                 estado,
-                pais
+                "Brasil"
         );
     }
 
     // valida e devolve o identificador do endereco
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_endereco");
+
+        // rejeita identificadores ausentes ou vazios
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do endereço é obrigatório.");
         }
+
         try {
-            int id = Integer.parseInt(valor.trim());
-            if (id <= 0) throw new NumberFormatException();
-            return id;
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) {
+                throw new IllegalArgumentException("Identificador deve ser maior que zero.");
+            }
+            return numero;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do endereço deve ser um inteiro positivo.", e);
+            // informa quando o identificador nao e um numero inteiro
+            throw new IllegalArgumentException("ID do endereço inválido.", e);
         }
     }
 
     // valida e devolve um parametro obrigatorio
-    private String obterParametroObrigatorio(HttpServletRequest request, String nome) {
+    private static String obterParametroObrigatorio(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
 
         // rejeita parametros ausentes ou vazios
@@ -239,21 +201,23 @@ public class EnderecoSERVLET extends HttpServlet {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
 
+        int limite = 50;
+        if ("cep".equals(nome)) limite = 15;
+        if ("logradouro".equals(nome)) limite = 200;
+        if ("numero".equals(nome)) limite = 20;
+        if ("bairro".equals(nome) || "cidade".equals(nome)) limite = 100;
+        if (valor.trim().length() > limite) {
+            throw new IllegalArgumentException("O campo '" + nome + "' aceita até " + limite + " caracteres.");
+        }
         return valor.trim();
     }
 
-    // valida o formato do campo e fornece uma mensagem clara quando ele não corresponde ao padrão
-    private String validarFormato(String valor, Pattern padrao, String mensagemErro) {
-        if (!padrao.matcher(valor).matches()) {
-            throw new IllegalArgumentException(mensagemErro);
-        }
-
-        return valor;
-    }
-
     // devolve o valor informado ou um texto vazio
-    private String obterParametroOpcional(HttpServletRequest request, String nome) {
+    private static String obterParametroOpcional(HttpServletRequest request, String nome) {
         String valor = request.getParameter(nome);
+        if (valor != null && valor.trim().length() > 100) {
+            throw new IllegalArgumentException("O complemento aceita até 100 caracteres.");
+        }
         return valor == null ? "" : valor.trim();
     }
 

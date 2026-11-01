@@ -49,7 +49,7 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
             response.getWriter().write(json.append(']').toString());
         } catch (Exception e) {
             // informa falhas ocorridas ao consultar as movimentacoes
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar movimentações: " + message(e));
         }
     }
@@ -61,15 +61,18 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
         prepare(response);
         prepareRequest(request);
         try {
-            movimentacaoDAO.inserirPontosMovimentacao(criar(request));
+            PontosMovimentacaoModel item = criar(request);
+            movimentacaoDAO.inserirPontosMovimentacao(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Movimentação cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Movimentação cadastrada com sucesso!\",\"id_movimentacao\":" + item.getId_movimentacao() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante o cadastro
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar movimentação: " + message(e));
         }
     }
@@ -86,12 +89,14 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
             movimentacaoDAO.atualizarPontosMovimentacao(item);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Movimentação atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando os dados enviados sao invalidos
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a atualizacao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar movimentação: " + message(e));
         }
     }
@@ -106,12 +111,14 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
                     requiredInt(request, "id_movimentacao"));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Movimentação removida com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            error(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             // informa quando o identificador enviado e invalido
             error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             // informa falhas ocorridas durante a remocao
-            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao remover movimentação: " + message(e));
         }
     }
@@ -127,11 +134,11 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
         }
         return new PontosMovimentacaoModel(
                 points,
-                validarTipoMovimentacao(requiredText(request, "tipo_movimentacao")),
+                requiredText(request, "tipo_movimentacao"),
                 requiredDate(request, "dt_movimentacao").toString(),
-                requiredInt(request, "id_entrega"),
+                optionalInt(request, "id_entrega"),
                 requiredInt(request, "id_carteira"),
-                requiredInt(request, "id_participacao"));
+                optionalInt(request, "id_participacao"));
     }
 
 
@@ -151,19 +158,18 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
         String value = request.getParameter(name);
         // rejeita parametros ausentes ou vazios
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + name + "' é obrigatório.");
+            throw new IllegalArgumentException("O par?metro '" + name + "' ? obrigat?rio.");
         }
         return value.trim();
     }
 
-    private String validarTipoMovimentacao(String tipo) {
-        if (!tipo.matches("[\\p{L}\\p{M}0-9][\\p{L}\\p{M}0-9 _-]*")) {
-            throw new IllegalArgumentException("Tipo de movimentação contém caracteres inválidos.");
-        }
-        return tipo;
+    // valida e converte um parametro para inteiro positivo
+    private Integer optionalInt(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        if (value == null || value.trim().isEmpty()) return null;
+        return requiredInt(request, name);
     }
 
-    // valida e converte um parametro para inteiro positivo
     private int requiredInt(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
         try {
@@ -173,37 +179,19 @@ public class PontosMovimentacaoSERVLET extends HttpServlet {
             return number;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    // valida e converte um parametro para numero nao negativo
-    private double requiredNonNegativeDouble(HttpServletRequest request, String name) {
-        String value = requiredText(request, name);
-        try {
-            double number = Double.parseDouble(value);
-            // rejeita valores negativos e valores que nao representam um numero finito
-            if (!Double.isFinite(number) || number < 0) throw new NumberFormatException();
-            return number;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve ser um número válido não negativo.", e);
+                    "O par?metro '" + name + "' deve ser um inteiro positivo.", e);
         }
     }
 
     // valida e converte um parametro para data
     private java.time.LocalDate requiredDate(HttpServletRequest request, String name) {
         String value = requiredText(request, name);
-        if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.");
-        }
         try {
             return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException e) {
+        } catch (RuntimeException e) {
             // informa o formato esperado para a data
             throw new IllegalArgumentException(
-                    "O parâmetro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
+                    "O par?metro '" + name + "' deve usar o formato yyyy-MM-dd.", e);
         }
     }
 

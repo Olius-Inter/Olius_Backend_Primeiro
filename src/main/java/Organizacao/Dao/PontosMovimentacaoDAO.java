@@ -21,18 +21,23 @@ public class PontosMovimentacaoDAO {
 
         // abre a conexao e prepara a insercao de movimentacao de pontos com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_movimentacao"})) {
 
             // associa os campos de movimentacao de pontos aos parametros da insercao
             stmt.setInt(1, movimentacao.getPontos_ganhos());
             stmt.setString(2, movimentacao.getTipo_movimentacao());
             stmt.setString(3, movimentacao.getDt_movimentacao());
-            stmt.setInt(4, movimentacao.getId_entrega());
-            stmt.setInt(5, movimentacao.getId_carteira());
-            stmt.setInt(6, movimentacao.getId_participacao());
+            stmt.setObject(4, movimentacao.getId_entrega(), java.sql.Types.INTEGER);
+            stmt.setObject(5, movimentacao.getId_carteira(), java.sql.Types.INTEGER);
+            stmt.setObject(6, movimentacao.getId_participacao(), java.sql.Types.INTEGER);
 
             // executa a gravacao dos dados de movimentacao de pontos
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    movimentacao.setId_movimentacao(rs.getInt(1));
+                }
+            }
             System.out.println("Movimentação de pontos cadastrada com sucesso!");
 
         // propaga a falha ao gravar movimentacao de pontos para informar o erro ao chamador
@@ -58,9 +63,9 @@ public class PontosMovimentacaoDAO {
                 int pontos_ganhos = rs.getInt("pontos_ganhos");
                 String tipo_movimentacao = rs.getString("tipo_movimentacao");
                 String dt_movimentacao = rs.getString("dt_movimentacao");
-                int id_entrega = rs.getInt("id_entrega");
-                int id_carteira = rs.getInt("id_carteira");
-                int id_participacao = rs.getInt("id_participacao");
+                Integer id_entrega = rs.getObject("id_entrega", Integer.class);
+                Integer id_carteira = rs.getObject("id_carteira", Integer.class);
+                Integer id_participacao = rs.getObject("id_participacao", Integer.class);
 
                 PontosMovimentacaoModel movimentacao = new PontosMovimentacaoModel(
                         pontos_ganhos, tipo_movimentacao, dt_movimentacao, id_entrega, id_carteira, id_participacao
@@ -92,9 +97,9 @@ public class PontosMovimentacaoDAO {
             stmt.setInt(1, movimentacao.getPontos_ganhos());
             stmt.setString(2, movimentacao.getTipo_movimentacao());
             stmt.setString(3, movimentacao.getDt_movimentacao());
-            stmt.setInt(4, movimentacao.getId_entrega());
-            stmt.setInt(5, movimentacao.getId_carteira());
-            stmt.setInt(6, movimentacao.getId_participacao());
+            stmt.setObject(4, movimentacao.getId_entrega(), java.sql.Types.INTEGER);
+            stmt.setObject(5, movimentacao.getId_carteira(), java.sql.Types.INTEGER);
+            stmt.setObject(6, movimentacao.getId_participacao(), java.sql.Types.INTEGER);
             stmt.setInt(7, movimentacao.getId_movimentacao());
 
             // executa a atualizacao dos dados de movimentacao de pontos
@@ -104,7 +109,7 @@ public class PontosMovimentacaoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Movimentação de pontos atualizada com sucesso!");
             } else {
-                System.out.println("Movimentação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar movimentacao de pontos para informar o erro ao chamador
@@ -132,7 +137,7 @@ public class PontosMovimentacaoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Movimentação deletada com sucesso!");
             } else {
-                System.out.println("Movimentação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover movimentacao de pontos e informa o ocorrido

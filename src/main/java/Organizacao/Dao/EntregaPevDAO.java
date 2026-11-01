@@ -18,24 +18,28 @@ public class EntregaPevDAO {
     // grava os dados de entrega em ponto voluntario no banco de dados
     public void inserirEntregaPev(EntregaPevModel entrega) {
         // define a consulta sql de insercao para entrega em ponto voluntario
-        String sql = "INSERT INTO entrega_pev (id_usuario_b2c, id_pev, qtd_litros, pontos_gerados, dt_entrega) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"ENTREGA_PEV\" (\"ID_B2C\", \"ID_PEV\", volume_entrega, \"DT_entrega\") VALUES (?, ?, ?, ?)";
 
         // abre a conexao e prepara a insercao de entrega em ponto voluntario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_entrega"})) {
 
             // associa os campos de entrega em ponto voluntario aos parametros da insercao
-            stmt.setInt(1, entrega.getId_usuario_b2c());
-            stmt.setInt(2, entrega.getId_pev());
+            stmt.setObject(1, entrega.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, entrega.getId_pev(), java.sql.Types.INTEGER);
             stmt.setDouble(3, entrega.getQtd_litros());
-            stmt.setInt(4, entrega.getPontos_gerados());
-            stmt.setDate(5, java.sql.Date.valueOf(entrega.getDt_entrega()));
+            stmt.setDate(4, java.sql.Date.valueOf(entrega.getDt_entrega()));
 
             // executa a gravacao dos dados de entrega em ponto voluntario
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    entrega.setId_entrega(rs.getInt(1));
+                }
+            }
             System.out.println("Entrega PEV cadastrada com sucesso!");
 
-        // propaga a falha ao gravar entrega em ponto voluntario para informar o erro ao chamador
+            // propaga a falha ao gravar entrega em ponto voluntario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir entrega PEV: " + e.getMessage(), e);
         }
@@ -45,7 +49,7 @@ public class EntregaPevDAO {
     public List<EntregaPevModel> listarEntregasPev() {
         List<EntregaPevModel> listaEntregas = new ArrayList<>();
         // define a consulta sql de leitura para entrega em ponto voluntario
-        String sql = "SELECT * FROM entrega_pev ORDER BY id_entrega";
+        String sql = "SELECT \"ID_entrega\" AS id_entrega, \"ID_B2C\" AS id_usuario_b2c, \"ID_PEV\" AS id_pev, volume_entrega AS qtd_litros, NULL::integer AS pontos_gerados, \"DT_entrega\" AS dt_entrega FROM \"ENTREGA_PEV\" ORDER BY \"ID_entrega\"";
 
         // abre a conexao e executa a consulta de entrega em ponto voluntario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -55,8 +59,8 @@ public class EntregaPevDAO {
             // converte os campos de cada linha consultada em entrega em ponto voluntario
             while (rs.next()) {
                 int id_entrega = rs.getInt("id_entrega");
-                int id_usuario_b2c = rs.getInt("id_usuario_b2c");
-                int id_pev = rs.getInt("id_pev");
+                Integer id_usuario_b2c = rs.getObject("id_usuario_b2c", Integer.class);
+                Integer id_pev = rs.getObject("id_pev", Integer.class);
                 double qtd_litros = rs.getDouble("qtd_litros");
                 int pontos_gerados = rs.getInt("pontos_gerados");
                 LocalDate dt_entrega = rs.getObject("dt_entrega", LocalDate.class);
@@ -69,7 +73,7 @@ public class EntregaPevDAO {
                 listaEntregas.add(entrega);
             }
 
-        // propaga a falha ao consultar entrega em ponto voluntario para informar o erro ao chamador
+            // propaga a falha ao consultar entrega em ponto voluntario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar entregas PEV: " + e.getMessage(), e);
         }
@@ -81,19 +85,18 @@ public class EntregaPevDAO {
     // atualiza os dados de entrega em ponto voluntario no banco de dados
     public void atualizarEntregaPev(EntregaPevModel entrega) {
         // define a consulta sql de atualizacao para entrega em ponto voluntario
-        String sql = "UPDATE entrega_pev SET id_usuario_b2c = ?, id_pev = ?, qtd_litros = ?, pontos_gerados = ?, dt_entrega = ? WHERE id_entrega = ?";
+        String sql = "UPDATE \"ENTREGA_PEV\" SET \"ID_B2C\" = ?, \"ID_PEV\" = ?, volume_entrega = ?, \"DT_entrega\" = ? WHERE \"ID_entrega\" = ?";
 
         // abre a conexao e prepara a atualizacao de entrega em ponto voluntario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de entrega em ponto voluntario aos parametros da atualizacao
-            stmt.setInt(1, entrega.getId_usuario_b2c());
-            stmt.setInt(2, entrega.getId_pev());
+            stmt.setObject(1, entrega.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, entrega.getId_pev(), java.sql.Types.INTEGER);
             stmt.setDouble(3, entrega.getQtd_litros());
-            stmt.setInt(4, entrega.getPontos_gerados());
-            stmt.setDate(5, java.sql.Date.valueOf(entrega.getDt_entrega()));
-            stmt.setInt(6, entrega.getId_entrega());
+            stmt.setDate(4, java.sql.Date.valueOf(entrega.getDt_entrega()));
+            stmt.setInt(5, entrega.getId_entrega());
 
             // executa a atualizacao dos dados de entrega em ponto voluntario
             int linhasAfetadas = stmt.executeUpdate();
@@ -102,10 +105,10 @@ public class EntregaPevDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Entrega PEV atualizada com sucesso!");
             } else {
-                System.out.println("Entrega PEV não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
-        // propaga a falha ao atualizar entrega em ponto voluntario para informar o erro ao chamador
+            // propaga a falha ao atualizar entrega em ponto voluntario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar entrega PEV: " + e.getMessage(), e);
         }
@@ -114,7 +117,7 @@ public class EntregaPevDAO {
     // remove o registro de entrega em ponto voluntario do banco de dados
     public void deletarEntregaPev(int id_entrega) {
         // define a consulta sql de exclusao para entrega em ponto voluntario
-        String sql = "DELETE FROM entrega_pev WHERE id_entrega = ?";
+        String sql = "DELETE FROM \"ENTREGA_PEV\" WHERE \"ID_entrega\" = ?";
 
         // abre a conexao e prepara a exclusao de entrega em ponto voluntario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -130,10 +133,10 @@ public class EntregaPevDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Entrega PEV deletada com sucesso!");
             } else {
-                System.out.println("Entrega PEV não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
-        // registra a falha ao remover entrega em ponto voluntario e informa o ocorrido
+            // registra a falha ao remover entrega em ponto voluntario e informa o ocorrido
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar entrega PEV: " + e.getMessage(), e);

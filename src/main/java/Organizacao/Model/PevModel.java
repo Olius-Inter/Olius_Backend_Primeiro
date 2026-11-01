@@ -7,17 +7,36 @@ import java.time.LocalDate;
 public class PevModel {
     // armazena os atributos e relacionamentos da entidade
 
+    private Integer id_usuario;
+    private EnderecoModel endereco;
+
+    public Integer getId_usuario() {
+        return id_usuario;
+    }
+
+    public void setId_usuario(Integer id_usuario) {
+        this.id_usuario = id_usuario;
+    }
+
+    public EnderecoModel getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(EnderecoModel endereco) {
+        this.endereco = endereco;
+    }
+
     private int id_pev;
-    private int id_endereco;
-    private int id_usuario_b2b;
-    private int id_usuario_b2c;
+    private Integer id_endereco;
+    private Integer id_usuario_b2b;
+    private Integer id_usuario_b2c;
     private String qr_code;
     private String status;
     private LocalDate dt_aprovacao;
 
     // inicializa os dados de ponto de entrega voluntaria com identificador
-    public PevModel(int id_endereco, int id_usuario_b2b,
-                    int id_usuario_b2c, String qr_code,
+    public PevModel(Integer id_endereco, Integer id_usuario_b2b,
+                    Integer id_usuario_b2c, String qr_code,
                     String status, LocalDate dt_aprovacao) {
 
         this.id_endereco = id_endereco;
@@ -39,17 +58,17 @@ public class PevModel {
     }
 
     // retorna o valor de id endereco
-    public int getId_endereco() {
+    public Integer getId_endereco() {
         return id_endereco;
     }
 
     // retorna o valor de id usuario b b
-    public int getId_usuario_b2b() {
+    public Integer getId_usuario_b2b() {
         return id_usuario_b2b;
     }
 
     // retorna o valor de id usuario b c
-    public int getId_usuario_b2c() {
+    public Integer getId_usuario_b2c() {
         return id_usuario_b2c;
     }
 
@@ -69,17 +88,17 @@ public class PevModel {
     }
 
     // atualiza o valor de id endereco
-    public void setId_endereco(int id_endereco) {
+    public void setId_endereco(Integer id_endereco) {
         this.id_endereco = id_endereco;
     }
 
     // atualiza o valor de id usuario b b
-    public void setId_usuario_b2b(int id_usuario_b2b) {
+    public void setId_usuario_b2b(Integer id_usuario_b2b) {
         this.id_usuario_b2b = id_usuario_b2b;
     }
 
     // atualiza o valor de id usuario b c
-    public void setId_usuario_b2c(int id_usuario_b2c) {
+    public void setId_usuario_b2c(Integer id_usuario_b2c) {
         this.id_usuario_b2c = id_usuario_b2c;
     }
 

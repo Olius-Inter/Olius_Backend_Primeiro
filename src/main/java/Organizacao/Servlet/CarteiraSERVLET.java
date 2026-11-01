@@ -53,7 +53,7 @@ public class CarteiraSERVLET extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(json.toString());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar carteiras: " + mensagem(e));
         }
     }
@@ -67,13 +67,16 @@ public class CarteiraSERVLET extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         try {
-            carteiraDAO.inserirCarteira(criarCarteira(request));
+            CarteiraModel item = criarCarteira(request);
+            carteiraDAO.inserirCarteira(item);
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Carteira cadastrada com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Carteira cadastrada com sucesso!\",\"id_carteira\":" + item.getId_carteira() + "}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar carteira: " + mensagem(e));
         }
     }
@@ -93,10 +96,12 @@ public class CarteiraSERVLET extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Carteira atualizada com sucesso!\"}");
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar carteira: " + mensagem(e));
         }
     }
@@ -115,7 +120,7 @@ public class CarteiraSERVLET extends HttpServlet {
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao deletar carteira: " + mensagem(e));
         }
     }
@@ -123,7 +128,7 @@ public class CarteiraSERVLET extends HttpServlet {
     // cria uma carteira com os dados recebidos
     private CarteiraModel criarCarteira(HttpServletRequest request) {
         return new CarteiraModel(
-                obterInteiroNaoNegativo(request, "pontuacao"),
+                obterInteiroObrigatorio(request, "pontuacao"),
                 obterParametroObrigatorio(request, "patente"),
                 obterParametroObrigatorio(request, "nivel"),
                 obterInteiroObrigatorio(request, "id_b2c")
@@ -136,31 +141,12 @@ public class CarteiraSERVLET extends HttpServlet {
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
         }
-        try {
-            int numero = Integer.parseInt(valor.trim());
-            if (numero <= 0) throw new NumberFormatException();
-            return numero;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro positivo.", e);
-        }
-    }
-
-    private int obterInteiroNaoNegativo(HttpServletRequest request, String nome) {
-        String valor = request.getParameter(nome);
-        if (valor == null || valor.trim().isEmpty()) {
-            throw new IllegalArgumentException("O parâmetro '" + nome + "' é obrigatório.");
-        }
 
         try {
-            int numero = Integer.parseInt(valor.trim());
-            if (numero < 0) {
-                throw new NumberFormatException();
-            }
-            return numero;
+            return Integer.parseInt(valor.trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "O parâmetro '" + nome + "' deve ser um inteiro não negativo.", e);
+                    "O parâmetro '" + nome + "' deve ser um número inteiro.", e);
         }
     }
 

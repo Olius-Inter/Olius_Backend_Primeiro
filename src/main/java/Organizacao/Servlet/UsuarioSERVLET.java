@@ -3,6 +3,8 @@ package Organizacao.Servlet;
 import Organizacao.Dao.UsuarioDAO;
 import Organizacao.Model.UsuarioModel;
 
+import Organizacao.Utilitarios.ValidarDocumentos;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,19 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @WebServlet("/usuarios")
 // atende requisicoes http de usuario
 public class UsuarioSERVLET extends HttpServlet {
-
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+");
-    private static final Pattern TELEFONE_PATTERN = Pattern.compile(
-            "(?:\\+55\\s?)?(?:\\([1-9]\\d\\)|[1-9]\\d)\\s?(?:9\\d{4}|[2-5]\\d{3})-?\\d{4}");
-    private static final Pattern NOME_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*");
-    private static final Pattern TIPO_USUARIO_PATTERN = Pattern.compile("[\\p{L}\\p{M}][\\p{L}\\p{M}_-]*");
-    private static final Pattern DATA_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     // mantem as dependencias e configuracoes usadas nas requisicoes
     private UsuarioDAO usuarioDAO;
@@ -45,7 +38,7 @@ public class UsuarioSERVLET extends HttpServlet {
 
         // consulta os registros e monta a resposta json
         try {
-            List<UsuarioModel> usuarios = usuarioDAO.listar();
+            List<UsuarioModel> usuarios = usuarioDAO.listar("true".equals(request.getParameter("referencias")));
             StringBuilder json = new StringBuilder();
             json.append("[");
 
@@ -55,6 +48,7 @@ public class UsuarioSERVLET extends HttpServlet {
                 json.append("{");
                 json.append("\"id_usuario\":").append(usuario.getId_usuario()).append(",");
                 json.append("\"nome\":\"").append(escape(usuario.getNome())).append("\",");
+                json.append("\"cpf\":\"").append(escape(usuario.getCpf())).append("\",");
                 json.append("\"email\":\"").append(escape(usuario.getEmail())).append("\",");
                 json.append("\"primeiro_registro\":\"")
                         .append(escape(formatarData(usuario.getPrimeiroRegistro())))
@@ -80,7 +74,7 @@ public class UsuarioSERVLET extends HttpServlet {
 
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao listar usuários: " + e.getMessage());
         }
     }
@@ -95,20 +89,23 @@ public class UsuarioSERVLET extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         // valida os campos da requisicao e cadastra usuario
+        if ("PUT".equals(request.getParameter("_metodo"))) {
+            doPut(request, response);
+            return;
+        }
         try {
-            int idUsuario = obterId(request);
-            String nome = validarFormato(
-                    obterParametroObrigatorio(request, "nome"), NOME_PATTERN, "Nome inválido.");
-            String email = validarFormato(
-                    obterParametroObrigatorio(request, "email"), EMAIL_PATTERN, "E-mail inválido.");
-            String senha = obterParametroObrigatorio(request, "senha");
-            String tipoUsuario = validarFormato(obterParametroObrigatorio(request, "tipo_usuario"),
-                    TIPO_USUARIO_PATTERN, "Tipo de usuário contém caracteres inválidos.");
-            String telefone = validarFormato(
-                    obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
-                    "Telefone inválido. Informe DDD e um telefone brasileiro válido.");
+            int idUsuario = 0;
+            String nome = obterParametroObrigatorio(request, "nome");
+            String email = obterParametroObrigatorio(request, "email");
+            String senha = request.getParameter("senha");
+            String tipoUsuario = "B2C";
+            String telefone = obterParametroObrigatorio(request, "telefone");
+            if (telefone.length() > 15) throw new IllegalArgumentException("Telefone deve ter no máximo 15 caracteres.");
+            if (!ValidarDocumentos.validarEmail(email)) throw new IllegalArgumentException("Informe um e-mail válido.");
+            if (nome.length() > 255) throw new IllegalArgumentException("Nome muito longo.");
             String primeiroRegistroString = request.getParameter("primeiro_registro");
 
+            if (senha == null || senha.isEmpty()) throw new IllegalArgumentException("Informe uma senha para o cadastro.");
             Date primeiroRegistro = obterData(primeiroRegistroString);
 
             UsuarioModel usuario = new UsuarioModel(
@@ -121,17 +118,19 @@ public class UsuarioSERVLET extends HttpServlet {
                     telefone
             );
 
-            usuarioDAO.salvar(usuario);
+            usuarioDAO.salvarComB2c(usuario, obterCpf(request), false);
             // define o status de criacao e confirma o cadastro em json
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write("{\"mensagem\":\"Usuário cadastrado com sucesso!\"}");
+            response.getWriter().write("{\"mensagem\":\"Usuário cadastrado com sucesso!\",\"id_usuario\":" + usuario.getId_usuario() + "}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao cadastrar usuário: " + e.getMessage());
         }
     }
@@ -148,16 +147,14 @@ public class UsuarioSERVLET extends HttpServlet {
         // valida os campos da requisicao e atualiza usuario
         try {
             int idUsuario = obterId(request);
-            String nome = validarFormato(
-                    obterParametroObrigatorio(request, "nome"), NOME_PATTERN, "Nome inválido.");
-            String email = validarFormato(
-                    obterParametroObrigatorio(request, "email"), EMAIL_PATTERN, "E-mail inválido.");
-            String senha = obterParametroObrigatorio(request, "senha");
-            String tipoUsuario = validarFormato(obterParametroObrigatorio(request, "tipo_usuario"),
-                    TIPO_USUARIO_PATTERN, "Tipo de usuário contém caracteres inválidos.");
-            String telefone = validarFormato(
-                    obterParametroObrigatorio(request, "telefone"), TELEFONE_PATTERN,
-                    "Telefone inválido. Informe DDD e um telefone brasileiro válido.");
+            String nome = obterParametroObrigatorio(request, "nome");
+            String email = obterParametroObrigatorio(request, "email");
+            String senha = request.getParameter("senha");
+            String tipoUsuario = "B2C";
+            String telefone = obterParametroObrigatorio(request, "telefone");
+            if (telefone.length() > 15) throw new IllegalArgumentException("Telefone deve ter no máximo 15 caracteres.");
+            if (!ValidarDocumentos.validarEmail(email)) throw new IllegalArgumentException("Informe um e-mail válido.");
+            if (nome.length() > 255) throw new IllegalArgumentException("Nome muito longo.");
 
             UsuarioModel usuario = new UsuarioModel(
                     idUsuario,
@@ -169,17 +166,19 @@ public class UsuarioSERVLET extends HttpServlet {
                     telefone
             );
 
-            usuarioDAO.atualizarUsuario(usuario);
+            usuarioDAO.salvarComB2c(usuario, obterCpf(request), true);
             // define o status de atualizacao e confirma a alteracao em json
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"mensagem\":\"Usuário atualizado com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao atualizar usuário: " + e.getMessage());
         }
     }
@@ -201,13 +200,24 @@ public class UsuarioSERVLET extends HttpServlet {
             response.getWriter().write("{\"mensagem\":\"Usuário deletado com sucesso!\"}");
 
         // devolve erro de requisicao quando os dados recebidos sao invalidos
+        } catch (java.util.NoSuchElementException e) {
+            enviarErro(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
             enviarErro(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         // devolve erro interno quando a operacao da requisicao falha
         } catch (Exception e) {
-            enviarErro(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            enviarErro(response, Organizacao.Conexao.ErroBanco.status(e),
                     "Erro ao deletar usuário: " + e.getMessage());
         }
+    }
+
+    // CPF e obrigatorio no cadastro do usuario B2C
+    private String obterCpf(HttpServletRequest request) {
+        String cpf = obterParametroObrigatorio(request, "cpf").replaceAll("[.\\-\\s]", "");
+        if (!ValidarDocumentos.validarCpf(cpf)) {
+            throw new IllegalArgumentException("CPF inválido.");
+        }
+        return cpf;
     }
 
     // protege caracteres especiais do texto antes de incluir no json
@@ -250,15 +260,23 @@ public class UsuarioSERVLET extends HttpServlet {
     // valida e converte o identificador recebido na requisicao
     private int obterId(HttpServletRequest request) {
         String valor = request.getParameter("id_usuario");
+
+        // rejeita a requisicao quando o parametro obrigatorio esta ausente
         if (valor == null || valor.trim().isEmpty()) {
             throw new IllegalArgumentException("ID do usuário é obrigatório.");
         }
+
+        // converte o texto do identificador para inteiro
         try {
-            int id = Integer.parseInt(valor.trim());
-            if (id <= 0) throw new NumberFormatException();
-            return id;
+
+            int numero = Integer.parseInt(valor.trim());
+            if (numero <= 0) {
+                throw new IllegalArgumentException("Identificador deve ser maior que zero.");
+            }
+            return numero;
+        // converte erro de conversao em uma validacao clara do parametro
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID do usuário deve ser um inteiro positivo.", e);
+            throw new IllegalArgumentException("ID do usuário inválido.", e);
         }
     }
 
@@ -272,22 +290,11 @@ public class UsuarioSERVLET extends HttpServlet {
         // interpreta o texto recebido como data local
         try {
             // devolve o valor validado e convertido
-            String data = valor.trim();
-            if (!DATA_PATTERN.matcher(data).matches()) {
-                throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.");
-            }
-            return Date.valueOf(data);
+            return Date.valueOf(java.time.LocalDate.parse(valor.trim()));
         // devolve erro de requisicao quando os dados recebidos sao invalidos
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             throw new IllegalArgumentException("Data inválida. Use o formato yyyy-MM-dd.", e);
         }
-    }
-
-    private String validarFormato(String valor, Pattern padrao, String mensagem) {
-        if (!padrao.matcher(valor).matches()) {
-            throw new IllegalArgumentException(mensagem);
-        }
-        return valor;
     }
 
     // converte a data para o formato exibido na resposta

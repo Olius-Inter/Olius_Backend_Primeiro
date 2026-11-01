@@ -17,22 +17,26 @@ public class MotoristaDAO {
     // grava os dados de motorista no banco de dados
     public void inserirMotorista(MotoristaModel motorista) {
         // define a consulta sql de insercao para motorista
-        String sql = "INSERT INTO motorista (nome, cpf, telefone, cnh, empresa, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"MOTORISTA\" (nome, telefone, licenca, empresa_resp, status) VALUES (?, ?, ?, ?, CAST(? AS public.status_motorista))";
 
         // abre a conexao e prepara a insercao de motorista com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_motorista"})) {
 
             // associa os campos de motorista aos parametros da insercao
             stmt.setString(1, motorista.getNome());
-            stmt.setString(2, motorista.getCpf());
-            stmt.setString(3, motorista.getTelefone());
-            stmt.setString(4, motorista.getCnh());
-            stmt.setString(5, motorista.getEmpresa());
-            stmt.setString(6, motorista.getStatus());
+            stmt.setString(2, motorista.getTelefone());
+            stmt.setString(3, motorista.getCnh());
+            stmt.setString(4, motorista.getEmpresa());
+            stmt.setString(5, motorista.getStatus());
 
             // executa a gravacao dos dados de motorista
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    motorista.setId_motorista(rs.getInt(1));
+                }
+            }
             System.out.println("Motorista cadastrado com sucesso!");
 
         // propaga a falha ao gravar motorista para informar o erro ao chamador
@@ -45,7 +49,7 @@ public class MotoristaDAO {
     public List<MotoristaModel> listarMotoristas() {
         List<MotoristaModel> listaMotoristas = new ArrayList<>();
         // define a consulta sql de leitura para motorista
-        String sql = "SELECT * FROM motorista ORDER BY id_motorista";
+        String sql = "SELECT \"ID_motorista\" AS id_motorista, nome, NULL::text AS cpf, telefone, licenca AS cnh, empresa_resp AS empresa, status FROM \"MOTORISTA\" ORDER BY \"ID_motorista\"";
 
         // abre a conexao e executa a consulta de motorista com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -80,7 +84,7 @@ public class MotoristaDAO {
     // atualiza os dados de motorista no banco de dados
     public void atualizarMotorista(MotoristaModel motorista) {
         // define a consulta sql de atualizacao para motorista
-        String sql = "UPDATE motorista SET nome = ?, cpf = ?, telefone = ?, cnh = ?, empresa = ?, status = ? WHERE id_motorista = ?";
+        String sql = "UPDATE \"MOTORISTA\" SET nome = ?, telefone = ?, licenca = ?, empresa_resp = ?, status = CAST(? AS public.status_motorista) WHERE \"ID_motorista\" = ?";
 
         // abre a conexao e prepara a atualizacao de motorista com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -88,12 +92,11 @@ public class MotoristaDAO {
 
             // associa os campos de motorista aos parametros da atualizacao
             stmt.setString(1, motorista.getNome());
-            stmt.setString(2, motorista.getCpf());
-            stmt.setString(3, motorista.getTelefone());
-            stmt.setString(4, motorista.getCnh());
-            stmt.setString(5, motorista.getEmpresa());
-            stmt.setString(6, motorista.getStatus());
-            stmt.setInt(7, motorista.getId_motorista());
+            stmt.setString(2, motorista.getTelefone());
+            stmt.setString(3, motorista.getCnh());
+            stmt.setString(4, motorista.getEmpresa());
+            stmt.setString(5, motorista.getStatus());
+            stmt.setInt(6, motorista.getId_motorista());
 
             // executa a atualizacao dos dados de motorista
             int linhasAfetadas = stmt.executeUpdate();
@@ -102,7 +105,7 @@ public class MotoristaDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Motorista atualizado com sucesso!");
             } else {
-                System.out.println("Motorista não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar motorista para informar o erro ao chamador
@@ -114,7 +117,7 @@ public class MotoristaDAO {
     // remove o registro de motorista do banco de dados
     public void deletarMotorista(int id_motorista) {
         // define a consulta sql de exclusao para motorista
-        String sql = "DELETE FROM motorista WHERE id_motorista = ?";
+        String sql = "DELETE FROM \"MOTORISTA\" WHERE \"ID_motorista\" = ?";
 
         // abre a conexao e prepara a exclusao de motorista com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
@@ -130,7 +133,7 @@ public class MotoristaDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Motorista deletado com sucesso!");
             } else {
-                System.out.println("Motorista não encontrado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover motorista e informa o ocorrido
