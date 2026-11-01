@@ -1,26 +1,27 @@
 <%@ page pageEncoding="UTF-8" %>
-
-    <!-- Cria a janela usada para cadastrar uma nova empresa ou editar uma empresa já cadastrada. -->
     <dialog id="modalFormulario" class="modal" aria-labelledby="tituloFormulario" data-novo="Nova Empresa" data-editar="Editar Empresa">
         <header class="topo-modal">
             <h2 id="tituloFormulario">Nova Empresa</h2>
             <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
-
-        <!-- Parte superior da janela, onde aparece o título do formulário e o botão para fechá-lo. -->
         </header>
-
-         <!-- Espaço onde aparecem mensagens para informar se alguma ação foi realizada ou se existe algum aviso. -->
         <p id="mensagemFormulario" class="aviso" role="status"></p>
-
-        <!-- Formulário que recebe os dados da empresa e envia as informações para o servlet responsável pelo cadastro. Depois do envio, o usuário retorna para a página de empresas. -->
         <form id="formEmpresa" action="${pageContext.request.contextPath}/empresas" method="post" data-retorno="${pageContext.request.contextPath}/Empresas/empresa.jsp">
 
-             <!-- Agrupa os campos com as informações principais da empresa, como nome, CNPJ, telefone e plano escolhido. -->
             <div class="campos">
 
                 <div class="campo">
                     <label for="nome">Nome da empresa *</label>
                     <input type="text" id="nome" name="nome_empresa" maxlength="200" required>
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" maxlength="255" required>
+                </div>
+
+                <div class="campo">
+                    <label for="senha">Senha *</label>
+                    <input type="password" id="senha" name="senha" minlength="6" maxlength="128" autocomplete="new-password" required>
                 </div>
 
                 <div class="campo">
@@ -55,9 +56,7 @@
                         <option value="Profissional">Profissional</option>
                     </select>
                 </div>
-                <
-
-                <!-- Parte do formulário destinada ao endereço da empresa, com campos para preencher o CEP, rua, número, complemento, bairro, cidade e estado. -->
+                <!-- endereco proprio deste cadastro -->
                 <div class="campo campo-completo">
                     <h2>Endereço</h2>
                 </div>
@@ -94,7 +93,7 @@
 
             </div>
 
-            <!-- Botões que permitem cancelar o preenchimento ou enviar as informações para cadastrar a empresa. -->
+            <!-- botões do formulário -->
             <div class="botoes-formulario">
 
                 <button type="button" class="botao-cancelar" data-fechar-modal>Cancelar</button>

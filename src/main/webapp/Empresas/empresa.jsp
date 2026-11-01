@@ -4,7 +4,6 @@
 <html lang="pt-br">
 
 <head>
-    <!-- Define o idioma e a forma como os textos aparecem na página. Também carrega os ícones, a fonte Poppins e os arquivos CSS que cuidam da aparência da tela. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon" sizes="180x180" href="${pageContext.request.contextPath}/images/apple-touch-icon.png">
@@ -15,7 +14,7 @@
 
     <title>Empresas - Olius</title>
 
-     <!-- Carrega os arquivos responsáveis pela aparência da página, pela fonte e pelos ícones usados nos botões do sistema. -->
+    <!-- arquivo que cuida da aparência da página -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/empresas.css">
 
     <!-- fonte usada no restante do sistema -->
@@ -27,13 +26,12 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css">
 </head>
 
-<!-- Guarda as informações que o JavaScript usa para buscar os dados das empresas, identificar cada registro e saber quais informações serão mostradas na tabela. Também indica que os endereços fazem parte do cadastro. -->
-<body data-endereco="true" data-api="${pageContext.request.contextPath}/empresas" data-id="id_usuario" data-base="${pageContext.request.contextPath}/Empresas" data-columns="nome_empresa,cnpj,plano,id_endereco,telefone">
+<body data-endereco="true" data-api="${pageContext.request.contextPath}/empresas" data-id="id_usuario" data-base="${pageContext.request.contextPath}/Empresas" data-columns="nome_empresa,cnpj,plano,id_endereco,telefone,email">
 
-     <!-- Menu lateral com os links para acessar as outras páginas do sistema. A classe ativo destaca a opção Empresas, mostrando em qual página o usuário está. -->
+    <!--menu que fica na lateral da tela -->
     <aside class="menu">
 
-         <!-- Mostra a logo do Olius no menu lateral. -->
+        <!--logo do Olius -->
         <div class="logo">
             <img src="${pageContext.request.contextPath}/images/logo.png.png" alt="Logo Olius">
         </div>
@@ -41,7 +39,7 @@
 
         <div class="caixa"></div>
 
-         <!-- Reúne os links para acessar as diferentes áreas do painel, como usuários, motoristas, coletas e certificações. -->
+        <!--Links para acessar as outras páginas do painel -->
         <button type="button" class="botao-menu" aria-expanded="false" aria-controls="menuNavegacao">Menu</button>
         <nav id="menuNavegacao" aria-label="Menu principal">
             <a href="${pageContext.request.contextPath}/index.jsp">Dashboard</a>
@@ -56,10 +54,10 @@
 
     </aside>
 
-   <!-- Parte principal da página, onde ficam o título da área de empresas e o botão para adicionar um novo cadastro. -->
+    <!-- área principal, onde ficam as informações das empresas -->
     <main class="conteudo">
 
-        <!-- Mostra o nome da página e o botão que abre o formulário para cadastrar uma nova empresa. -->
+        <!-- título da página e botão para cadastrar uma empresa -->
         <header class="topo">
             <h1>Empresas (B2B)</h1>
 
@@ -71,7 +69,8 @@
             </button>
         </header>
 
-        <!-- Área de busca que permite encontrar uma empresa na lista e limpar os filtros usados. -->
+        <!-- tabela com os dados cadastrados -->
+        <!-- filtros da listagem, sem alterar os dados cadastrados -->
         <section class="filtros" aria-label="Filtros da listagem">
             <div>
                 <label for="busca">Buscar nesta lista</label>
@@ -84,7 +83,6 @@
             <button type="button" id="limparFiltros">Limpar filtros</button>
         </section>
 
-         <!-- Tabela que mostra as empresas cadastradas e suas principais informações, como nome, CNPJ, plano, endereço e telefone. Também possui uma coluna para as ações disponíveis em cada registro. -->
         <section class="tabela-container" tabindex="0" aria-label="Registros cadastrados">
 
             <table>
@@ -97,11 +95,12 @@
                         <th>Plano</th>
                         <th>Endereço</th>
                         <th>Telefone</th>
+                        <th>E-mail</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
 
-                <!-- Os dados das empresas são carregados pelo JavaScript e aparecem nesta parte da tabela. -->
+                <!-- Empresas usadas como exemplo para preencher a tabela -->
                 <tbody></tbody>
 
             </table>
@@ -111,12 +110,12 @@
     </main>
 
 
-    <!-- Adiciona o formulário de cadastro e edição dentro da própria página de empresas. -->
+    <!-- cadastro e edicao na propria listagem -->
     <%@ include file="formulario.jsp" %>
 
-    <!-- Adiciona a janela que aparece quando o usuário deseja excluir uma empresa. -->
+    <!-- excluir somente depois da confirmacao -->
     <%@ include file="excluir.jsp" %>
-    <!-- Carrega os arquivos JavaScript que cuidam das validações, da edição dos registros e do funcionamento do menu. -->
+
     <script src="${pageContext.request.contextPath}/js/validar.js" defer></script>
     <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
 

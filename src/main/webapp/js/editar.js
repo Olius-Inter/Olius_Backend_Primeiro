@@ -3,8 +3,6 @@
     const pagina = document.body;
     const api = pagina.dataset.api;
     if (!api) return;
-
-    // Identifica a página atual e guarda as informações necessárias para consultar os dados.
     const idCampo = pagina.dataset.id;
     let enderecos = [];
     let registros = [];
@@ -31,15 +29,12 @@
     const mensagemExcluir = document.getElementById('mensagemExcluir');
     document.querySelector('.tabela-container').before(aviso);
 
-    // Exibe mensagens de carregamento, sucesso ou erro na página.
     function informar(texto, erro = false) {
         aviso.textContent = texto;
         aviso.classList.toggle('erro', erro);
         aviso.setAttribute('role', erro ? 'alert' : 'status');
     }
 
-    // Faz as requisições ao servidor e verifica se a resposta recebida está correta.
-    // Caso ocorra algum problema, apresenta uma mensagem explicando o erro.
     async function requisitar(url, opcoes = {}) {
         const resposta = await fetch(url, { ...opcoes, headers: { Accept: 'application/json', ...opcoes.headers } });
         let dados;
@@ -52,33 +47,28 @@
         return dados;
     }
 
-    // Busca os registros da página e confere se o servidor retornou uma lista válida.
     async function listar() {
         const dados = await requisitar(api);
         if (!Array.isArray(dados)) throw new Error('A listagem recebida é inválida.');
         return dados;
     }
 
-    // Converte as datas do formato usado pelo sistema para o formato brasileiro.
     function formatarData(valor) {
         const data = String(valor || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
         return data ? `${data[3]}/${data[2]}/${data[1]}` : String(valor || '');
     }
 
-    // Localiza o nome da empresa usando o ID que está salvo no registro.
-    // Dessa forma, a tabela mostra o nome em vez de apresentar apenas um número.
+    // Os IDs continuam nas operacoes; a tela apresenta os nomes relacionados.
     function nomeEmpresa(idEmpresa) {
         const empresa = empresas.find(item => String(item.id_usuario) === String(idEmpresa));
         return empresa ? empresa.nome_empresa || empresa.razao_social || 'Empresa sem nome' : 'Empresa não encontrada';
     }
 
-    // Junta as principais informações de uma solicitação para facilitar sua identificação.
     function descricaoSolicitacao(solicitacao) {
         return [nomeEmpresa(solicitacao.id_b2b), formatarData(solicitacao.dt_solicitacao),
             `${solicitacao.litros_estimados} L`].join(' — ');
     }
 
-    // Substitui IDs de relacionamentos pelos nomes correspondentes, facilitando a leitura dos registros.
     function valorExibido(campo, valor) {
         if (valor == null || valor === '') return valor;
         if (campo === 'id_usuario') {
@@ -97,8 +87,6 @@
         return valor;
     }
 
-    // Formata os valores antes de exibi-los na tabela, como endereços, datas e volumes.
-    // Quando o registro possui um PDF, cria um link para abrir o arquivo.
     function mostrarValor(celula, campo, valor) {
         valor = valorExibido(campo, valor);
         if (valor == null || valor === '') {
@@ -132,8 +120,6 @@
         } else celula.textContent = String(valor);
     }
 
-    // Busca os registros e também os dados relacionados que serão usados na tabela.
-    // Depois, prepara as opções dos filtros e chama a função que monta a listagem.
     async function carregarTabela() {
         informar('Carregando registros…');
         tabela.replaceChildren();
@@ -176,9 +162,6 @@
         return String(valor == null ? '' : valor).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     }
 
-
-    // Aplica a busca e o filtro selecionado e monta novamente as linhas da tabela.
-    // Também cria os botões que permitem editar ou excluir cada registro.
     function mostrarTabela() {
         tabela.replaceChildren();
         const colunas = pagina.dataset.columns.split(',');
@@ -229,8 +212,7 @@
         informar(`${dados.length} de ${registros.length} registro(s) encontrado(s).`);
     }
 
-    // Carrega as informações de outros cadastros para preencher os campos de seleção do formulário.
-    // Assim, a pessoa pode escolher um nome ou uma descrição em vez de precisar digitar um ID.
+    // carrega os cadastros relacionados antes de permitir salvar
     async function carregarReferencias(tentativa) {
         const caminho = api.substring(0, api.lastIndexOf('/') + 1);
         const referencias = {
@@ -275,14 +257,12 @@
         }
     }
 
-    // Exibe mensagens dentro dos formulários e identifica quando se trata de um erro.
     function mensagem(elemento, texto, erro = false) {
         elemento.textContent = texto;
         elemento.classList.toggle('erro', erro);
         elemento.setAttribute('role', erro ? 'alert' : 'status');
     }
 
-    // Bloqueia ou libera os campos enquanto o sistema está carregando ou salvando informações.
     function bloquearCampos(bloquear) {
         formulario.querySelectorAll('input, select, textarea').forEach(campo => {
             campo.disabled = bloquear;
@@ -290,8 +270,6 @@
         formulario.querySelector('[type="submit"]').disabled = bloquear;
     }
 
-    // Abre o formulário para um novo cadastro ou para editar um registro existente.
-    // Quando é uma edição, busca os dados atuais e preenche os campos automaticamente.
     async function abrirFormulario(identificador = null) {
         if (ocupado || modal.open) return;
         const tentativa = ++abertura;
@@ -317,6 +295,7 @@
                 const registro = (await listar()).find(item => String(item[idCampo]) === id);
                 if (tentativa !== abertura || !modal.open) return;
                 if (!registro) throw new Error('Registro não encontrado. Atualize a listagem.');
+                if (senha && 'id_usuario_vinculado' in registro) senha.required = registro.id_usuario_vinculado == null;
                 Object.entries(registro).forEach(([nome, valor]) => {
                     const campo = formulario.elements.namedItem(nome);
                     if (campo && nome !== 'senha') {
@@ -341,7 +320,7 @@
                 if (primeiroRegistro) primeiroRegistro.readOnly = true;
             }
             bloquearCampos(false);
-            mensagem(mensagemFormulario, id && senha ? 'Deixe a senha em branco para manter a atual.' : '');
+            mensagem(mensagemFormulario, id && senha ? (senha.required ? 'Informe e-mail e senha para completar o cadastro da empresa.' : 'Deixe a senha em branco para manter a atual.') : '');
             const primeiro = formulario.querySelector('input:not(:disabled):not([readonly]), select:not(:disabled)');
             if (primeiro) primeiro.focus();
         } catch (erro) {
@@ -349,7 +328,6 @@
         }
     }
 
-    // Guarda o registro escolhido e abre a janela de confirmação antes de realizar a exclusão.
     function abrirExclusao(identificador) {
         if (ocupado) return;
         idExcluir = identificador;
@@ -383,8 +361,6 @@
             });
         });
 
-        // Confere os campos e envia os dados ao servidor para cadastrar ou atualizar um registro.
-        // Depois que a operação termina, fecha o formulário e carrega novamente a tabela
         formulario.addEventListener('submit', async evento => {
             evento.preventDefault();
             if (ocupado || formulario.querySelector('[type="submit"]').disabled) return;
@@ -418,7 +394,6 @@
             carregarTabela().catch(erro => informar('Registro salvo. ' + erro.message, true));
         });
 
-        // Envia ao servidor o pedido de exclusão do registro confirmado e atualiza a listagem.
         document.getElementById('confirmarExclusao').addEventListener('click', async evento => {
             if (ocupado || !idExcluir) return;
             const botao = evento.currentTarget;
@@ -443,7 +418,6 @@
 
     }
 
-    // Faz o carregamento inicial da tabela. Se houver erro, mostra a mensagem e permite tentar novamente.
     if (tabela) carregarTabela().catch(erro => {
         informar(erro.message, true);
         const tentar = document.createElement('button');

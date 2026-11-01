@@ -11,6 +11,9 @@ public class B2bModel {
     private String nome_empresa;
     private String telefone;
     private Integer id_endereco;
+    private Integer id_usuario_vinculado;
+    private String email;
+    private String senha;
 
     // inicializa os dados de empresa b dois b
     public B2bModel(String cnpj, String razao_social,
@@ -93,6 +96,31 @@ public class B2bModel {
     public void setId_endereco(Integer id_endereco) {
         this.id_endereco = id_endereco;
     }
+    // usuario que guarda os dados comuns deste cadastro de empresa
+    public Integer getId_usuario_vinculado() {
+        return id_usuario_vinculado;
+    }
+
+    public void setId_usuario_vinculado(Integer id_usuario_vinculado) {
+        this.id_usuario_vinculado = id_usuario_vinculado;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
     private String plano;
 
     public String getPlano() {
