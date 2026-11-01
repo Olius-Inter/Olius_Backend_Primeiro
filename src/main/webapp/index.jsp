@@ -37,6 +37,7 @@
             <a href="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">Solicitações de coleta</a>
             <a href="${pageContext.request.contextPath}/Coletas/coletas.jsp">Coletas realizadas</a>
             <a href="${pageContext.request.contextPath}/Certificados/certificados.jsp">Certificações</a>
+            <a href="${pageContext.request.contextPath}/login?sair=1">Sair</a>
         </nav>
     </aside>
 

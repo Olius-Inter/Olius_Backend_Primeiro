@@ -1,4 +1,4 @@
-package Organizacao.Dao;
+  package Organizacao.Dao;
 
 import Organizacao.Conexao.Conexao_Banco;
 import Organizacao.Model.UsuarioModel;
@@ -49,6 +49,32 @@ public class UsuarioDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar usuário: " + e.getMessage(), e);
         }
+    }
+
+    // busca os dados do usuario para conferir o login pelo e-mail
+    public UsuarioModel buscarPorEmail(String email) {
+        String sql = "SELECT \"ID_usuario\" AS id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone FROM \"USUARIO\" WHERE LOWER(email) = LOWER(?)";
+
+        try (Connection conexao = Conexao_Banco.conectar();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new UsuarioModel(
+                            rs.getInt("id_usuario"),
+                            rs.getString("nome"),
+                            rs.getString("email"),
+                            rs.getString("senha"),
+                            rs.getDate("primeiro_registro"),
+                            rs.getString("tipo_usuario"),
+                            rs.getString("telefone")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar usuário pelo e-mail: " + e.getMessage(), e);
+        }
+        return null;
     }
 
     // consulta os registros de usuario e devolve a lista
@@ -121,7 +147,7 @@ public class UsuarioDAO {
                 throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
-            // propaga a falha ao atualizar usuario para informar o erro ao chamador
+        // propaga a falha ao atualizar usuario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar usuário: " + e.getMessage(), e);
         }
@@ -142,12 +168,10 @@ public class UsuarioDAO {
                     pev.setInt(1, id_Usuario);
                     pev.executeUpdate();
                 }
-
                 try (PreparedStatement cliente = conexao.prepareStatement("DELETE FROM \"B2C\" WHERE \"ID_usuario\" = ?")) {
                     cliente.setInt(1, id_Usuario);
                     cliente.executeUpdate();
                 }
-
                 // associa o identificador do registro aos parametros da exclusao
                 stmt.setInt(1, id_Usuario);
 
@@ -166,12 +190,11 @@ public class UsuarioDAO {
                 conexao.rollback();
                 throw e;
             }
-            // propaga a falha ao remover usuario para informar o erro ao chamador
+        // propaga a falha ao remover usuario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
         }
     }
-
     // salva usuario e cliente B2C juntos, usando a mesma chave e transacao
     public void salvarComB2c(UsuarioModel usuario, String cpf, boolean atualizar) {
         try (Connection conexao = Conexao_Banco.conectar()) {
@@ -189,7 +212,6 @@ public class UsuarioDAO {
                 } else {
                     salvar(usuario, conexao);
                 }
-
                 if ("B2C".equals(usuario.getTipoUsuario())) {
                     boolean existe;
                     String sql = "SELECT \"ID_usuario\" FROM \"B2C\" WHERE \"ID_usuario\" = ?";
@@ -199,11 +221,9 @@ public class UsuarioDAO {
                             existe = rs.next();
                         }
                     }
-
                     B2cModel b2c = new B2cModel(usuario.getId_usuario(), cpf, usuario.getTelefone());
                     if (existe) new B2cDAO().atualizarB2c(b2c, conexao);
                     else new B2cDAO().inserirB2c(b2c, conexao);
-
                 } else if (atualizar) {
                     // dependencias existentes impedem retirar o perfil B2C
                     try (PreparedStatement stmt = conexao.prepareStatement("DELETE FROM \"B2C\" WHERE \"ID_usuario\" = ?")) {
@@ -211,7 +231,6 @@ public class UsuarioDAO {
                         stmt.executeUpdate();
                     }
                 }
-
                 conexao.commit();
             } catch (SQLException | RuntimeException e) {
                 conexao.rollback();
@@ -220,35 +239,5 @@ public class UsuarioDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar usuário B2C: " + e.getMessage(), e);
         }
-    }
-
-    // busca um usuario pelo e-mail informado
-    public UsuarioModel buscarPorEmail(String email) throws Exception {
-
-        String sql = "SELECT \"ID_usuario\" AS id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone " +
-                "FROM \"USUARIO\" WHERE LOWER(email) = LOWER(?)";
-
-        try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (rs.next()) {
-                    return new UsuarioModel(
-                            rs.getInt("id_usuario"),
-                            rs.getString("nome"),
-                            rs.getString("email"),
-                            rs.getString("senha"),
-                            rs.getDate("primeiro_registro"),
-                            rs.getString("tipo_usuario"),
-                            rs.getString("telefone")
-                    );
-                }
-            }
-        }
-
-        return null;
     }
 }
