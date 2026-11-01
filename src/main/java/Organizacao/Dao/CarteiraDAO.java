@@ -18,19 +18,18 @@ public class CarteiraDAO {
     public void inserirCarteira(CarteiraModel carteira) {
 
         // define a consulta sql de insercao para carteira de pontos
-        String sql = "INSERT INTO carteira (pontuacao, patente, nivel, id_b2c) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO \"CARTEIRA\" (pontos_totais, nivel, \"ID_B2C\") VALUES (?, CAST(? AS integer), ?)";
 
         // abre a conexao e prepara a insercao de carteira de pontos com fechamento automatico
         try (
                 Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_carteira"})
+                PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_carteira"})
         ) {
 
             // associa os campos de carteira de pontos aos parametros da insercao
             stmt.setInt(1, carteira.getPontuacao());
-            stmt.setString(2, carteira.getPatente());
-            stmt.setString(3, carteira.getNivel());
-            stmt.setObject(4, carteira.getId_b2c(), java.sql.Types.INTEGER);
+            stmt.setString(2, carteira.getNivel());
+            stmt.setObject(3, carteira.getId_b2c(), java.sql.Types.INTEGER);
 
             // executa a gravacao dos dados de carteira de pontos
             stmt.executeUpdate();
@@ -42,7 +41,7 @@ public class CarteiraDAO {
 
             System.out.println("Carteira cadastrada com sucesso!");
 
-        // registra a falha ao gravar carteira de pontos e informa o ocorrido
+            // registra a falha ao gravar carteira de pontos e informa o ocorrido
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir carteira: " + e.getMessage(), e);
@@ -55,7 +54,7 @@ public class CarteiraDAO {
         List<CarteiraModel> listaCarteiras = new ArrayList<>();
 
         // define a consulta sql de leitura para carteira de pontos
-        String sql = "SELECT * FROM carteira ORDER BY id_carteira";
+        String sql = "SELECT \"ID_carteira\" AS id_carteira, pontos_totais AS pontuacao, NULL::text AS patente, nivel, \"ID_B2C\" AS id_b2c FROM \"CARTEIRA\" ORDER BY \"ID_carteira\"";
 
         // abre a conexao e executa a consulta de carteira de pontos com fechamento automatico
         try (
@@ -85,7 +84,7 @@ public class CarteiraDAO {
                 listaCarteiras.add(carteira);
             }
 
-        // propaga a falha ao consultar carteira de pontos para informar o erro ao chamador
+            // propaga a falha ao consultar carteira de pontos para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar carteiras: " + e.getMessage(), e);
         }
@@ -98,7 +97,7 @@ public class CarteiraDAO {
     public void atualizarCarteira(CarteiraModel carteira) {
 
         // define a consulta sql de atualizacao para carteira de pontos
-        String sql = "UPDATE carteira SET pontuacao = ?, patente = ?, nivel = ?, id_b2c = ? WHERE id_carteira = ?";
+        String sql = "UPDATE \"CARTEIRA\" SET pontos_totais = ?, nivel = CAST(? AS integer), \"ID_B2C\" = ? WHERE \"ID_carteira\" = ?";
 
         // abre a conexao e prepara a atualizacao de carteira de pontos com fechamento automatico
         try (
@@ -108,10 +107,9 @@ public class CarteiraDAO {
 
             // associa os campos de carteira de pontos aos parametros da atualizacao
             stmt.setInt(1, carteira.getPontuacao());
-            stmt.setString(2, carteira.getPatente());
-            stmt.setString(3, carteira.getNivel());
-            stmt.setObject(4, carteira.getId_b2c(), java.sql.Types.INTEGER);
-            stmt.setInt(5, carteira.getId_carteira());
+            stmt.setString(2, carteira.getNivel());
+            stmt.setObject(3, carteira.getId_b2c(), java.sql.Types.INTEGER);
+            stmt.setInt(4, carteira.getId_carteira());
 
             // executa a atualizacao dos dados de carteira de pontos
             int linhasAfetadas = stmt.executeUpdate();
@@ -123,7 +121,7 @@ public class CarteiraDAO {
                 throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
-        // registra a falha ao atualizar carteira de pontos e informa o ocorrido
+            // registra a falha ao atualizar carteira de pontos e informa o ocorrido
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar carteira: " + e.getMessage(), e);
@@ -134,7 +132,7 @@ public class CarteiraDAO {
     public void deletarCarteira(int id_carteira) {
 
         // define a consulta sql de exclusao para carteira de pontos
-        String sql = "DELETE FROM carteira WHERE id_carteira = ?";
+        String sql = "DELETE FROM \"CARTEIRA\" WHERE \"ID_carteira\" = ?";
 
         // abre a conexao e prepara a exclusao de carteira de pontos com fechamento automatico
         try (
@@ -155,7 +153,7 @@ public class CarteiraDAO {
                 throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
-        // registra a falha ao remover carteira de pontos e informa o ocorrido
+            // registra a falha ao remover carteira de pontos e informa o ocorrido
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar carteira: " + e.getMessage(), e);
