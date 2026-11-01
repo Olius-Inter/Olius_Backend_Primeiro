@@ -21,15 +21,20 @@ public class ParticipacaoEventoDAO {
 
         // abre a conexao e prepara a insercao de participacao em evento com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_participacao"})) {
 
             // associa os campos de participacao em evento aos parametros da insercao
             stmt.setString(1, participacao.getStatus());
-            stmt.setInt(2, participacao.getId_b2c());
-            stmt.setInt(3, participacao.getId_evento());
+            stmt.setObject(2, participacao.getId_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(3, participacao.getId_evento(), java.sql.Types.INTEGER);
 
             // executa a gravacao dos dados de participacao em evento
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    participacao.setId_participacao(rs.getInt(1));
+                }
+            }
             System.out.println("Participação em evento cadastrada com sucesso!");
 
         // propaga a falha ao gravar participacao em evento para informar o erro ao chamador
@@ -53,8 +58,8 @@ public class ParticipacaoEventoDAO {
             while (rs.next()) {
                 int id_participacao = rs.getInt("id_participacao");
                 String status = rs.getString("status");
-                int id_b2c = rs.getInt("id_b2c");
-                int id_evento = rs.getInt("id_evento");
+                Integer id_b2c = rs.getObject("id_b2c", Integer.class);
+                Integer id_evento = rs.getObject("id_evento", Integer.class);
 
                 ParticipacaoEventoModel participacao = new ParticipacaoEventoModel(status, id_b2c, id_evento);
                 participacao.setId_participacao(id_participacao);
@@ -82,8 +87,8 @@ public class ParticipacaoEventoDAO {
 
             // associa os campos de participacao em evento aos parametros da atualizacao
             stmt.setString(1, participacao.getStatus());
-            stmt.setInt(2, participacao.getId_b2c());
-            stmt.setInt(3, participacao.getId_evento());
+            stmt.setObject(2, participacao.getId_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(3, participacao.getId_evento(), java.sql.Types.INTEGER);
             stmt.setInt(4, participacao.getId_participacao());
 
             // executa a atualizacao dos dados de participacao em evento
@@ -93,7 +98,7 @@ public class ParticipacaoEventoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Participação atualizada com sucesso!");
             } else {
-                System.out.println("Participação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar participacao em evento para informar o erro ao chamador
@@ -121,7 +126,7 @@ public class ParticipacaoEventoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Participação deletada com sucesso!");
             } else {
-                System.out.println("Participação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover participacao em evento e informa o ocorrido

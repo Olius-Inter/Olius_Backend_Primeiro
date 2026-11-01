@@ -2,6 +2,7 @@ package Organizacao.Dao;
 
 import Organizacao.Conexao.Conexao_Banco;
 import Organizacao.Model.UsuarioModel;
+import Organizacao.Model.B2cModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,34 +17,53 @@ public class UsuarioDAO {
 
     // grava os dados de usuario no banco de dados
     public void salvar(UsuarioModel usuario) throws Exception {
+        try (Connection conexao = Conexao_Banco.conectar()) {
+            salvar(usuario, conexao);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao acessar o banco: " + e.getMessage(), e);
+        }
+    }
+
+    public void salvar(UsuarioModel usuario, Connection conexao) {
         // define a consulta sql de insercao para usuario
-        String sql = "INSERT INTO usuario (id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"USUARIO\" (nome, email, senha, primeiro_registro, tipo_usuario, telefone) VALUES (?, ?, ?, COALESCE(?, CURRENT_DATE), CAST(? AS public.tipo_usuario), ?)";
 
         // abre a conexao e prepara a insercao de usuario com fechamento automatico
-        try (Connection conn = Conexao_Banco.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"ID_usuario"})) {
 
             // associa os campos de usuario aos parametros da insercao
-            stmt.setInt(1, usuario.getId_usuario());
-            stmt.setString(2, usuario.getNome());
-            stmt.setString(3, usuario.getEmail());
-            stmt.setString(4, usuario.getSenha());
-            stmt.setDate(5, usuario.getPrimeiroRegistro());
-            stmt.setString(6, usuario.getTipoUsuario());
-            stmt.setString(7, usuario.getTelefone());
+            stmt.setString(1, usuario.getNome());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getSenha() == null || usuario.getSenha().isEmpty() ? null : usuario.getSenha());
+            stmt.setDate(4, usuario.getPrimeiroRegistro());
+            stmt.setString(5, usuario.getTipoUsuario());
+            stmt.setString(6, usuario.getTelefone());
 
             // executa a gravacao dos dados de usuario
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    usuario.setIdUsuario(rs.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar usuário: " + e.getMessage(), e);
         }
     }
 
     // consulta os registros de usuario e devolve a lista
     public List<UsuarioModel> listar() throws Exception {
+        return listar(false);
+    }
+
+    public List<UsuarioModel> listar(boolean referencias) throws Exception {
         List<UsuarioModel> lista = new ArrayList<>();
         // define a consulta sql de leitura para usuario
-        String sql = "SELECT * FROM usuario";
+        String sql = "SELECT u.\"ID_usuario\" AS id_usuario, u.nome, u.email, NULL::text AS senha, u.primeiro_registro, u.tipo_usuario, u.telefone, b.\"CPF\" AS cpf FROM \"USUARIO\" u LEFT JOIN \"B2C\" b ON b.\"ID_usuario\" = u.\"ID_usuario\" ORDER BY u.\"ID_usuario\"";
 
         // abre a conexao e executa a consulta de usuario com fechamento automatico
+        if (!referencias) sql = sql.replace("ORDER BY", "WHERE u.tipo_usuario = 'B2C' ORDER BY");
+
         try (Connection conn = Conexao_Banco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -59,6 +79,7 @@ public class UsuarioDAO {
                         rs.getString("tipo_usuario"),
                         rs.getString("telefone")
                 );
+                u.setCpf(rs.getString("cpf"));
                 lista.add(u);
             }
         }
@@ -68,17 +89,24 @@ public class UsuarioDAO {
 
     // atualiza os dados de usuario no banco de dados
     public void atualizarUsuario(UsuarioModel usuario) {
+        try (Connection conexao = Conexao_Banco.conectar()) {
+            atualizarUsuario(usuario, conexao);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao acessar o banco: " + e.getMessage(), e);
+        }
+    }
+
+    public void atualizarUsuario(UsuarioModel usuario, Connection conexao) {
         // define a consulta sql de atualizacao para usuario
-        String sql = "UPDATE usuario SET nome = ?, email = ?, senha = ?, tipo_usuario = ?, telefone = ? WHERE id_usuario = ?";
+        String sql = "UPDATE \"USUARIO\" SET nome = ?, email = ?, senha = COALESCE(?, senha), tipo_usuario = CAST(? AS public.tipo_usuario), telefone = ? WHERE \"ID_usuario\" = ?";
 
         // abre a conexao e prepara a atualizacao de usuario com fechamento automatico
-        try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de usuario aos parametros da atualizacao
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha());
+            stmt.setString(3, usuario.getSenha() == null || usuario.getSenha().isEmpty() ? null : usuario.getSenha());
             stmt.setString(4, usuario.getTipoUsuario());
             stmt.setString(5, usuario.getTelefone());
             stmt.setInt(6, usuario.getId_usuario());
@@ -90,7 +118,7 @@ public class UsuarioDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Usuário atualizado com sucesso!");
             } else {
-                System.out.println("Nenhum registro de usuário encontrado com o ID informado.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar usuario para informar o erro ao chamador
@@ -102,28 +130,88 @@ public class UsuarioDAO {
     // remove o registro de usuario do banco de dados
     public void deletarUsuario(int id_Usuario) {
         // define a consulta sql de exclusao para usuario
-        String sql = "DELETE FROM usuario WHERE id_usuario = ?";
+        String sql = "DELETE FROM \"USUARIO\" WHERE \"ID_usuario\" = ?";
 
         // abre a conexao e prepara a exclusao de usuario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            // associa o identificador do registro aos parametros da exclusao
-            stmt.setInt(1, id_Usuario);
+            conexao.setAutoCommit(false);
+            try {
+                try (PreparedStatement pev = conexao.prepareStatement("DELETE FROM \"PEV\" WHERE \"ID_usuario\" = ?")) {
+                    pev.setInt(1, id_Usuario);
+                    pev.executeUpdate();
+                }
+                try (PreparedStatement cliente = conexao.prepareStatement("DELETE FROM \"B2C\" WHERE \"ID_usuario\" = ?")) {
+                    cliente.setInt(1, id_Usuario);
+                    cliente.executeUpdate();
+                }
+                // associa o identificador do registro aos parametros da exclusao
+                stmt.setInt(1, id_Usuario);
 
-            // executa a exclusao do registro de usuario
-            int linhasAfetadas = stmt.executeUpdate();
+                // executa a exclusao do registro de usuario
+                int linhasAfetadas = stmt.executeUpdate();
 
-            // verifica se algum registro de usuario foi removido
-            if (linhasAfetadas > 0) {
-                System.out.println("Usuário deletado com sucesso!");
-            } else {
-                System.out.println("Nenhum usuário encontrado com esse ID para deletar.");
+                // verifica se algum registro de usuario foi removido
+                if (linhasAfetadas > 0) {
+                    System.out.println("Usuário deletado com sucesso!");
+                } else {
+                    throw new java.util.NoSuchElementException("Registro não encontrado.");
+                }
+
+                conexao.commit();
+            } catch (SQLException | RuntimeException e) {
+                conexao.rollback();
+                throw e;
             }
-
         // propaga a falha ao remover usuario para informar o erro ao chamador
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
+        }
+    }
+    // salva usuario e cliente B2C juntos, usando a mesma chave e transacao
+    public void salvarComB2c(UsuarioModel usuario, String cpf, boolean atualizar) {
+        try (Connection conexao = Conexao_Banco.conectar()) {
+            conexao.setAutoCommit(false);
+            try {
+                if (atualizar) {
+                    String sql = "SELECT \"ID_usuario\" FROM \"USUARIO\" WHERE \"ID_usuario\" = ? FOR UPDATE";
+                    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+                        stmt.setInt(1, usuario.getId_usuario());
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            if (!rs.next()) throw new java.util.NoSuchElementException("Registro não encontrado.");
+                        }
+                    }
+                    atualizarUsuario(usuario, conexao);
+                } else {
+                    salvar(usuario, conexao);
+                }
+                if ("B2C".equals(usuario.getTipoUsuario())) {
+                    boolean existe;
+                    String sql = "SELECT \"ID_usuario\" FROM \"B2C\" WHERE \"ID_usuario\" = ?";
+                    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+                        stmt.setInt(1, usuario.getId_usuario());
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            existe = rs.next();
+                        }
+                    }
+                    B2cModel b2c = new B2cModel(usuario.getId_usuario(), cpf, usuario.getTelefone());
+                    if (existe) new B2cDAO().atualizarB2c(b2c, conexao);
+                    else new B2cDAO().inserirB2c(b2c, conexao);
+                } else if (atualizar) {
+                    // dependencias existentes impedem retirar o perfil B2C
+                    try (PreparedStatement stmt = conexao.prepareStatement("DELETE FROM \"B2C\" WHERE \"ID_usuario\" = ?")) {
+                        stmt.setInt(1, usuario.getId_usuario());
+                        stmt.executeUpdate();
+                    }
+                }
+                conexao.commit();
+            } catch (SQLException | RuntimeException e) {
+                conexao.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar usuário B2C: " + e.getMessage(), e);
         }
     }
 }

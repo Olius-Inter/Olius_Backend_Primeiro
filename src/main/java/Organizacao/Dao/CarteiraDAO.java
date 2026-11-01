@@ -23,17 +23,22 @@ public class CarteiraDAO {
         // abre a conexao e prepara a insercao de carteira de pontos com fechamento automatico
         try (
                 Connection conexao = Conexao_Banco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql)
+                PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_carteira"})
         ) {
 
             // associa os campos de carteira de pontos aos parametros da insercao
             stmt.setInt(1, carteira.getPontuacao());
             stmt.setString(2, carteira.getPatente());
             stmt.setString(3, carteira.getNivel());
-            stmt.setInt(4, carteira.getId_b2c());
+            stmt.setObject(4, carteira.getId_b2c(), java.sql.Types.INTEGER);
 
             // executa a gravacao dos dados de carteira de pontos
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    carteira.setId_carteira(rs.getInt(1));
+                }
+            }
 
             System.out.println("Carteira cadastrada com sucesso!");
 
@@ -66,7 +71,7 @@ public class CarteiraDAO {
                 int pontuacao = rs.getInt("pontuacao");
                 String patente = rs.getString("patente");
                 String nivel = rs.getString("nivel");
-                int id_b2c = rs.getInt("id_b2c");
+                Integer id_b2c = rs.getObject("id_b2c", Integer.class);
 
                 CarteiraModel carteira = new CarteiraModel(
                         pontuacao,
@@ -82,7 +87,7 @@ public class CarteiraDAO {
 
         // propaga a falha ao consultar carteira de pontos para informar o erro ao chamador
         } catch (SQLException e) {
-            System.out.println("Erro ao listar carteiras: " + e.getMessage());
+            throw new RuntimeException("Erro ao listar carteiras: " + e.getMessage(), e);
         }
 
         // devolve os registros encontrados pela consulta
@@ -105,7 +110,7 @@ public class CarteiraDAO {
             stmt.setInt(1, carteira.getPontuacao());
             stmt.setString(2, carteira.getPatente());
             stmt.setString(3, carteira.getNivel());
-            stmt.setInt(4, carteira.getId_b2c());
+            stmt.setObject(4, carteira.getId_b2c(), java.sql.Types.INTEGER);
             stmt.setInt(5, carteira.getId_carteira());
 
             // executa a atualizacao dos dados de carteira de pontos
@@ -115,7 +120,7 @@ public class CarteiraDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Carteira atualizada com sucesso!");
             } else {
-                System.out.println("Carteira não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao atualizar carteira de pontos e informa o ocorrido
@@ -147,7 +152,7 @@ public class CarteiraDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Carteira deletada com sucesso!");
             } else {
-                System.out.println("Carteira não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover carteira de pontos e informa o ocorrido

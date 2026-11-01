@@ -22,11 +22,11 @@ public class PontuacaoDAO {
 
         // abre a conexao e prepara a insercao de pontuacao de usuario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_pontuacao"})) {
 
             // associa os campos de pontuacao de usuario aos parametros da insercao
-            stmt.setInt(1, pontuacao.getId_usuario_b2c());
-            stmt.setInt(2, pontuacao.getId_entrega());
+            stmt.setObject(1, pontuacao.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, pontuacao.getId_entrega(), java.sql.Types.INTEGER);
             stmt.setInt(3, pontuacao.getPontos());
             stmt.setString(4, pontuacao.getTp_movimentacao());
             stmt.setString(5, pontuacao.getDescricao());
@@ -34,6 +34,11 @@ public class PontuacaoDAO {
 
             // executa a gravacao dos dados de pontuacao de usuario
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    pontuacao.setId_pontuacao(rs.getInt(1));
+                }
+            }
             System.out.println("Pontuação cadastrada com sucesso!");
 
         // propaga a falha ao gravar pontuacao de usuario para informar o erro ao chamador
@@ -56,8 +61,8 @@ public class PontuacaoDAO {
             // converte os campos de cada linha consultada em pontuacao de usuario
             while (rs.next()) {
                 int id_pontuacao = rs.getInt("id_pontuacao");
-                int id_usuario_b2c = rs.getInt("id_usuario_b2c");
-                int id_entrega = rs.getInt("id_entrega");
+                Integer id_usuario_b2c = rs.getObject("id_usuario_b2c", Integer.class);
+                Integer id_entrega = rs.getObject("id_entrega", Integer.class);
                 int pontos = rs.getInt("pontos");
                 String tp_movimentacao = rs.getString("tp_movimentacao");
                 String descricao = rs.getString("descricao");
@@ -90,8 +95,8 @@ public class PontuacaoDAO {
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de pontuacao de usuario aos parametros da atualizacao
-            stmt.setInt(1, pontuacao.getId_usuario_b2c());
-            stmt.setInt(2, pontuacao.getId_entrega());
+            stmt.setObject(1, pontuacao.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, pontuacao.getId_entrega(), java.sql.Types.INTEGER);
             stmt.setInt(3, pontuacao.getPontos());
             stmt.setString(4, pontuacao.getTp_movimentacao());
             stmt.setString(5, pontuacao.getDescricao());
@@ -105,7 +110,7 @@ public class PontuacaoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Pontuação atualizada com sucesso!");
             } else {
-                System.out.println("Pontuação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar pontuacao de usuario para informar o erro ao chamador
@@ -133,7 +138,7 @@ public class PontuacaoDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Pontuação deletada com sucesso!");
             } else {
-                System.out.println("Pontuação não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover pontuacao de usuario e informa o ocorrido

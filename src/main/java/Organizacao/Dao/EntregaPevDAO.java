@@ -22,17 +22,22 @@ public class EntregaPevDAO {
 
         // abre a conexao e prepara a insercao de entrega em ponto voluntario com fechamento automatico
         try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+             PreparedStatement stmt = conexao.prepareStatement(sql, new String[]{"id_entrega"})) {
 
             // associa os campos de entrega em ponto voluntario aos parametros da insercao
-            stmt.setInt(1, entrega.getId_usuario_b2c());
-            stmt.setInt(2, entrega.getId_pev());
+            stmt.setObject(1, entrega.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, entrega.getId_pev(), java.sql.Types.INTEGER);
             stmt.setDouble(3, entrega.getQtd_litros());
             stmt.setInt(4, entrega.getPontos_gerados());
             stmt.setDate(5, java.sql.Date.valueOf(entrega.getDt_entrega()));
 
             // executa a gravacao dos dados de entrega em ponto voluntario
             stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    entrega.setId_entrega(rs.getInt(1));
+                }
+            }
             System.out.println("Entrega PEV cadastrada com sucesso!");
 
         // propaga a falha ao gravar entrega em ponto voluntario para informar o erro ao chamador
@@ -55,8 +60,8 @@ public class EntregaPevDAO {
             // converte os campos de cada linha consultada em entrega em ponto voluntario
             while (rs.next()) {
                 int id_entrega = rs.getInt("id_entrega");
-                int id_usuario_b2c = rs.getInt("id_usuario_b2c");
-                int id_pev = rs.getInt("id_pev");
+                Integer id_usuario_b2c = rs.getObject("id_usuario_b2c", Integer.class);
+                Integer id_pev = rs.getObject("id_pev", Integer.class);
                 double qtd_litros = rs.getDouble("qtd_litros");
                 int pontos_gerados = rs.getInt("pontos_gerados");
                 LocalDate dt_entrega = rs.getObject("dt_entrega", LocalDate.class);
@@ -88,8 +93,8 @@ public class EntregaPevDAO {
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de entrega em ponto voluntario aos parametros da atualizacao
-            stmt.setInt(1, entrega.getId_usuario_b2c());
-            stmt.setInt(2, entrega.getId_pev());
+            stmt.setObject(1, entrega.getId_usuario_b2c(), java.sql.Types.INTEGER);
+            stmt.setObject(2, entrega.getId_pev(), java.sql.Types.INTEGER);
             stmt.setDouble(3, entrega.getQtd_litros());
             stmt.setInt(4, entrega.getPontos_gerados());
             stmt.setDate(5, java.sql.Date.valueOf(entrega.getDt_entrega()));
@@ -102,7 +107,7 @@ public class EntregaPevDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Entrega PEV atualizada com sucesso!");
             } else {
-                System.out.println("Entrega PEV não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // propaga a falha ao atualizar entrega em ponto voluntario para informar o erro ao chamador
@@ -130,7 +135,7 @@ public class EntregaPevDAO {
             if (linhasAfetadas > 0) {
                 System.out.println("Entrega PEV deletada com sucesso!");
             } else {
-                System.out.println("Entrega PEV não encontrada.");
+                throw new java.util.NoSuchElementException("Registro não encontrado.");
             }
 
         // registra a falha ao remover entrega em ponto voluntario e informa o ocorrido
