@@ -8,15 +8,15 @@ public class EntregaPevModel {
     // armazena os atributos e relacionamentos da entidade
 
     private int id_entrega;
-    private int id_usuario_b2c;
-    private int id_pev;
+    private Integer id_usuario_b2c;
+    private Integer id_pev;
     private double qtd_litros;
     private int pontos_gerados;
     private LocalDate dt_entrega;
 
     // inicializa os dados de entrega em ponto voluntario com identificador
-    public EntregaPevModel(int id_usuario_b2c,
-                           int id_pev,
+    public EntregaPevModel(Integer id_usuario_b2c,
+                           Integer id_pev,
                            double qtd_litros,
                            int pontos_gerados,
                            LocalDate dt_entrega) {
@@ -39,12 +39,12 @@ public class EntregaPevModel {
     }
 
     // retorna o valor de id usuario b c
-    public int getId_usuario_b2c() {
+    public Integer getId_usuario_b2c() {
         return id_usuario_b2c;
     }
 
     // retorna o valor de id pev
-    public int getId_pev() {
+    public Integer getId_pev() {
         return id_pev;
     }
 
@@ -64,12 +64,12 @@ public class EntregaPevModel {
     }
 
     // atualiza o valor de id usuario b c
-    public void setId_usuario_b2c(int id_usuario_b2c) {
+    public void setId_usuario_b2c(Integer id_usuario_b2c) {
         this.id_usuario_b2c = id_usuario_b2c;
     }
 
     // atualiza o valor de id pev
-    public void setId_pev(int id_pev) {
+    public void setId_pev(Integer id_pev) {
         this.id_pev = id_pev;
     }
 

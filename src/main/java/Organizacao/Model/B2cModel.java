@@ -1,7 +1,7 @@
 package Organizacao.Model;
 
 
-// representa os dados da entidade cliente B2C
+// representa os dados da entidade usuario b dois c
 public class B2cModel {
     // armazena os atributos e relacionamentos da entidade
 
@@ -9,13 +9,13 @@ public class B2cModel {
     private String cpf;
     private String telefone;
 
-    // inicializa os dados de cliente B2C
+    // inicializa os dados de usuario b dois c
     public B2cModel(String cpf, String telefone) {
         this.cpf = cpf;
         this.telefone = telefone;
     }
 
-    // inicializa os dados de cliente B2C com identificador
+    // inicializa os dados de usuario b dois c com identificador
     public B2cModel(int id_usuario, String cpf, String telefone) {
         this.id_usuario = id_usuario;
         this.cpf = cpf;

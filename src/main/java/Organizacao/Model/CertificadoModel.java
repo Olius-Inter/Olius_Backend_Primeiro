@@ -8,7 +8,7 @@ public class CertificadoModel {
     // armazena os atributos e relacionamentos da entidade
 
     private int id_certificado;
-    private int id_usuario_b2b;
+    private Integer id_usuario_b2b;
     private String codigo;
     private String nivel;
     private double volume_total;
@@ -16,7 +16,7 @@ public class CertificadoModel {
     private String arquivo_pdf;
 
     // inicializa os dados de certificado empresarial com identificador
-    public CertificadoModel(int id_usuario_b2b,
+    public CertificadoModel(Integer id_usuario_b2b,
                             String codigo,
                             String nivel,
                             double volume_total,
@@ -42,7 +42,7 @@ public class CertificadoModel {
     }
 
     // retorna o valor de id usuario b b
-    public int getId_usuario_b2b() {
+    public Integer getId_usuario_b2b() {
         return id_usuario_b2b;
     }
 
@@ -72,7 +72,7 @@ public class CertificadoModel {
     }
 
     // atualiza o valor de id usuario b b
-    public void setId_usuario_b2b(int id_usuario_b2b) {
+    public void setId_usuario_b2b(Integer id_usuario_b2b) {
         this.id_usuario_b2b = id_usuario_b2b;
     }
 
@@ -100,4 +100,14 @@ public class CertificadoModel {
     public void setArquivo_pdf(String arquivo_pdf) {
         this.arquivo_pdf = arquivo_pdf;
     }
+    private Integer id_coleta;
+
+    public Integer getId_coleta() {
+        return id_coleta;
+    }
+
+    public void setId_coleta(Integer id_coleta) {
+        this.id_coleta = id_coleta;
+    }
+
 }

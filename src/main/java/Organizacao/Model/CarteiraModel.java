@@ -9,10 +9,10 @@ public class CarteiraModel {
     private int pontuacao;
     private String patente;
     private String nivel;
-    private int id_b2c;
+    private Integer id_b2c;
 
     // inicializa os dados de carteira de pontos com identificador
-    public CarteiraModel(int pontuacao, String patente, String nivel, int id_b2c) {
+    public CarteiraModel(int pontuacao, String patente, String nivel, Integer id_b2c) {
         this.pontuacao = pontuacao;
         this.patente = patente;
         this.nivel = nivel;
@@ -20,7 +20,7 @@ public class CarteiraModel {
     }
 
     // inicializa os dados de carteira de pontos com identificador
-    public CarteiraModel(int id_carteira, int pontuacao, String patente, String nivel, int id_b2c) {
+    public CarteiraModel(int id_carteira, int pontuacao, String patente, String nivel, Integer id_b2c) {
         this.id_carteira = id_carteira;
         this.pontuacao = pontuacao;
         this.patente = patente;
@@ -49,7 +49,7 @@ public class CarteiraModel {
     }
 
     // retorna o valor de id b c
-    public int getId_b2c() {
+    public Integer getId_b2c() {
         return id_b2c;
     }
 
@@ -74,7 +74,7 @@ public class CarteiraModel {
     }
 
     // atualiza o valor de id b c
-    public void setId_b2c(int id_b2c) {
+    public void setId_b2c(Integer id_b2c) {
         this.id_b2c = id_b2c;
     }
 }

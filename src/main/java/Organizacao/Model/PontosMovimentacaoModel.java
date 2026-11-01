@@ -9,12 +9,12 @@ public class PontosMovimentacaoModel {
     private int pontos_ganhos;
     private String tipo_movimentacao;
     private String dt_movimentacao;
-    private int id_entrega;
-    private int id_carteira;
-    private int id_participacao;
+    private Integer id_entrega;
+    private Integer id_carteira;
+    private Integer id_participacao;
 
     // inicializa os dados de movimentacao de pontos com identificador
-    public PontosMovimentacaoModel(int pontos_ganhos, String tipo_movimentacao, String dt_movimentacao, int id_entrega, int id_carteira, int id_participacao) {
+    public PontosMovimentacaoModel(int pontos_ganhos, String tipo_movimentacao, String dt_movimentacao, Integer id_entrega, Integer id_carteira, Integer id_participacao) {
         this.pontos_ganhos = pontos_ganhos;
         this.tipo_movimentacao = tipo_movimentacao;
         this.dt_movimentacao = dt_movimentacao;
@@ -49,17 +49,17 @@ public class PontosMovimentacaoModel {
     }
 
     // retorna o valor de id entrega
-    public int getId_entrega() {
+    public Integer getId_entrega() {
         return id_entrega;
     }
 
     // retorna o valor de id carteira
-    public int getId_carteira() {
+    public Integer getId_carteira() {
         return id_carteira;
     }
 
     // retorna o valor de id participacao
-    public int getId_participacao() {
+    public Integer getId_participacao() {
         return id_participacao;
     }
 
@@ -79,17 +79,17 @@ public class PontosMovimentacaoModel {
     }
 
     // atualiza o valor de id entrega
-    public void setId_entrega(int id_entrega) {
+    public void setId_entrega(Integer id_entrega) {
         this.id_entrega = id_entrega;
     }
 
     // atualiza o valor de id carteira
-    public void setId_carteira(int id_carteira) {
+    public void setId_carteira(Integer id_carteira) {
         this.id_carteira = id_carteira;
     }
 
     // atualiza o valor de id participacao
-    public void setId_participacao(int id_participacao) {
+    public void setId_participacao(Integer id_participacao) {
         this.id_participacao = id_participacao;
     }
 }

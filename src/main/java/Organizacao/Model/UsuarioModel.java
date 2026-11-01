@@ -14,6 +14,7 @@ public class UsuarioModel {
     private Date primeiroRegistro;
     private String tipoUsuario;
     private String telefone;
+    private String cpf;
 
     // inicializa os dados de usuario
     public UsuarioModel() {
@@ -105,5 +106,13 @@ public class UsuarioModel {
     // atualiza o valor de nome
     public void setNome(String nome) {
         this.nome = nome;
+    }
+    // dados do cliente B2C vinculado ao usuario
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 }
