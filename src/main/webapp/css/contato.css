@@ -1,0 +1,310 @@
+/* ========================================================================== 
+   1. SEÇÃO SOBRE O PROJETO (.conheca-o-projeto)
+   ========================================================================== */
+
+/* Container principal com fundo bege e área restrita para elementos absolutos */
+.hero-section {
+    position: relative;
+    background-color: #fcf5e6; /* Cor bege base da marca */
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden; /* Evita que o brilho crie barras de rolagem */
+}
+
+/* Mancha amarela desfocada (Efeito de brilho no canto superior esquerdo) */
+.luz-amarela {
+    position: absolute;
+    top: -150px;            /* Sobe parcialmente para fora da tela */
+    left: -150px;           /* Desloca para a esquerda fora da tela */
+    width: 600px;           /* Largura do círculo de iluminação */
+    height: 600px;          /* Altura do círculo de iluminação */
+    background-color: #fdb705;
+    opacity: 0.4;           /* Transparência suave */
+    border-radius: 50%;     /* Forma circular */
+    filter: blur(100px);    /* Desfoca o círculo para criar o efeito de luz */
+    pointer-events: none;   /* Impede interação ou bloqueio de cliques */
+    z-index: 0;             /* Mantém no fundo, atrás do conteúdo */
+}
+
+/* Garante que o cabeçalho e o conteúdo fiquem sobrepostos ao brilho */
+.header, 
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Espaçamento e largura máxima da seção Sobre */
+.conheca-o-projeto {
+    padding: 80px 2%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Cabeçalho centralizado no topo da seção */
+.projeto-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.projeto-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #000000;
+}
+
+.projeto-header .projeto-destaque {
+    color: #FCC203; /* Amarelo em destaque */
+}
+
+.projeto-header .subtitulo {
+    color: #333333;
+    font-size: 1.1rem;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Estrutura de Grid (2 colunas: Mockups à esquerda, Texto à direita) */
+.projeto-conteudo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+/* Imagem do Notebook */
+.mockup-notebook {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* Imagem do Celular (Sobreposta ao Notebook) */
+.mockup-mobile {
+    position: absolute;
+    width: 20%; 
+    max-width: 200px; 
+    right: 50%; 
+    bottom: -10px;
+    z-index: 2;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+}
+
+/* Bloco de texto descritivo alinhado à direita */
+.descricao-projeto {
+    text-align: right;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.descricao-projeto p {
+    font-size: 0.98rem;
+    color: #222222;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.descricao-projeto p:last-child {
+    margin-bottom: 0;
+}
+
+/* Ajustes de Responsividade para telas de até 900px (Tablets e Celulares) */
+@media (max-width: 900px) {
+    .projeto-conteudo {
+        grid-template-columns: 1fr; /* Muda para 1 coluna empilhada */
+        gap: 40px;
+    }
+
+    .descricao-projeto {
+        text-align: center; /* Centraliza o texto para melhor leitura em dispositivos móveis */
+    }
+
+    .mockup-mobile {
+        right: 15%;
+    }
+}
+
+
+/* ========================================================================== 
+   2. SEÇÃO DE PILARES (.pilares)
+   ========================================================================== */
+.pilares {
+    padding: 60px 5%;
+    background-color: #FCF5E6;
+    text-align: center;
+}
+
+.nossos-pilares {
+    font-size: 2rem;
+    margin-bottom: 40px;
+}
+
+/* Grid adaptável para os cartões dos pilares */
+.grid-pilares {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilização individual de cada cartão de pilar */
+.pilar-card {
+    background: #FEFEFC;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.pilar-card img {
+    width: 48px;
+    margin-bottom: 15px;
+}
+
+
+/* ========================================================================== 
+   3. SEÇÃO EQUIPE (.conheca-a-equipe)
+   ========================================================================== */
+.conheca-a-equipe {
+    padding: 80px 2%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.conheca-a-equipe-container span.equipe {
+    color: var(--primary-color);
+}
+
+.somos-um-time {
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+
+/* Estrutura principal do carrossel */
+.carrossel-equipe {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Container de rolagens dos cards com rolagem suave e ocultação de barras */
+.equipe-cards-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding: 10px 0;
+    width: 100%;
+    scrollbar-width: none; /* Oculta barra de rolagem no Firefox */
+}
+
+.equipe-cards-container::-webkit-scrollbar {
+    display: none; /* Oculta barra de rolagem no Chrome e Safari */
+}
+
+/* Cartão dos integrantes */
+.membro-card {
+    flex: 0 0 calc((100% - 60px) / 4);
+    scroll-snap-align: start;
+    box-sizing: border-box;
+    background-color: #FEECC2; 
+    border-radius: 16px;
+    padding: 24px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Foto do integrante com enquadramento focado na cabeça */
+.foto-membro {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 16px;
+    object-position: center 20%;
+}
+
+.membro-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.cargo {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.ano {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+/* Citação / frase */
+blockquote {
+    margin: 0;
+    font-size: 0.8rem;
+    font-style: italic;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+blockquote cite {
+    display: block;
+    margin-top: 4px;
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Botão com ícone do GitHub */
+.github-btn {
+    background: transparent url('../assets/contato/git-icon.png') no-repeat center / contain;
+    border: none;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    margin-top: 16px;
+}
+
+/* Setas laterais para navegação manual do carrossel */
+.nav-btn {
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 0 10px;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.nav-btn:hover {
+    color: var(--primary-color);
+}
+
+
+/* ========================================================================== 
+   4. BANNER JUNTOS PELO FUTURO (.juntos-pelo-futuro-banner)
+   ========================================================================== */
+.juntos-pelo-futuro-banner{
+    padding: 60px 5%;
+    text-align: center;
+    margin: 40px auto;
+    max-width: 1200px;
+    border-radius: 12px;
+    border: 1px solid #FFB033;
+    background-color: #FFF9F0;
+}

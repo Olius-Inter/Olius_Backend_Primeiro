@@ -1,0 +1,408 @@
+/* ==========================================================================
+   1. CONFIGURAÇÕES GERAIS DA PÁGINA
+   ========================================================================== */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #fcf5e6;
+    color: #000000;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+.destaque, 
+.diferentes {
+    color: #febd1d;
+}
+
+/* ==========================================================================
+   2. CABEÇALHO / NAVBAR (.header)
+   ========================================================================== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 80px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative; /* Garante que elementos absolutos fiquem presos aqui */
+    z-index: 10;
+}
+
+/* Elemento decorativo de iluminação */
+.header .luz-amarela {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.header .logo-icon {
+    width: 35px;
+    height: auto;
+}
+
+.header .logo-texto {
+    font-size: 24px;
+    font-weight: 700;
+    color: #febd1d;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 500;
+}
+
+.nav-links a.active {
+    color: #febd1d;
+}
+
+.btn-agendar {
+    background-color: #febd1d;
+    color: #fff !important;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. SEÇÃO INÍCIO / HERO (.inicio)
+   ========================================================================== */
+.inicio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 80px;
+    gap: 40px;
+    overflow: visible;
+}
+
+.inicio-conteudo {
+    max-width: 500px;
+}
+
+.o-olius-funciona-container {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.empresas-e-cidadaos {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #4a4a4a;
+}
+
+/* Área dos Mockups + Mancha de Brilho em Fundo */
+.projeto-conteudo {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.projeto-mockups {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* Brilho radial decorativo atrás dos dispositivos */
+.projeto-conteudo::before {
+    content: '';
+    position: absolute;
+    width: 500px; 
+    height: 500px; 
+    background: radial-gradient(circle, rgba(254, 189, 29, 0.45) 0%, rgba(254, 189, 29, 0) 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-30%, -50%);
+}
+
+/* Mockup Notebook */
+.mockup-notebook {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* Mockup Celular (Sobreposto) */
+.mockup-mobile {
+    position: absolute;
+    width: 35%; 
+    max-width: 200px; 
+    right: 5%; 
+    bottom: -10px;
+    z-index: 2;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+}
+
+.diferentes {
+    color: #febd1d;
+    display: inline;
+    margin-right: 0;
+    padding-right: 0;
+}
+
+/* ==========================================================================
+   4. SEÇÕES DE PÚBLICO (Empresas, Cidadãos, Coletores)
+   ========================================================================== */
+.secao-publico {
+    padding: 60px 80px;
+}
+
+.secao-header {
+    margin-bottom: 40px;
+}
+
+.icone-titulo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.icone-titulo img {
+    width: 50px;
+    height: 50px;
+}
+
+.icone-titulo h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.secao-header .subtitulo {
+    font-size: 18px;
+    color: #555;
+    margin-top: 10px;
+    max-width: 600px;
+}
+
+/* Grid de cards com as etapas dos processos */
+.passos-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 40px 0;
+}
+
+.passo-card {
+    background-color: #fefbf0;
+    border-radius: 20px;
+    padding: 25px 20px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.passos-grid li::before {
+    content: none !important;
+}
+
+/* Estrutura interna do topo do card */
+.passo-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.passo-icone-wrapper {
+    width: 55px;
+    height: 55px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.passo-icone {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.passo-titulo-grupo {
+    display: flex;
+    flex-direction: column;
+}
+
+.passo-numero {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f2bf40;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.passo-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: #000;
+}
+
+.passo-card p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Indicador conector no formato chevron (>) entre os cards */
+.passo-card:not(:last-child)::after {
+    content: '>';
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f2bf40;
+    font-size: 24px;
+    font-weight: 700;
+    z-index: 2;
+}
+
+/* ==========================================================================
+   5. BANNERS DE RECURSOS E DIFERENCIAIS (.recursos-banner)
+   ========================================================================== */
+.recursos-banner {
+    background-color: #fefbf0;
+    border-radius: 18px;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.recursos-banner h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    max-width: 250px;
+}
+
+.recursos-lista {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recursos-lista li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.recursos-lista li img {
+    width: 24px;
+    height: 24px;
+}
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (TABLET E MOBILE)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .header {
+        padding: 20px 30px;
+    }
+
+    .passos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .passo-card:not(:last-child)::after {
+        display: none;
+    }
+
+    .recursos-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .recursos-lista {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links {
+        gap: 15px;
+        font-size: 14px;
+    }
+
+    .inicio,
+    .secao-publico {
+        padding: 30px 20px;
+    }
+
+    .inicio {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .passos-grid {
+        grid-template-columns: 1fr;
+    }
+}

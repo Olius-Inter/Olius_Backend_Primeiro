@@ -4,17 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
-
 // abre conexoes com o banco de dados
 public class Conexao_Banco {
+
     // mantem as credenciais carregadas do ambiente
-
     static String username = System.getenv("DB_USERNAME");
-    static String password = System.getenv("DB_PASSWORD");;
-    static String URL =System.getenv("DB_URL");
-
-
+    static String password = System.getenv("DB_PASSWORD");
+    static String URL = System.getenv("DB_URL");
 
     // carrega o driver e abre uma conexao com o banco de dados
     public static Connection conectar() {
@@ -44,7 +40,5 @@ public class Conexao_Banco {
                     erro
             );
         }
-
-
     }
 }

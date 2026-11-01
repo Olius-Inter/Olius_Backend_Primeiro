@@ -1,0 +1,1089 @@
+/* ==========================================================================
+   1. CONFIGURAÇÕES GERAIS DA PÁGINA
+   ========================================================================== */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #fcf5e6;
+    color: #000000;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+h1, h2, h3, h4, p {
+    margin: 0;
+}
+
+.highlight {
+    color: #febd1d;
+}
+
+/* ==========================================================================
+   3. SEÇÃO INÍCIO / HERO (.inicio)
+   ========================================================================== */
+.inicio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 60px;
+    gap: 40px;
+    position: relative;
+}
+
+.hero-content {
+    max-width: 550px;
+}
+
+.hero-content h1 {
+    font-size: 46px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.hero-description {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #4a4a4a;
+    margin-bottom: 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.btn-primary {
+    background-color: #fdb705;
+    color: #161a1c;
+    padding: 12px 28px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #e0a100;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #fffde4;
+    border: 2px solid #febe04;
+    color: #161a1c;
+    padding: 12px 28px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #fdb705;
+    color: #ffffff;
+}
+
+.hero-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    border-top: 1px solid #ffeacb;
+    padding-top: 25px;
+}
+
+.feature-item strong {
+    font-size: 12px;
+    color: #000000;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.feature-item p {
+    font-size: 11px;
+    color: #666666;
+    line-height: 1.4;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.feature-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.hero-mockup {
+    position: relative;
+    width: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinha os mockups pela base */
+    margin-top: 40px;     /* Move ambos os mockups para baixo */
+}
+
+.mockup-notebook {
+    width: 100%;
+    height: auto;
+}
+
+.mockup-mobile {
+    position: absolute;
+    width: 28%;
+    max-width: 210px;
+    left: 0px;          /* Posiciona o celular para a esquerda do notebook */
+    bottom: -30px;      /* Puxa um pouco para baixo da base */
+    z-index: 2;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.2));
+}
+
+/* ==========================================================================
+   4. SEÇÃO DE DESTAQUES (.destaques)
+   ========================================================================== */
+.destaques {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin: 20px 60px 80px;
+}
+
+.card-destaque {
+    background-color: #fefaf2;
+    border: 2px solid #ffeacb;
+    border-radius: 24px;
+    padding: 30px 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.card-destaque h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.card-destaque p {
+    font-size: 13.5px;
+    color: #555555;
+    line-height: 1.5;
+}
+
+.card-icon-wrapper {
+    width:85px;
+    height: 85px;
+    background-color: #fef2df;
+    border: 3px solid #fde4ad;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.card-icon-wrapper img {
+    width: 95px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ==========================================================================
+   5. SEÇÃO COMO FUNCIONA (.como-funciona)
+   ========================================================================== */
+.como-funciona {
+    padding: 60px 80px;
+    text-align: center;
+}
+
+.como-funciona h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 50px;
+}
+
+.passos-container {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Linha horizontal amarela restrita entre o primeiro e último círculo */
+.linha-passos {
+    position: absolute;
+    top: 40px; /* Alinha ao centro da bolinha de 80px */
+    left: 10%;  /* Recua das bordas laterais para prender nos círculos das pontas */
+    right: 10%;
+    height: 3px;
+    background-color: #fde4ad;
+    z-index: 1;
+}
+
+.passos-lista {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    z-index: 2; /* Fica na frente da linha */
+}
+
+.passo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 180px;
+}
+
+/* Bolinha amarela com o ícone */
+.passo-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background-color: #fff8eb;
+    border: 3px solid #fde4ad;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.passo-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+/* Número da etapa abaixo da bolinha */
+.passo-numero {
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 8px;
+}
+
+.passo-item p {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+    line-height: 1.35;
+    margin: 0;
+}
+
+/* ==========================================================================
+   6. SEÇÃO IMPACTO EM TEMPO REAL (.impacto-tempo-real)
+   ========================================================================== */
+.impacto-tempo-real {
+    background-color: #fdfaf3;
+    border: 2px solid #fde4ad;
+    border-radius: 20px;
+    padding: 40px 50px;
+    margin: 40px 80px;
+}
+
+.impacto-tempo-real h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 6px 0;
+    text-align: left;
+}
+
+.impacto-tempo-real .subtitulo {
+    font-size: 13.5px;
+    color: #666;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* Card com posicionamento relativo e alinhamento do texto à base */
+.metrica-card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    min-height: 150px;
+    display: flex;
+    align-items: flex-start; /* Move o texto para o topo do card */
+    justify-content: flex-start;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+}
+
+/* Ícone grande encostado no canto inferior esquerdo */
+.card-bg-icon {
+    position: absolute;
+    left: -10px;       /* Encosta no canto esquerdo */
+    bottom: -10px;      /* Encosta no canto inferior */
+    width: 100px;       /* Tamanho aumentado do ícone */
+    height: 100px;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 1;         /* Fica atrás do texto */
+}
+
+/* Conteúdo de texto sobreposto ao ícone */
+.metrica-conteudo {
+    position: relative;
+    z-index: 2;         /* Garante que o texto fique acima da imagem */
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.metrica-card .valor {
+    font-size: 17px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.metrica-card .rotulo {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    line-height: 1.35;
+}
+
+/* ==========================================================================
+   7. SEÇÃO DE SOLUÇÕES (.solucoes)
+   ========================================================================== */
+.solucoes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    padding: 60px 80px;
+}
+
+/* Card Principal com a borda amarelada fina */
+.solucao-card {
+    background-color: #fdfaf3;
+    border: 1.5px solid #f2cf85;
+    border-radius: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    overflow: hidden; /* Garante que a imagem fique presa dentro das bordas */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.solucao-conteudo {
+    flex: 1;
+    padding: 40px 30px 40px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.solucao-conteudo h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+.solucao-conteudo p {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.solucao-conteudo ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    flex: 1;
+}
+
+.solucao-conteudo li {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #222222;
+    padding: 10px 0;
+    border-bottom: 1px solid #fde4ad;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* BOTÕES ESTILO PÍLULA ARREDONDADOS */
+.btn-solucao {
+    display: inline-block;
+    background-color: #fdb705; /* Amarelo vibrante do botão B2B */
+    color: #161a1c;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13.5px;
+    text-decoration: none;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-solucao:hover {
+    background-color: #e2a300;
+    transform: translateY(-1px);
+}
+
+/* Botão Laranja B2C */
+.btn-laranja {
+    background-color: #ff9400; /* Laranja vibrante do botão B2C */
+    color: #ffffff;
+}
+
+.btn-laranja:hover {
+    background-color: #e08200;
+}
+
+/* RECORTE SUAVE DA CURVA DA IMAGEM */
+.solucao-imagem {
+    width: 42%;
+    min-width: 210px;
+    position: relative;
+    overflow: hidden;
+}
+
+.solucao-imagem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Gera a curva contínua idêntica ao mockup original */
+    border-top-left-radius: 50% 100%;
+    border-bottom-left-radius: 50% 100%;
+}
+
+/* ==========================================================================
+   8. SEÇÃO DO MAPA (.secao-mapa-container)
+   ========================================================================== */
+.secao-mapa-container {
+    padding: 60px 80px;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Caixa principal que engloba a esquerda (textos/inputs) e a direita (mapa) */
+.mapa-card-principal {
+    background-color: #ffffff;
+    border: 1.5px solid #f2cf85;
+    border-radius: 28px;
+    padding: 50px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+}
+
+/* Coluna Esquerda */
+.mapa-info-lateral {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.mapa-info-lateral h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #000000;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.mapa-info-lateral h2 .highlight {
+    color: #fdb705;
+}
+
+.mapa-subtitulo {
+    font-size: 14px;
+    color: #555555;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+/* Caixa de input de CEP + Botão */
+.cep-busca-box {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1.5px solid #fde4ad;
+    border-radius: 50px;
+    padding: 6px;
+    margin-bottom: 35px;
+    max-width: 420px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.input-cep {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+}
+
+.input-cep::placeholder {
+    color: #999;
+}
+
+.btn-buscar-cep {
+    background-color: #fdb705;
+    color: #161a1c;
+    border: none;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-buscar-cep:hover {
+    background-color: #e2a300;
+}
+
+/* Lista de mini cards informativos empilhados */
+.info-mini-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mini-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #fdfaf3;
+    border: 1px solid #fde4ad;
+    border-radius: 16px;
+    padding: 14px 20px;
+    max-width: 320px;
+}
+
+.mini-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    background-color: #fff8eb;
+    border: 1.5px solid #fde4ad;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mini-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.mini-card strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.2;
+}
+
+.mini-card span {
+    font-size: 12.5px;
+    color: #666;
+}
+
+/* Coluna Direita (O Mapa em si) */
+.mapa {
+    flex: 1.1;
+    height: 440px;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 2px solid #fde4ad;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.mapa iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* ==========================================================================
+   9. SEÇÃO DESTINAÇÃO DO ÓLEO (.destinacao-oleo)
+   ========================================================================== */
+.destinacao-oleo {
+    padding: 60px 80px;
+    text-align: center;
+}
+
+.destinacao-oleo h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.destinacao-oleo > p {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555555;
+    margin-bottom: 50px;
+}
+
+.produtos-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.produto-card {
+    background-color: #ffffff;
+    border: 1.5px solid #fde4ad;
+    border-radius: 24px;
+    padding: 40px 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Círculo de fundo para a imagem/ícone */
+.produto-icon-wrapper {
+    width: 110px;
+    height: 110px;
+    background-color: #fff9ec;
+    border: 2px solid #fde4ad;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.produto-icon {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+}
+
+.produto-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    position: relative;
+    display: inline-block;
+    color: #000000;
+}
+
+/* Traço amarelo embaixo do título */
+.produto-card h3::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 3.5px;
+    background-color: #fac527;
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+.produto-card p {
+    font-size: 13.5px;
+    color: #555555;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ==========================================================================
+   10. SEÇÃO APLICATIVO (.app-acompanhamento)
+   ========================================================================== */
+.app-acompanhamento {
+    background-color: #fdfaf3;
+    border: 1.5px solid #f2cf85;
+    border-radius: 28px;
+    padding: 60px 0 60px 70px;
+    margin: 40px 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.app-info {
+    flex: 1;
+    max-width: 480px;
+}
+
+.app-info h2 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #000000;
+    margin-bottom: 15px;
+}
+
+.app-info h2 .highlight {
+    color: #fdb705;
+}
+
+.app-info p {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #555555;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+.app-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.app-info li {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #222222;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.check-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Container da imagem expandido para a direita */
+.app-preview {
+    flex: 1.3;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.app-preview img {
+    width: 100%;
+    max-width: 680px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    transform: translateX(30px);
+}
+
+/* ==========================================================================
+   11. SEÇÕES VANTAGENS E CERTIFICAÇÕES (.vantagens-certificacoes-wrapper)
+   ========================================================================== */
+.vantagens-certificacoes-wrapper {
+    position: relative;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 140px;
+    overflow: visible;
+}
+
+/* Estrutura lado a lado: texto na esquerda, cards na direita */
+.secao-lado-a-lado {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 50px;
+}
+
+/* Coluna de Texto (Esquerda) */
+.coluna-texto {
+    flex: 0 0 280px;
+    max-width: 320px;
+    padding-top: 20px;
+}
+
+.coluna-texto h2 {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #000000;
+    margin-bottom: 16px;
+}
+
+.coluna-texto h2 .highlight {
+    color: #fdb705;
+}
+
+.coluna-texto p {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #555555;
+    line-height: 1.5;
+}
+
+/* Coluna de Cards (Direita) */
+.coluna-cards {
+    flex: 1;
+}
+
+.vantagens-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.certificacoes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* Estilização dos Cards */
+.vantagem-card,
+.certificacao-card {
+    background-color: #ffffff;
+    border: 1.5px solid #fde4ad;
+    border-radius: 24px;
+    padding: 35px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Círculos dos ícones */
+.vantagem-icon-wrapper {
+    width: 85px;
+    height: 85px;
+    background-color: #fff9ec;
+    border: 2px solid #fde4ad;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.vantagem-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.cert-icon-wrapper {
+    width: 90px;
+    height: 90px;
+    background-color: #fff9ec;
+    border: 2px solid #fde4ad;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.cert-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+/* Textos e Títulos dentro dos cards */
+.vantagem-card h3,
+.certificacao-card strong {
+    font-size: 16.5px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+.vantagem-card p,
+.certificacao-card p {
+    font-size: 13px;
+    color: #555555;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.card-line {
+    width: 35px;
+    height: 3.5px;
+    background-color: #fdb705;
+    border-radius: 2px;
+    margin: 18px auto 0 auto;
+}
+
+/* Imagem do respingo de óleo flutuante entre as seções */
+.respingo-oleo-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.respingo-oleo-img {
+    position: absolute;
+    top: -210px;
+    left: -80px;
+    width: 65%;
+    max-width: 850px;
+    height: auto;
+    display: block;
+}
+
+/* ==========================================================================
+   12. SEÇÃO FAQ (.faq-secao)
+   ========================================================================== */
+.faq-secao {
+    padding: 20px 20px 60px 20px;
+    margin-top: -20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header centralizado */
+.faq-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.faq-secao h2 {
+    background-color: #fc9000;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 12px 36px;
+    border-radius: 30px;
+    display: inline-block;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(252, 144, 0, 0.15);
+}
+
+/* Container do Accordion */
+.faq-accordion {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Card da Pergunta */
+.faq-item {
+    background-color: #ffffff;
+    border: 2.5px solid transparent;
+    border-radius: 18px;
+    padding: 20px 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+/* Efeito Hover e Estado Aberto */
+.faq-item:hover,
+.faq-item[open] {
+    border-color: #fdb705;
+    box-shadow: 0 4px 15px rgba(253, 183, 5, 0.15);
+}
+
+.faq-item summary {
+    font-size: 15px;
+    font-weight: 700;
+    color: #000000;
+    outline: none;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Seta em Chevron desenhada em CSS puro */
+.faq-icon {
+    width: 9px;
+    height: 9px;
+    border-right: 2.5px solid #000000;
+    border-bottom: 2.5px solid #000000;
+    transform: rotate(45deg);
+    transition: transform 0.25s ease;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.faq-item[open] .faq-icon {
+    transform: rotate(-135deg);
+}
+
+.faq-item p {
+    font-size: 14px;
+    color: #555555;
+    margin-top: 14px;
+    line-height: 1.55;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .faq-secao {
+        padding: 30px 20px;
+        margin: 20px 0;
+    }
+}
