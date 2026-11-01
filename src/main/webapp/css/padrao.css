@@ -1,0 +1,397 @@
+/* Mantem o mesmo visual nas telas administrativas dos alunos. */
+body,
+input,
+select,
+textarea,
+button {
+    font-family: 'Poppins', system-ui, sans-serif;
+}
+
+body {
+    background-color: #f8f7f2;
+    color: #49351a;
+}
+
+h1,
+.topo h1 {
+    font-size: 28px;
+    font-weight: 500;
+    color: #49300e;
+    line-height: 1.3;
+}
+
+.menu nav a {
+    display: block;
+    min-height: 45px;
+}
+
+.adicionar,
+.botao-adicionar {
+    background-color: #ffdf70;
+    color: #49300e;
+    border-radius: 8px;
+}
+
+.campo[hidden] {
+    display: none;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    font-family: inherit;
+    min-width: 0;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    h1,
+    .topo h1 {
+        font-size: 24px;
+    }
+}
+
+/* Ajustes compartilhados, mantendo os estilos e cores de cada pagina. */
+.conteudo {
+    min-width: 0;
+}
+
+.topo > *, .painel-topo > * {
+    min-width: 0;
+}
+
+.topo h1, .aviso, #mensagemDashboard {
+    overflow-wrap: anywhere;
+}
+
+.botao-menu {
+    display: none;
+}
+
+.menu nav a {
+    white-space: normal;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+.tabela-container:focus-visible {
+    outline: 3px solid #9c720a;
+    outline-offset: 3px;
+}
+
+.acoes button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    min-width: 44px;
+    min-height: 44px;
+    height: auto;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.acoes i {
+    font-size: 16px;
+}
+
+.tabela-container td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    max-width: 320px;
+}
+
+.tabela-container td.acoes {
+    white-space: nowrap;
+    max-width: none;
+}
+
+.filtros {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.filtros > div {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.filtros > div[hidden] {
+    display: none;
+}
+
+.filtros label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.filtros input, .filtros select, .filtros button {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #d9d2c4;
+    border-radius: 8px;
+    background: #fffdfa;
+    color: #49351a;
+}
+
+.filtros button {
+    width: auto;
+    cursor: pointer;
+}
+
+
+/* No tablet o menu deixa de reduzir a largura do conteudo. */
+@media (max-width: 900px) {
+    body {
+        display: block;
+    }
+
+    .menu {
+        position: static;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        width: 100%;
+        height: auto;
+        padding: 12px 20px;
+        border-right: 0;
+        border-bottom: 1px solid #eeeae3;
+        overflow: visible;
+    }
+
+    .menu .logo img {
+        width: 80px;
+    }
+
+    .menu .caixa {
+        display: none;
+    }
+
+    .botao-menu {
+        display: block;
+        min-height: 44px;
+        padding: 10px 16px;
+        border: 1px solid #d9d2c4;
+        border-radius: 8px;
+        background: #ffdf70;
+        color: #49300e;
+        cursor: pointer;
+    }
+
+    .menu nav {
+        display: none;
+        grid-column: 1 / -1;
+        margin-top: 12px;
+    }
+
+    .menu.aberto nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .menu nav a {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .conteudo {
+        margin-left: 0;
+        width: 100%;
+        padding: 24px 20px;
+    }
+
+    .indicadores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card-indicador {
+        min-height: 110px;
+    }
+
+    .descricao {
+        font-size: 14px;
+    }
+
+    .numero {
+        font-size: 24px;
+    }
+
+    .graficos {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .painel-topo {
+        flex-wrap: wrap;
+    }
+
+}
+
+/* Cada linha vira um registro com os nomes dos campos, sem rolagem lateral. */
+@media (max-width: 900px) {
+    .conteudo {
+        padding: 24px 16px;
+    }
+
+    .topo {
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .topo h1 {
+        font-size: 24px;
+    }
+
+    .topo .adicionar {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .filtros input, .filtros select {
+        font-size: 16px;
+    }
+
+    .filtros button {
+        width: 100%;
+    }
+
+    .tabela-container {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        overflow: visible;
+    }
+
+    .tabela-container table {
+        display: block;
+        min-width: 0;
+        width: 100%;
+        border-spacing: 0;
+    }
+
+    .tabela-container thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .tabela-container tbody {
+        display: grid;
+        gap: 16px;
+    }
+
+    .tabela-container tbody tr {
+        display: block;
+        padding: 8px 16px;
+        background: #fffdfa;
+        border: 1px solid #e4ded2;
+        border-radius: 12px;
+    }
+
+    .tabela-container tbody td {
+        display: grid;
+        grid-template-columns: minmax(90px, .8fr) minmax(0, 1.2fr);
+        gap: 12px;
+        padding: 12px 0;
+        max-width: none;
+        border-radius: 0;
+        border-bottom: 1px solid #eeeae3;
+        background: transparent;
+        font-size: 14px;
+    }
+
+    .tabela-container tbody td::before {
+        content: attr(data-label);
+        font-weight: 500;
+        color: #6d604e;
+    }
+
+    .tabela-container tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    .tabela-container tbody td.acoes {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        white-space: normal;
+        gap: 8px;
+    }
+
+    .tabela-container .acoes button + button {
+        margin-left: 0;
+    }
+
+    .tabela-container td.acoes::before, .tabela-container td.vazio::before {
+        content: none;
+    }
+
+    .tabela-container tbody td.vazio {
+        display: block;
+        padding: 20px 0;
+    }
+
+    .tabela-container tbody tr:nth-child(even) td {
+        background: transparent;
+    }
+
+    .tabela-container td a {
+        overflow-wrap: anywhere;
+    }
+
+    .rosca-area {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .painel-topo .filtro {
+        max-width: 100%;
+        font-size: 16px;
+    }
+
+}
+
+@media (max-width: 380px) {
+    .indicadores {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .menu.aberto nav {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+}
+
+/* Os meses continuam legiveis quando o grafico mostra um ano inteiro. */
+.meses span {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .meses:has(span:nth-child(12)) span:nth-child(even):not(:last-child) {
+        visibility: hidden;
+    }
+
+}
+
+@media (max-width: 600px) {
+    .meses:has(span:nth-child(12)) span:nth-child(11) {
+        visibility: hidden;
+    }
+}

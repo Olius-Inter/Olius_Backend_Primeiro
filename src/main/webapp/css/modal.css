@@ -1,0 +1,203 @@
+/* Os formularios usam os mesmos campos dentro da listagem. */
+.modal {
+    margin: auto;
+    width: min(720px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 28px;
+    border: 0;
+    border-radius: 12px;
+    background: #fffdf6;
+    color: #49351a;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.modal::backdrop {
+    background: rgb(0 0 0 / 45%);
+}
+
+body.modal-aberto {
+    overflow: hidden;
+}
+
+.modal .topo-modal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.modal h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.modal .topo-modal button {
+    background: transparent;
+    border: 0;
+    font-size: 28px;
+    color: inherit;
+    cursor: pointer;
+    padding: 4px 12px;
+}
+
+.modal .campos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.modal .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.modal .campo[hidden] {
+    display: none;
+}
+
+.modal .campo-completo {
+    grid-column: 1 / -1;
+}
+
+.modal .campo label {
+    font-size: 14px;
+}
+
+.modal input, .modal select, .modal textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d9d2c4;
+    background: #fff;
+    color: inherit;
+    font-size: 16px;
+    min-height: 44px;
+    box-sizing: border-box;
+}
+
+.modal input:read-only {
+    background: #f0eee7;
+}
+
+.modal .volume-litros {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal .arquivo-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.modal .arquivo-container input {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.modal .botoes-formulario {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal .botoes-formulario button {
+    padding: 10px 22px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal .botao-cancelar {
+    background: #eae5db;
+    color: #49300e;
+}
+
+.modal .botao-excluir {
+    background: #b82f28;
+    color: white;
+}
+
+.modal button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.modal .aviso {
+    margin: 16px 0;
+    overflow-wrap: anywhere;
+}
+
+.modal .aviso.erro {
+    color: #a3231b;
+}
+
+.modal-excluir {
+    width: min(440px, calc(100% - 32px));
+}
+
+@media (max-width: 600px) {
+    .modal {
+        padding: 20px;
+    }
+
+    .modal .campos {
+        grid-template-columns: 1fr;
+    }
+
+    .modal h2 {
+        font-size: 20px;
+    }
+
+}
+
+/* Campos legiveis no celular e botoes com espaco para toque. */
+.modal .botoes-formulario button, .modal .topo-modal button {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (max-width: 700px) {
+    .modal {
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 16px);
+        padding: 20px;
+    }
+
+    .modal .campos {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modal input, .modal select, .modal textarea {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    .modal .botoes-formulario {
+        flex-wrap: nowrap;
+    }
+
+    .modal .botoes-formulario button {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 8px;
+        font-size: 16px;
+    }
+
+    .modal .topo-modal h2 {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .modal .arquivo-container input {
+        flex-basis: 100%;
+    }
+
+}
