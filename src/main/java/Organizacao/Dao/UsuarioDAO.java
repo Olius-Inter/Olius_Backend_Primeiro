@@ -1,4 +1,4 @@
-  package Organizacao.Dao;
+package Organizacao.Dao;
 
 import Organizacao.Conexao.Conexao_Banco;
 import Organizacao.Model.UsuarioModel;
@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import Organizacao.Utilitarios.SenhaUtil;
 
 
 // acessa e administra os registros de usuario
@@ -34,7 +35,7 @@ public class UsuarioDAO {
             // associa os campos de usuario aos parametros da insercao
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha() == null || usuario.getSenha().isEmpty() ? null : usuario.getSenha());
+            stmt.setString(3, senhaParaGravar(usuario.getSenha()));
             stmt.setDate(4, usuario.getPrimeiroRegistro());
             stmt.setString(5, usuario.getTipoUsuario());
             stmt.setString(6, usuario.getTelefone());
@@ -49,32 +50,6 @@ public class UsuarioDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar usuário: " + e.getMessage(), e);
         }
-    }
-
-    // busca os dados do usuario para conferir o login pelo e-mail
-    public UsuarioModel buscarPorEmail(String email) {
-        String sql = "SELECT \"ID_usuario\" AS id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone FROM \"USUARIO\" WHERE LOWER(email) = LOWER(?)";
-
-        try (Connection conexao = Conexao_Banco.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new UsuarioModel(
-                            rs.getInt("id_usuario"),
-                            rs.getString("nome"),
-                            rs.getString("email"),
-                            rs.getString("senha"),
-                            rs.getDate("primeiro_registro"),
-                            rs.getString("tipo_usuario"),
-                            rs.getString("telefone")
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar usuário pelo e-mail: " + e.getMessage(), e);
-        }
-        return null;
     }
 
     // consulta os registros de usuario e devolve a lista
@@ -113,6 +88,40 @@ public class UsuarioDAO {
         return lista;
     }
 
+    // a senha nunca vai pro banco em texto puro: guarda o hash (pbkdf2); se ja vier em hash, mantem
+    private String senhaParaGravar(String senha) {
+        if (senha == null || senha.isEmpty()) {
+            return null;
+        }
+        return senha.startsWith("pbkdf2$") ? senha : SenhaUtil.gerarHash(senha);
+    }
+
+    // busca um usuario pelo e-mail (usado no login); devolve null se nao existir
+    public UsuarioModel buscarPorEmail(String email) throws Exception {
+        String sql = "SELECT \"ID_usuario\" AS id_usuario, nome, email, senha, primeiro_registro, tipo_usuario, telefone FROM \"USUARIO\" WHERE LOWER(email) = LOWER(?)";
+
+        try (Connection conn = Conexao_Banco.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new UsuarioModel(
+                            rs.getInt("id_usuario"),
+                            rs.getString("nome"),
+                            rs.getString("email"),
+                            rs.getString("senha"),
+                            rs.getDate("primeiro_registro"),
+                            rs.getString("tipo_usuario"),
+                            rs.getString("telefone")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     // atualiza os dados de usuario no banco de dados
     public void atualizarUsuario(UsuarioModel usuario) {
         try (Connection conexao = Conexao_Banco.conectar()) {
@@ -132,7 +141,7 @@ public class UsuarioDAO {
             // associa os campos de usuario aos parametros da atualizacao
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha() == null || usuario.getSenha().isEmpty() ? null : usuario.getSenha());
+            stmt.setString(3, senhaParaGravar(usuario.getSenha()));
             stmt.setString(4, usuario.getTipoUsuario());
             stmt.setString(5, usuario.getTelefone());
             stmt.setInt(6, usuario.getId_usuario());

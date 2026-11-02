@@ -75,7 +75,7 @@ public class LoginSERVLET extends HttpServlet {
             sessao.setAttribute("usuarioTipo", usuario.getTipoUsuario());
             sessao.setMaxInactiveInterval(30 * 60);
 
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/como_funciona.jsp");
 
         } catch (Exception e) {
             voltarComErro(request, response,
@@ -84,9 +84,13 @@ public class LoginSERVLET extends HttpServlet {
     }
 
     // compara as senhas em tempo constante
+    // confere a senha digitada: usuarios novos tem hash (pbkdf2); contas antigas ainda em texto puro continuam entrando
     private boolean senhaConfere(String informada, String armazenada) {
         if (armazenada == null) {
             return false;
+        }
+        if (armazenada.startsWith("pbkdf2$")) {
+            return Organizacao.Utilitarios.SenhaUtil.conferir(informada, armazenada);
         }
         return MessageDigest.isEqual(
                 informada.getBytes(StandardCharsets.UTF_8),
