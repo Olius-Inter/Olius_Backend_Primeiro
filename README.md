@@ -26,7 +26,8 @@ BACK_END_OLIUS/
 │       │       ├── Conexao/
 │       │       ├── Dao/
 │       │       ├── Model/
-│       │       └── Servlet/
+│       │       ├── Servlet/
+|       |       └── Utilitarios/
 │       ├── resources/
 │       │   └── META-INF/
 │       │       └── persistence.xml
