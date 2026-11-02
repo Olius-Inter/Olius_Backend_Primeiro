@@ -53,8 +53,9 @@ public class AdmFiltro implements Filter {
         // caminho sem o contexto, já decodificado (/adm/Empresas/empresa.jsp, /empresas...)
         String caminho = request.getServletPath() + (request.getPathInfo() != null ? request.getPathInfo() : "");
         // caminhos antigos do login de usuario voltam ao site publico
-        if (caminho.equals("/login") || caminho.equals("/login.jsp")) {
-            response.sendRedirect(request.getContextPath() + "/index/index.html");
+        if (caminho.equals("/login") || caminho.equals("/login.jsp")
+                || caminho.equals("/index/index.html")) {
+            response.sendRedirect("https://olius-inter.github.io/Olius_Backend_Primeiro/");
             return;
         }
         boolean pagina = caminho.equals("/adm") || caminho.startsWith("/adm/")

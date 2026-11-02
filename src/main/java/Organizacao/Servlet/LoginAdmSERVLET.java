@@ -41,7 +41,7 @@ public class LoginAdmSERVLET extends HttpServlet {
             if (sessao != null) {
                 sessao.invalidate();
             }
-            response.sendRedirect(request.getContextPath() + "/index/index.html");
+            response.sendRedirect("https://olius-inter.github.io/Olius_Backend_Primeiro/");
             return;
         }
 

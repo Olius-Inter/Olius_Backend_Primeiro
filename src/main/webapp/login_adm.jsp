@@ -88,7 +88,7 @@
                     <% } %>
                 </div>
 
-                <p class="voltar">Não é administrador? <a href="${pageContext.request.contextPath}/index/index.html">Voltar ao site</a></p>
+                <p class="voltar">Não é administrador? <a href="https://olius-inter.github.io/Olius_Backend_Primeiro/">Voltar ao site</a></p>
             </div>
 
         </section>

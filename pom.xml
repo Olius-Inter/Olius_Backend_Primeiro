@@ -76,6 +76,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
+                <configuration>
+                    <!-- As paginas publicas sao publicadas pelo GitHub Pages. -->
+                    <packagingExcludes>index/**,como_funciona.jsp,planos.jsp,contato.jsp</packagingExcludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
