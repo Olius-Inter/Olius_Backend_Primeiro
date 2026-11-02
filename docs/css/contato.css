@@ -71,6 +71,12 @@
     align-items: center;
 }
 
+.projeto-mockups {
+    position: relative;
+    min-width: 0;
+    padding-bottom: 20px;
+}
+
 /* Imagem do Notebook */
 .mockup-notebook {
     width: 100%;
@@ -84,9 +90,9 @@
 /* Imagem do Celular (Sobreposta ao Notebook) */
 .mockup-mobile {
     position: absolute;
-    width: 20%;
+    width: 25%;
     max-width: 200px;
-    right: 50%;
+    right: 5%;
     bottom: -10px;
     z-index: 2;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
@@ -123,7 +129,7 @@
     }
 
     .mockup-mobile {
-        right: 15%;
+        right: 5%;
     }
 }
 
@@ -307,4 +313,54 @@ blockquote cite {
     border-radius: 12px;
     border: 1px solid #FFB033;
     background-color: #FFF9F0;
+}
+
+/* Ajustes dos cards e espacamentos para tablet e celular. */
+@media (max-width: 900px) {
+    .conheca-o-projeto, .conheca-a-equipe {
+        padding: 48px 20px;
+    }
+
+    .projeto-mockups {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .membro-card {
+        flex: 0 0 calc((100% - 20px) / 2);
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .projeto-header h2 {
+        font-size: 30px;
+    }
+
+    .pilares {
+        padding: 40px 20px;
+    }
+
+    .grid-pilares {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .membro-card {
+        flex: 0 0 100%;
+    }
+
+    .equipe-cards-container {
+        min-width: 0;
+    }
+
+    .nav-btn {
+        padding: 0;
+        font-size: 2rem;
+    }
+
+    .juntos-pelo-futuro-banner {
+        margin: 32px 20px;
+        padding: 32px 24px;
+    }
 }

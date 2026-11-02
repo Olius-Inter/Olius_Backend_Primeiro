@@ -55,11 +55,11 @@ html, body {
     max-width: 1440px;
     width: 100%;
     margin: 40px auto 30px;
-    padding: 60px 80px 30px;
+    padding: 60px 45% 30px 80px;
     background-image: url('../assets/planos/oleo.png');
     background-repeat: no-repeat;
     background-position: top right; /* Posiciona a onda de óleo no canto superior direito */
-    background-size: contain;      /* Ajusta o tamanho proporcionalmente */
+    background-size: 42% auto;      /* Ajusta o tamanho proporcionalmente */
 }
 
 .hero-texto h1 {
@@ -247,7 +247,24 @@ html, body {
     }
 
     .planos-hero {
-        padding: 40px 30px;
-        background-size: cover;
+        padding: 40px 45% 40px 30px;
+        background-size: 42% auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .planos-hero {
+        margin-top: 24px;
+        padding: 24px 20px 180px;
+        background-position: bottom right;
+        background-size: 240px auto;
+    }
+
+    .hero-texto h1 {
+        font-size: 30px;
+    }
+
+    .plano-card {
+        padding: 28px 24px;
     }
 }
