@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+target
+docs
+.env
+.env.*
+*.env
+configuracao_privada
+*.dump
+*.zip
+*.log
