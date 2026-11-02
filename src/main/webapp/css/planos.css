@@ -30,7 +30,7 @@ html, body {
 .luz-amarela {
     position: absolute;
     top: -150px;             /* Sobe um pouco para fora da tela */
-    right: -100px;           /* Ajustado para limitar o transbordo */
+    right: 0;               /* Mantem o brilho dentro da largura da pagina */
     left: auto;              /* Reseta o alinhamento da esquerda */
     width: 500px;            /* Largura ajustada */
     height: 500px;           /* Altura ajustada */
