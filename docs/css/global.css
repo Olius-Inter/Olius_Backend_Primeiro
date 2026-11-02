@@ -1,4 +1,4 @@
-/* ========================================================================== 
+/* ==========================================================================
    1. VARIÁVEIS GLOBAIS & RESET CSS
    ========================================================================== */
 
@@ -27,7 +27,7 @@ body {
 }
 
 
-/* ========================================================================== 
+/* ==========================================================================
    2. CABEÇALHO (.header)
    ========================================================================== */
 .header {
@@ -92,78 +92,74 @@ body {
 /* ==========================================================================
    3. CTA BANNER (.cta-banner) - Com respingo ultrapassando a borda e botão ajustado
    ========================================================================== */
+/* O mesmo bloco final e usado nas paginas publicas. */
 .cta-banner {
     position: relative;
-    background-color: #fdb705;
-    padding: 60px 80px;
-    margin: 80px auto -60px auto; /* Aumenta o margin-top para dar espaço à gota no topo */
-    max-width: 1400px;
-    width: 92%;
-    border-radius: 32px 32px 0 0;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
-    overflow: visible; /* IMPORTANTE: Permite que a gota saia para fora do retângulo amarelo */
-    z-index: 1;
-    box-sizing: border-box;
+    width: 92%;
+    max-width: 1280px;
+    margin: 64px auto 0;
+    background-color: #fdb705;
+    border-radius: 32px 32px 0 0;
+    overflow: hidden;
 }
 
-/* Conteúdo de Texto do CTA */
 .cta-conteudo {
-    max-width: 500px;
-    text-align: left;
+    min-width: 0;
+    padding: 48px;
     position: relative;
-    z-index: 3;
+    z-index: 1;
 }
 
 .cta-conteudo h2 {
-    font-size: 2.4rem;
-    font-weight: 800;
+    font-size: clamp(28px, 2.8vw, 38px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
     color: #000000;
-    margin-bottom: 12px;
 }
 
 .cta-conteudo p {
-    font-size: 1.1rem;
+    font-size: 16px;
+    line-height: 1.6;
     color: #111111;
-    line-height: 1.5;
 }
 
-/* Botão CTA (Ajustado mais para a esquerda via margem) */
-.btn-cta {
-    background-color: #FFFDF0;
-    color: #000000;
-    padding: 18px 40px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.05rem;
-    border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    white-space: nowrap;
-    position: relative;
-    z-index: 4; /* Fica acima de tudo para poder ser clicado facilmente */
-    margin-right: 400px; /* Empurra o botão mais para a esquerda */
-    transition: all 0.2s ease;
-}
-
-.btn-cta:hover {
-    background-color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-}
-
-/* Posicionamento do Respingo de Óleo (Saindo para cima) */
 .cta-imagem-oleo {
-    position: absolute;
-    right: 1px;
-    top: -30px; /* Valor negativo faz a gota ultrapassar a borda amarela no topo */
-    height: 100%; /* Aumenta a altura para subir além do limite */
-    width: auto;
+    position: static;
+    display: block;
+    align-self: end;
+    justify-self: end;
+    width: 100%;
+    height: auto;
     object-fit: contain;
-    z-index: 2;
-    pointer-events: none; /* Evita que a imagem bloqueie os cliques */
+    object-position: right bottom;
+    pointer-events: none;
 }
 
+@media (max-width: 900px) {
+    .cta-conteudo {
+        padding: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .cta-banner {
+        grid-template-columns: minmax(0, 1fr);
+        margin-top: 40px;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .cta-conteudo {
+        padding: 28px 24px 16px;
+    }
+
+    .cta-imagem-oleo {
+        max-width: 340px;
+    }
+}
 
 /* ==========================================================================
    4. RODAPÉ (.footer) - Sobrepõe a parte inferior do CTA
@@ -228,7 +224,7 @@ body {
 }
 
 /* Listas do Rodapé */
-.footer-links ul, 
+.footer-links ul,
 .footer-contato ul {
     list-style: none;
     padding: 0;
@@ -348,4 +344,9 @@ body {
 /* O brilho decorativo do cabecalho nao aumenta a largura da pagina. */
 .header .luz-amarela {
     max-width: 100%;
+}
+
+/* O bloco final termina junto ao rodape das paginas publicas. */
+body > main {
+    padding-bottom: 0;
 }

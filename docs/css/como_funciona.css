@@ -26,7 +26,7 @@ main {
     flex: 1;
 }
 
-.destaque, 
+.destaque,
 .diferentes {
     color: #febd1d;
 }
@@ -145,8 +145,8 @@ main {
 .projeto-conteudo::before {
     content: '';
     position: absolute;
-    width: 500px; 
-    height: 500px; 
+    width: 500px;
+    height: 500px;
     background: radial-gradient(circle, rgba(254, 189, 29, 0.45) 0%, rgba(254, 189, 29, 0) 70%);
     border-radius: 50%;
     filter: blur(80px);
@@ -170,9 +170,9 @@ main {
 /* Mockup Celular (Sobreposto) */
 .mockup-mobile {
     position: absolute;
-    width: 35%; 
-    max-width: 200px; 
-    right: 5%; 
+    width: 35%;
+    max-width: 200px;
+    right: 5%;
     bottom: -10px;
     z-index: 2;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));

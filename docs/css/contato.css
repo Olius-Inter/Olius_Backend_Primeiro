@@ -1,4 +1,4 @@
-/* ========================================================================== 
+/* ==========================================================================
    1. SEÇÃO SOBRE O PROJETO (.conheca-o-projeto)
    ========================================================================== */
 
@@ -27,7 +27,7 @@
 }
 
 /* Garante que o cabeçalho e o conteúdo fiquem sobrepostos ao brilho */
-.header, 
+.header,
 .hero-content {
     position: relative;
     z-index: 1;
@@ -84,9 +84,9 @@
 /* Imagem do Celular (Sobreposta ao Notebook) */
 .mockup-mobile {
     position: absolute;
-    width: 20%; 
-    max-width: 200px; 
-    right: 50%; 
+    width: 20%;
+    max-width: 200px;
+    right: 50%;
     bottom: -10px;
     z-index: 2;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
@@ -128,7 +128,7 @@
 }
 
 
-/* ========================================================================== 
+/* ==========================================================================
    2. SEÇÃO DE PILARES (.pilares)
    ========================================================================== */
 .pilares {
@@ -165,7 +165,7 @@
 }
 
 
-/* ========================================================================== 
+/* ==========================================================================
    3. SEÇÃO EQUIPE (.conheca-a-equipe)
    ========================================================================== */
 .conheca-a-equipe {
@@ -213,7 +213,7 @@
     flex: 0 0 calc((100% - 60px) / 4);
     scroll-snap-align: start;
     box-sizing: border-box;
-    background-color: #FEECC2; 
+    background-color: #FEECC2;
     border-radius: 16px;
     padding: 24px 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -296,7 +296,7 @@ blockquote cite {
 }
 
 
-/* ========================================================================== 
+/* ==========================================================================
    4. BANNER JUNTOS PELO FUTURO (.juntos-pelo-futuro-banner)
    ========================================================================== */
 .juntos-pelo-futuro-banner{

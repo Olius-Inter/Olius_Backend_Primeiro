@@ -1,4 +1,4 @@
-/* ========================================================================== 
+/* ==========================================================================
    1. CONFIGURAÇÕES GERAIS E PREVENÇÃO DE OVERFLOW
    ========================================================================== */
 html, body {
@@ -13,7 +13,7 @@ html, body {
     box-sizing: inherit;
 }
 
-/* ========================================================================== 
+/* ==========================================================================
    2. SEÇÃO HERO DA PÁGINA DE PLANOS (.planos-hero)
    ========================================================================== */
 
@@ -34,7 +34,7 @@ html, body {
     left: auto;              /* Reseta o alinhamento da esquerda */
     width: 500px;            /* Largura ajustada */
     height: 500px;           /* Altura ajustada */
-    background-color: #fdb705; 
+    background-color: #fdb705;
     opacity: 0.4;            /* Transparência suave */
     border-radius: 50%;      /* Forma circular */
     filter: blur(100px);     /* Desfoca para criar o efeito de brilho */
@@ -43,7 +43,7 @@ html, body {
 }
 
 /* Garante que o conteúdo e o logo fiquem sobrepostos ao brilho */
-.header, 
+.header,
 .hero-content {
     position: relative;
     z-index: 1;
@@ -80,7 +80,7 @@ html, body {
     max-width: 500px;
 }
 
-/* ========================================================================== 
+/* ==========================================================================
    3. SEÇÃO DE CARDS DE PLANOS (.planos-container)
    ========================================================================== */
 
@@ -232,7 +232,7 @@ html, body {
     background-color: #e0a100;
 }
 
-/* ========================================================================== 
+/* ==========================================================================
    4. RESPONSIVIDADE (TABLET / MOBILE)
    ========================================================================== */
 @media (max-width: 1024px) {

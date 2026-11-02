@@ -1,6 +1,6 @@
 /* ==========================================================================
-   1. CONFIGURAÇÕES GERAIS DA PÁGINA
-   ========================================================================== */
+ *  1. CONFIGURAÇÕES GERAIS DA PÁGINA
+ *  ========================================================================== */
 html, body {
     overflow-x: hidden;
     width: 100%;
@@ -35,8 +35,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   3. SEÇÃO INÍCIO / HERO (.inicio)
-   ========================================================================== */
+ *  3. SEÇÃO INÍCIO / HERO (.inicio)
+ *  ========================================================================== */
 .inicio {
     display: flex;
     align-items: center;
@@ -162,8 +162,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   4. SEÇÃO DE DESTAQUES (.destaques)
-   ========================================================================== */
+ *  4. SEÇÃO DE DESTAQUES (.destaques)
+ *  ========================================================================== */
 .destaques {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -213,8 +213,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   5. SEÇÃO COMO FUNCIONA (.como-funciona)
-   ========================================================================== */
+ *  5. SEÇÃO COMO FUNCIONA (.como-funciona)
+ *  ========================================================================== */
 .como-funciona {
     padding: 60px 80px;
     text-align: center;
@@ -295,8 +295,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   6. SEÇÃO IMPACTO EM TEMPO REAL (.impacto-tempo-real)
-   ========================================================================== */
+ *  6. SEÇÃO IMPACTO EM TEMPO REAL (.impacto-tempo-real)
+ *  ========================================================================== */
 .impacto-tempo-real {
     background-color: #fdfaf3;
     border: 2px solid #fde4ad;
@@ -378,8 +378,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   7. SEÇÃO DE SOLUÇÕES (.solucoes)
-   ========================================================================== */
+ *  7. SEÇÃO DE SOLUÇÕES (.solucoes)
+ *  ========================================================================== */
 .solucoes {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -495,8 +495,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   8. SEÇÃO DO MAPA (.secao-mapa-container)
-   ========================================================================== */
+ *  8. SEÇÃO DO MAPA (.secao-mapa-container)
+ *  ========================================================================== */
 .secao-mapa-container {
     padding: 60px 80px;
     max-width: 1440px;
@@ -652,8 +652,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   9. SEÇÃO DESTINAÇÃO DO ÓLEO (.destinacao-oleo)
-   ========================================================================== */
+ *  9. SEÇÃO DESTINAÇÃO DO ÓLEO (.destinacao-oleo)
+ *  ========================================================================== */
 .destinacao-oleo {
     padding: 60px 80px;
     text-align: center;
@@ -737,8 +737,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   10. SEÇÃO APLICATIVO (.app-acompanhamento)
-   ========================================================================== */
+ *  10. SEÇÃO APLICATIVO (.app-acompanhamento)
+ *  ========================================================================== */
 .app-acompanhamento {
     background-color: #fdfaf3;
     border: 1.5px solid #f2cf85;
@@ -822,8 +822,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   11. SEÇÕES VANTAGENS E CERTIFICAÇÕES (.vantagens-certificacoes-wrapper)
-   ========================================================================== */
+ *  11. SEÇÕES VANTAGENS E CERTIFICAÇÕES (.vantagens-certificacoes-wrapper)
+ *  ========================================================================== */
 .vantagens-certificacoes-wrapper {
     position: relative;
     padding: 60px 80px;
@@ -984,8 +984,8 @@ h1, h2, h3, h4, p {
 }
 
 /* ==========================================================================
-   12. SEÇÃO FAQ (.faq-secao)
-   ========================================================================== */
+ *  12. SEÇÃO FAQ (.faq-secao)
+ *  ========================================================================== */
 .faq-secao {
     padding: 20px 20px 60px 20px;
     margin-top: -20px;
@@ -1085,5 +1085,239 @@ h1, h2, h3, h4, p {
     .faq-secao {
         padding: 30px 20px;
         margin: 20px 0;
+    }
+}
+
+/* Ajustes de largura mantendo a estrutura do HTML e as imagens da aluna. */
+html, body {
+    overflow-x: visible;
+}
+
+img, iframe {
+    max-width: 100%;
+}
+
+.hero-content, .hero-mockup, .solucao-conteudo, .solucao-imagem,
+.mapa-info-lateral, .mapa, .app-info, .app-preview, .coluna-cards {
+    min-width: 0;
+}
+
+section {
+    scroll-margin-top: 24px;
+}
+
+@media (max-width: 1200px) {
+    .inicio, .como-funciona, .solucoes, .secao-mapa-container,
+    .destinacao-oleo, .vantagens-certificacoes-wrapper {
+        padding: 40px 24px;
+    }
+
+    .destaques, .impacto-tempo-real {
+        margin: 24px;
+    }
+
+    .inicio, .secao-lado-a-lado {
+        gap: 28px;
+    }
+
+    .hero-content, .hero-mockup {
+        flex: 1;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .card-destaque {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .solucao-card {
+        flex-direction: column;
+    }
+
+    .solucao-imagem {
+        max-height: 280px;
+    }
+
+    .solucao-imagem img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .mapa-card-principal {
+        padding: 28px;
+        gap: 24px;
+    }
+
+    .info-mini-cards {
+        flex-wrap: wrap;
+    }
+
+    .app-acompanhamento {
+        margin: 24px;
+        padding: 32px;
+    }
+
+    .secao-lado-a-lado {
+        flex-direction: column;
+    }
+
+    .coluna-texto {
+        flex: auto;
+        max-width: none;
+    }
+
+    .coluna-cards {
+        width: 100%;
+    }
+
+    .respingo-oleo-img {
+        left: -24px;
+        top: -90px;
+        max-width: 240px;
+    }
+
+}
+
+@media (max-width: 900px) {
+    .inicio, .mapa-card-principal, .app-acompanhamento {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-content, .hero-mockup, .app-info {
+        max-width: none;
+        width: 100%;
+    }
+
+    .hero-mockup {
+        max-width: 540px;
+        margin: 24px auto;
+    }
+
+    .destaques, .metricas-grid, .solucoes, .produtos-grid,
+    .vantagens-grid, .certificacoes-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mapa {
+        flex: auto;
+        width: 100%;
+        min-height: 300px;
+    }
+
+    .mapa iframe {
+        min-height: 300px;
+    }
+
+    .app-preview img {
+        max-width: 520px;
+        margin: auto;
+        transform: none;
+    }
+
+    .hero-buttons {
+        flex-wrap: wrap;
+    }
+
+    .passos-lista {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 28px;
+    }
+
+    .passo-item {
+        flex: 1 1 160px;
+    }
+
+    .linha-passos {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 0 20px;
+    }
+
+    .inicio, .como-funciona, .solucoes, .secao-mapa-container,
+    .destinacao-oleo, .vantagens-certificacoes-wrapper {
+        padding: 32px 0;
+    }
+
+    .hero-content h1, .app-info h2, .coluna-texto h2,
+    .mapa-info-lateral h2, .destinacao-oleo h2 {
+        font-size: 30px;
+    }
+
+    .hero-buttons a {
+        flex: 1 1 200px;
+        text-align: center;
+    }
+
+    .hero-features, .destaques, .metricas-grid, .solucoes, .produtos-grid,
+    .vantagens-grid, .certificacoes-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .destaques, .impacto-tempo-real, .app-acompanhamento {
+        margin: 24px 0;
+    }
+
+    .impacto-tempo-real, .app-acompanhamento, .mapa-card-principal {
+        padding: 24px;
+    }
+
+    .solucao-conteudo {
+        padding: 24px;
+    }
+
+    .info-mini-cards {
+        flex-direction: column;
+    }
+
+    .cep-busca-box {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .input-cep {
+        flex: 1 1 140px;
+        min-width: 0;
+    }
+
+    .vantagens-certificacoes-wrapper {
+        gap: 40px;
+    }
+
+    .respingo-oleo-container {
+        display: none;
+    }
+
+    .faq-item {
+        padding: 20px;
+    }
+
+}
+
+
+@media (max-width: 1200px) {
+    .solucao-imagem {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .solucao-imagem img {
+        border-radius: 0;
+    }
+}
+
+/* No tablet, o rodape usa duas colunas para nao apertar os contatos. */
+@media (min-width: 601px) and (max-width: 900px) {
+    .footer-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
