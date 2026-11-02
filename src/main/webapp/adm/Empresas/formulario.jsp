@@ -1,43 +1,27 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>${not empty param.id ? 'Editar Empresa' : 'Nova Empresa'} - Olius</title>
-
-    <!-- estilos da página -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/adm/css/adicionar/nova-empresa.css">
-
-    <!-- fonte Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-
-<body data-endereco="true" data-api="${pageContext.request.contextPath}/empresas" data-id="id_usuario">
-
-    <!-- formulário de cadastro -->
-    <main class="formulario">
-
-        <!-- if para o título: se empresa.id estiver vazio, exibe 'Nova Empresa', senão exibe 'Editar Empresa' -->
-        <h1>${not empty param.id ? 'Editar Empresa' : 'Nova Empresa'}</h1>
-
-
+<%@ page pageEncoding="UTF-8" %>
+    <dialog id="modalFormulario" class="modal" aria-labelledby="tituloFormulario" data-novo="Nova Empresa" data-editar="Editar Empresa">
+        <header class="topo-modal">
+            <h2 id="tituloFormulario">Nova Empresa</h2>
+            <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
+        </header>
+        <p id="mensagemFormulario" class="aviso" role="status"></p>
         <form id="formEmpresa" action="${pageContext.request.contextPath}/empresas" method="post" data-retorno="${pageContext.request.contextPath}/adm/Empresas/empresa.jsp">
-
-
-            <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty param.id}">
-                <input type="hidden" name="id" value="${param.id}">
-            </c:if>
 
             <div class="campos">
 
                 <div class="campo">
                     <label for="nome">Nome da empresa *</label>
-                    <input type="text" id="nome" name="nome_fantasia" value="<c:out value='${empresa.nome_fantasia}'/>" maxlength="200" required>
+                    <input type="text" id="nome" name="nome_empresa" maxlength="200" required>
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" maxlength="255" required>
+                </div>
+
+                <div class="campo">
+                    <label for="senha">Senha *</label>
+                    <input type="password" id="senha" name="senha" minlength="6" maxlength="128" autocomplete="new-password" required>
                 </div>
 
                 <div class="campo">
@@ -47,14 +31,9 @@
                         id="cnpj"
                         name="cnpj"
                         placeholder="00.000.000/0000-00"
-                        value="<c:out value='${empresa.cnpj}'/>" maxlength="20"
+                        maxlength="20"
                         required
                     >
-                </div>
-
-                <div class="campo">
-                    <label for="email">Razão social *</label>
-                    <input type="text" id="email" name="razao_social" value="<c:out value='${empresa.razao_social}'/>" maxlength="200" required>
                 </div>
 
                 <div class="campo">
@@ -64,11 +43,19 @@
                         id="telefone"
                         name="telefone"
                         placeholder="(11) 99999-9999"
-                        value="<c:out value='${empresa.telefone}'/>" maxlength="30"
+                        maxlength="30"
                         required
                     >
                 </div>
 
+                <div class="campo">
+                    <label for="plano">Plano *</label>
+                    <select id="plano" name="plano" required>
+                        <option value="Basico">Básico</option>
+                        <option value="Empresa">Empresa</option>
+                        <option value="Profissional">Profissional</option>
+                    </select>
+                </div>
                 <!-- endereco proprio deste cadastro -->
                 <div class="campo campo-completo">
                     <h2>Endereço</h2>
@@ -83,7 +70,7 @@
                 </div>
                 <div class="campo">
                     <label for="endereco_numero">Número *</label>
-                    <input type="text" id="endereco_numero" name="numero" maxlength="20" required>
+                    <input type="text" id="endereco_numero" name="numero" maxlength="10" required>
                 </div>
                 <div class="campo">
                     <label for="endereco_complemento">Complemento</label>
@@ -99,12 +86,9 @@
                 </div>
                 <div class="campo">
                     <label for="endereco_estado">Estado *</label>
-                    <input type="text" id="endereco_estado" name="estado" maxlength="50" required>
+                    <input type="text" id="endereco_estado" name="estado" maxlength="2" required>
                 </div>
-                <div class="campo">
-                    <label for="endereco_pais">País *</label>
-                    <input type="text" id="endereco_pais" name="pais" maxlength="50" required>
-                </div>
+
 
 
             </div>
@@ -112,19 +96,13 @@
             <!-- botões do formulário -->
             <div class="botoes-formulario">
 
-                <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/adm/Empresas/empresa.jsp'">Cancelar</button>
+                <button type="button" class="botao-cancelar" data-fechar-modal>Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                    ${empty param.id ? 'Adicionar' : 'Salvar'}
+                    Adicionar
                 </button>
 
             </div>
 
         </form>
-
-    </main>
-
-    <script src="${pageContext.request.contextPath}/adm/js/editar.js" defer></script>
-
-</body>
-</html>
+    </dialog>

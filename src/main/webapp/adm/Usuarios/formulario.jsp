@@ -1,89 +1,67 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="pt-BR">
+<%@ page pageEncoding="UTF-8" %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Janela usada para cadastrar um novo usuário ou editar um cadastro existente -->
+    <dialog id="modalFormulario" class="modal" aria-labelledby="tituloFormulario" data-novo="Novo Usuário" data-editar="Editar Usuário">
+        <header class="topo-modal">
+            <h2 id="tituloFormulario">Novo Usuário</h2>
+            <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
+        </header>
 
-    <title>${not empty param.id ? 'Editar Usuário' : 'Novo Usuário'} - Olius</title>
+        <!-- Espaço para mostrar mensagens sobre o preenchimento do formulário -->
+        <p id="mensagemFormulario" class="aviso" role="status"></p>
 
-    <!-- estilos da página -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/adm/css/adicionar/novo-usuario.css">
-
-    <!-- fonte Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-
-<body data-api="${pageContext.request.contextPath}/usuarios" data-id="id_usuario">
-
-    <main class="formulario">
-
-        <h1>${not empty param.id ? 'Editar Usuário' : 'Novo Usuário'}</h1>
-
-
-        <!-- dados do usuário -->
+         <!-- Formulário que envia os dados do usuário para o sistema -->
         <form id="formUsuario" action="${pageContext.request.contextPath}/usuarios" method="post" data-retorno="${pageContext.request.contextPath}/adm/Usuarios/usuarios.jsp">
-
-            <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty param.id}">
-                <input type="hidden" name="id" value="${param.id}">
-            </c:if>
 
             <div class="campos">
 
+                <!-- Campo para informar o nome do usuário -->
                 <div class="campo">
                     <label for="nome">Nome *</label>
-                    <input type="text" id="nome" name="nome" maxlength="255" value="<c:out value='${usuario.nome}'/>" required>
+                    <input type="text" id="nome" name="nome" maxlength="255" required>
                 </div>
 
+                <!-- Campo para informar o e-mail do usuário -->
                 <div class="campo">
                     <label for="email">E-mail *</label>
-                    <input type="email" id="email" name="email" value="<c:out value='${usuario.email}'/>" maxlength="255" required>
+                    <input type="email" id="email" name="email" maxlength="255" required>
                 </div>
 
+                 <!-- Campo para informar o telefone de contato -->
                 <div class="campo">
                     <label for="telefone">Telefone *</label>
-                    <input type="tel" id="telefone" name="telefone" value="<c:out value='${usuario.telefone}'/>" required>
+                    <input type="tel" id="telefone" name="telefone" required>
                 </div>
 
-                <div class="campo">
-                    <label for="tipoUsuario">Tipo de usuário *</label>
-                    <select id="tipoUsuario" name="tipo_usuario" required>
-                        <option value="" disabled ${empty usuario.tipoUsuario ? 'selected' : ''}>Selecione o tipo</option>
-                        <option value="B2B" ${usuario.tipoUsuario == 'B2B' ? 'selected' : ''}>B2B - Empresa</option>
-                        <option value="B2C" ${usuario.tipoUsuario == 'B2C' ? 'selected' : ''}>B2C - Usuário comum</option>
-                    </select>
+                <!-- Campo para informar o CPF do cliente B2C -->
+                <div class="campo" id="dadosB2c">
+                    <label for="cpf">CPF do cliente B2C *</label>
+                    <input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="Somente os 11 números" required>
                 </div>
 
+                 <!-- Campo para registrar a data do primeiro cadastro -->
                 <div class="campo campo-completo">
-                    <label for="endereco">Primeiro registro *</label>
-                    <input type="date" id="endereco" name="primeiro_registro" required>
+                    <label for="primeiro_registro">Primeiro registro *</label>
+                    <input type="date" id="primeiro_registro" name="primeiro_registro" required>
                 </div>
 
+                <!-- Campo para cadastrar a senha do usuário -->
                 <div class="campo campo-completo">
                     <label for="status">Senha *</label>
-                    <input type="password" id="status" name="senha" required maxlength="18">
+                    <input type="password" id="status" name="senha" minlength="6" maxlength="128" autocomplete="new-password" required>
                 </div>
             </div>
 
-            <!-- botões do formulário -->
+            <!-- Botões para cancelar o cadastro ou enviar as informações -->
             <div class="botoes-formulario">
 
-                <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/adm/Usuarios/usuarios.jsp'">Cancelar</button>
+                <button type="button" class="botao-cancelar" data-fechar-modal>Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                     ${empty param.id ? 'Adicionar' : 'Salvar'}
+                     Adicionar
                 </button>
 
             </div>
 
         </form>
-
-    </main>
-
-    <script src="${pageContext.request.contextPath}/adm/js/editar.js" defer></script>
-
-</body>
-</html>
+    </dialog>

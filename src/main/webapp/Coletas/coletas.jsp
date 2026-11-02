@@ -26,22 +26,23 @@
 <!-- Menu lateral com os links para acessar as outras páginas do sistema. A classe ativo destaca a opção Coletas realizadas, indicando em qual página o usuário está. -->
 <aside class="menu">
     <div class="logo">
-        <img src="${pageContext.request.contextPath}/images/logo.png.png" alt="Logo Olius">
+        <a href="${pageContext.request.contextPath}/adm/index.jsp" title="Ir para a tela inicial"><img src="${pageContext.request.contextPath}/images/logo.png.png" alt="Logo Olius"></a>
     </div>
 
     <div class="caixa"></div>
 
     <button type="button" class="botao-menu" aria-expanded="false" aria-controls="menuNavegacao">Menu</button>
     <nav id="menuNavegacao" aria-label="Menu principal">
-        <a href="${pageContext.request.contextPath}/index.jsp">Dashboard</a>
-        <a href="${pageContext.request.contextPath}/Empresas/empresa.jsp">Empresas</a>
-        <a href="${pageContext.request.contextPath}/Usuarios/usuarios.jsp">Usuários</a>
-        <a href="${pageContext.request.contextPath}/PEV/pev.jsp">PEV</a>
-        <a href="${pageContext.request.contextPath}/Motoristas/motoristas.jsp">Motoristas</a>
-        <a href="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">Solicitações de coleta</a>
-        <a href="${pageContext.request.contextPath}/Coletas/coletas.jsp" class="ativo">Coletas realizadas</a>
-        <a href="${pageContext.request.contextPath}/Certificados/certificados.jsp">Certificações</a>
-    </nav>
+        <a href="${pageContext.request.contextPath}/adm/index.jsp">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/adm/Empresas/empresa.jsp">Empresas</a>
+        <a href="${pageContext.request.contextPath}/adm/Usuarios/usuarios.jsp">Usuários</a>
+        <a href="${pageContext.request.contextPath}/adm/PEV/pev.jsp">PEV</a>
+        <a href="${pageContext.request.contextPath}/adm/Motoristas/motoristas.jsp">Motoristas</a>
+        <a href="${pageContext.request.contextPath}/adm/Solicitacoes/solicitacoes.jsp">Solicitações de coleta</a>
+        <a href="${pageContext.request.contextPath}/adm/Coletas/coletas.jsp" class="ativo">Coletas realizadas</a>
+        <a href="${pageContext.request.contextPath}/adm/Certificados/certificados.jsp">Certificações</a>
+        <a href="${pageContext.request.contextPath}/login-adm?sair=1">Sair</a>
+        </nav>
 </aside>
 
 <!-- Parte principal da página, onde aparece o título "Coletas realizadas" e ficam as informações sobre as coletas que já foram concluídas. -->
@@ -83,8 +84,7 @@
 </main>
 
 <!-- Carrega os arquivos JavaScript responsáveis pelas funções da listagem e pelo funcionamento do menu lateral. O atributo defer faz com que os scripts sejam executados depois da leitura do HTML. -->
-    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
-    <script src="${pageContext.request.contextPath}/js/editar.js" defer></script>
+    <script src="${pageContext.request.contextPath}/adm/js/editar.js" defer></script>
 
     <script src="${pageContext.request.contextPath}/js/menu.js" defer></script>
 </body>

@@ -1,62 +1,35 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page pageEncoding="UTF-8" %>
 
+    <!-- Cria a janela usada para adicionar uma nova certificação ou editar uma já cadastrada -->
+    <dialog id="modalFormulario" class="modal" aria-labelledby="tituloFormulario" data-novo="Nova Certificação" data-editar="Editar Certificação">
 
-<!DOCTYPE html>
-<html lang="pt-BR">
+        <!-- Parte superior da janela, onde aparece o título do formulario e o botão para fechá-lo -->
+        <header class="topo-modal">
+            <h2 id="tituloFormulario">Nova Certificação</h2>
+            <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
+        </header>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Espaço onde aparecem mensagens para informar se alguma ação foi realizada ou se existe algum aviso. -->
+        <p id="mensagemFormulario" class="aviso" role="status"></p>
 
-   <title>${not empty param.id ? 'Editar Certificado' : 'Novo Certificado'} - Olius</title>
+        <! Formulario que recebe as informações da certificação e envia os dados para o servlet responsável por esse cadastro. Depois do envio, o usuario retorna para a página de certificações -->
+        <form id="formCertificado" action="${pageContext.request.contextPath}/certificado" method="post" data-retorno="${pageContext.request.contextPath}/adm/Certificados/certificados.jsp" >
 
-    <!-- estilos da página -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/adm/css/adicionar/novo-certificado.css">
-
-    <!-- fonte Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-
-<body>
-
-    <main class="formulario">
-
-        <h1>${not empty param.id  ? 'Novo Certificado' : 'Editar Certificado'}</h1>
-
-        <!-- dados do certificado -->
-        <form id="formCertificado" action="${pageContext.request.contextPath}/certificado" method="post" >
-
-
-            <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test="${not empty certificado.id}">
-                <input type="hidden" name="id" value="${certificado.id}">
-            </c:if>
-
+            <!-- Agrupa os campos que precisam ser preenchidos para cadastrar uma certificação, como a empresa responsável, o volume de óleo e o arquivo PDF -->
             <div class="campos">
 
                 <div class="campo">
                     <label for="empresa">Empresa *</label>
                     <input
-                        type="text"
+                        type="number"
                         id="empresa"
-                        name="empresa"
-                        value="<c:out value='${certificado.empresa}'/>"
+                        name="id_usuario_b2b"
+                       
                         required
                     >
                 </div>
 
-                <div class="campo">
-                    <label for="dataEmissao">Data de emissão *</label>
-                    <input
-                        type="date"
-                        id="dataEmissao"
-                        name="dataEmissao"
-                        value="<c:out value='${certificado.dataEmissao}'/>"
-                        required
-                    >
-                </div>
-
+                <!-- Campo usado para informar a quantidade de oleo coletado, com a medida em litros.  -->
                 <div class="campo campo-volume">
                     <label for="volume">Volume total *</label>
 
@@ -65,20 +38,21 @@
                         <input
                             type="number"
                             id="volume"
-                            name="volume"
+                            name="volume_total"
                             min="0.1"
                             step="0.1"
-                            value="<c:out value='${certificado.volume}'/>"
+                           
                             required
                         >
                         <span>L</span>
                     </div>
                 </div>
 
+                <!-- Area usada para informar o caminho ou o endereço do arquivo PDF da certficação, com um ícone para facilitar sua identificação -->
                 <div class="campo campo-completo">
-                    <label for="arquivo">Arquivo PDF *</label>
+                    <label for="arquivo">Caminho ou URL do PDF *</label>
 
-                    <!-- seleção do arquivo -->
+                    <!-- caminho do arquivo PDF -->
                     <div class="arquivo-container">
 
                         <span class="icone-arquivo" aria-hidden="true">
@@ -90,15 +64,14 @@
                         </span>
 
                         <label for="arquivo" class="botao-arquivo">
-                            Escolher arquivo
+                            Informar arquivo
                         </label>
 
                         <input
-                            type="file"
+                            type="text"
                             id="arquivo"
-                            name="arquivo"
-                            accept="application/pdf,.pdf"
-                            value="<c:out value='${certificado.arquivo}'/>"
+                            name="arquivo_pdf"
+                            maxlength="255"
                             required
                         >
 
@@ -107,25 +80,20 @@
                     </div>
                 </div>
 
+
+
             </div>
 
-            <!--botões do formulário -->
+            <!--botões do formulário que permitem cancelar o preenchimento ou enviar as informações para cadastrar a certificação -->
             <div class="botoes-formulario">
 
-                <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/adm/Certificados/certificados.jsp'">Cancelar</button>
+                <button type="button" class="botao-cancelar" data-fechar-modal>Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                     ${empty certificado.id ? 'Adicionar' : 'Salvar'}
+                     Adicionar
                 </button>
 
             </div>
 
         </form>
-
-    </main>
-    <c:if test="${not empty param.id}">
-        <script src="${pageContext.request.contextPath}/adm/js/editar.js" defer></script>
-    </c:if>
-
-</body>
-</html>
+    </dialog>

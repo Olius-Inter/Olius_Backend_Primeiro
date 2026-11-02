@@ -11,7 +11,7 @@
         <p id="mensagemFormulario" class="aviso" role="status"></p>
 
         <!-- Formulário que envia as informações da solicitação para o sistema -->
-        <form id="formSolicitacao" action="${pageContext.request.contextPath}/solicitacoes-coleta" method="post" data-retorno="${pageContext.request.contextPath}/Solicitações/solicitacoes.jsp">
+        <form id="formSolicitacao" action="${pageContext.request.contextPath}/solicitacoes-coleta" method="post" data-retorno="${pageContext.request.contextPath}/adm/Solicitacoes/solicitacoes.jsp">
 
             <div class="campos">
 

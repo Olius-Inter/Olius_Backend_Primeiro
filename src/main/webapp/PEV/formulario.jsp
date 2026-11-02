@@ -11,7 +11,7 @@
         <p id="mensagemFormulario" class="aviso" role="status"></p>
 
         <!-- Formulário que envia os dados do ponto de coleta para o sistema -->
-        <form id="formPEV" action="${pageContext.request.contextPath}/pev" method="post" data-retorno="${pageContext.request.contextPath}/PEV/pev.jsp">
+        <form id="formPEV" action="${pageContext.request.contextPath}/pev" method="post" data-retorno="${pageContext.request.contextPath}/adm/PEV/pev.jsp">
 
 
 

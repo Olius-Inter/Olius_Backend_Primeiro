@@ -52,6 +52,11 @@ public class AdmFiltro implements Filter {
 
         // caminho sem o contexto, já decodificado (/adm/Empresas/empresa.jsp, /empresas...)
         String caminho = request.getServletPath() + (request.getPathInfo() != null ? request.getPathInfo() : "");
+        // caminhos antigos do login de usuario voltam ao site publico
+        if (caminho.equals("/login") || caminho.equals("/login.jsp")) {
+            response.sendRedirect(request.getContextPath() + "/index/index.html");
+            return;
+        }
         boolean pagina = caminho.equals("/adm") || caminho.startsWith("/adm/")
                 || comeca(caminho, PAGINAS_ANTIGAS);
         boolean api = comeca(caminho, APIS);

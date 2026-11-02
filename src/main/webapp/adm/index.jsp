@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="${pageContext.request.contextPath}/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="${pageContext.request.contextPath}/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="${pageContext.request.contextPath}/images/favicon-16x16.png">
+    <link rel="icon" href="${pageContext.request.contextPath}/images/favicon.ico">
+    <link rel="manifest" href="${pageContext.request.contextPath}/images/site.webmanifest">
     <title>Dashboard - Olius</title>
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,25 +16,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/adm/css/adm.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/padrao.css">
 </head>
-<body data-api="${pageContext.request.contextPath}/certificado" data-id="id_certificado" data-base="${pageContext.request.contextPath}/adm/Certificados" data-columns="id_usuario_b2b,dt_emissao,volume_total,arquivo_pdf">
+<body data-base="${pageContext.request.contextPath}">
 
     <aside class="menu">
         <div class="logo">
-            <img src="${pageContext.request.contextPath}/adm/logo.png" alt="Logo Olius">
+            <img src="${pageContext.request.contextPath}/images/logo.png.png" alt="Logo Olius">
         </div>
 
         <div class="caixa"></div>
 
-        <nav>
+        <button type="button" class="botao-menu" aria-expanded="false" aria-controls="menuNavegacao">Menu</button>
+        <nav id="menuNavegacao" aria-label="Menu principal">
             <a href="${pageContext.request.contextPath}/adm/index.jsp" class="ativo" aria-current="page">Dashboard</a>
             <a href="${pageContext.request.contextPath}/adm/Empresas/empresa.jsp">Empresas</a>
             <a href="${pageContext.request.contextPath}/adm/Usuarios/usuarios.jsp">Usuários</a>
             <a href="${pageContext.request.contextPath}/adm/PEV/pev.jsp">PEV</a>
             <a href="${pageContext.request.contextPath}/adm/Motoristas/motoristas.jsp">Motoristas</a>
-            <a href="${pageContext.request.contextPath}/adm/Solicitacoes/solicitacoes.jsp">Solicitacoes de coleta</a>
+            <a href="${pageContext.request.contextPath}/adm/Solicitacoes/solicitacoes.jsp">Solicitações de coleta</a>
             <a href="${pageContext.request.contextPath}/adm/Coletas/coletas.jsp">Coletas realizadas</a>
-            <a href="${pageContext.request.contextPath}/adm/Certificados/certificados.jsp">Certificados</a>
+            <a href="${pageContext.request.contextPath}/adm/Certificados/certificados.jsp">Certificações</a>
+            <a href="${pageContext.request.contextPath}/login-adm?sair=1">Sair</a>
         </nav>
     </aside>
 
@@ -40,7 +48,9 @@
                     <h1>Dashboard</h1>
                     <p>Acompanhe os principais indicadores da Olius.</p>
                 </div>
+                <button type="button" class="filtro" id="atualizarDashboard">Atualizar</button>
             </header>
+            <p id="mensagemDashboard" role="status">Carregando indicadores…</p>
 
             <!-- Indicadores -->
             <section class="indicadores" aria-label="Indicadores gerais">
@@ -56,7 +66,7 @@
                             <path d="M16 14h1M16 17h1"/>
                         </svg>
                     </div>
-                    <h2 class="numero">12</h2>
+                    <h2 class="numero" data-indicador="empresas">…</h2>
                     <p class="descricao">Empresas cadastradas</p>
                 </article>
 
@@ -68,7 +78,7 @@
                             <path d="M5 21v-2a7 7 0 0 1 14 0v2"/>
                         </svg>
                     </div>
-                    <h2 class="numero">28</h2>
+                    <h2 class="numero" data-indicador="usuarios">…</h2>
                     <p class="descricao">Usuários cadastrados</p>
                 </article>
 
@@ -80,7 +90,7 @@
                             <circle cx="12" cy="10" r="2.5"/>
                         </svg>
                     </div>
-                    <h2 class="numero">8</h2>
+                    <h2 class="numero" data-indicador="pev">…</h2>
                     <p class="descricao">Pontos de coleta</p>
                 </article>
 
@@ -93,11 +103,11 @@
                             <path d="M2 12h20M10 12v2h4v-2"/>
                         </svg>
                     </div>
-                    <h2 class="numero">6</h2>
+                    <h2 class="numero" data-indicador="motoristas">…</h2>
                     <p class="descricao">Motoristas cadastrados</p>
                 </article>
 
-                <!-- Solicitacoes pendentes -->
+                <!-- Solicitações pendentes -->
                 <article class="card-indicador">
                     <div class="icone" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -105,8 +115,8 @@
                             <path d="M14 2v6h6M8 13h8M8 17h8"/>
                         </svg>
                     </div>
-                    <h2 class="numero">5</h2>
-                    <p class="descricao">Solicitacoes pendentes</p>
+                    <h2 class="numero" data-indicador="solicitacoes-coleta">…</h2>
+                    <p class="descricao">Solicitações pendentes</p>
                 </article>
 
                 <!-- Coletas realizadas: símbolo de correto -->
@@ -116,7 +126,7 @@
                             <path d="M5 12.5l4.5 4.5L19 7"/>
                         </svg>
                     </div>
-                    <h2 class="numero">4</h2>
+                    <h2 class="numero" data-indicador="coleta">…</h2>
                     <p class="descricao">Coletas realizadas</p>
                 </article>
 
@@ -129,8 +139,8 @@
                             <path d="m8 15 2.5 2.5L16 12"/>
                         </svg>
                     </div>
-                    <h2 class="numero">3</h2>
-                    <p class="descricao">Certificados emitidos</p>
+                    <h2 class="numero" data-indicador="certificado">…</h2>
+                    <p class="descricao">Certificações emitidos</p>
                 </article>
 
             </section>
@@ -154,23 +164,10 @@
                             <div
                                 class="grafico-rosca"
                                 role="img"
-                                aria-label="Gráfico ilustrativo: duas solicitações pendentes, duas concluídas e uma em andamento">
+                                aria-label="Carregando solicitações" style="background: #eeeae3">
                             </div>
 
-                            <ul class="legenda">
-                                <li>
-                                    <span class="ponto ponto-amarelo"></span>
-                                    <span>Pendentes<br><small>2 solicitações</small></span>
-                                </li>
-                                <li>
-                                    <span class="ponto ponto-verde"></span>
-                                    <span>Concluídas<br><small>2 solicitações</small></span>
-                                </li>
-                                <li>
-                                    <span class="ponto ponto-laranja"></span>
-                                    <span>Em andamento<br><small>1 solicitação</small></span>
-                                </li>
-                            </ul>
+                            <ul class="legenda"><li>Carregando solicitações…</li></ul>
                         </div>
                     </article>
 
@@ -179,12 +176,12 @@
                         <div class="painel-topo">
                             <div>
                                 <h3>Coletas realizadas</h3>
-                                <p>Quantidade de coletas por mês</p>
+                                <p>Solicitações realizadas por mês, conforme a data prevista</p><p id="resumoColetas">Carregando coletas…</p>
                             </div>
 
-                            <select class="filtro" aria-label="Período do gráfico">
-                                <option>Últimos 6 meses</option>
-                                <option>Últimos 12 meses</option>
+                            <select class="filtro" id="periodoColetas" aria-label="Período do gráfico" disabled>
+                                <option value="6">Últimos 6 meses</option>
+                                <option value="12">Últimos 12 meses</option>
                             </select>
                         </div>
 
@@ -213,34 +210,20 @@
                                     viewBox="0 0 600 160"
                                     preserveAspectRatio="none"
                                     role="img"
-                                    aria-label="Gráfico ilustrativo de coletas mensais">
+                                    aria-label="Carregando coletas">
 
                                     <polygon
                                         class="area-preenchida"
-                                        points="0,130 120,110 240,120 360,65 480,85 600,30 600,160 0,160"/>
+                                        points=""/>
 
                                     <polyline
                                         class="linha-dados"
-                                        points="0,130 120,110 240,120 360,65 480,85 600,30"/>
+                                        points=""/>
 
-                                    <g class="marcadores">
-                                        <circle cx="0" cy="130" r="4"/>
-                                        <circle cx="120" cy="110" r="4"/>
-                                        <circle cx="240" cy="120" r="4"/>
-                                        <circle cx="360" cy="65" r="4"/>
-                                        <circle cx="480" cy="85" r="4"/>
-                                        <circle cx="600" cy="30" r="4"/>
-                                    </g>
+                                    <g class="marcadores"></g>
                                 </svg>
 
-                                <div class="meses" aria-hidden="true">
-                                    <span>Mai</span>
-                                    <span>Jun</span>
-                                    <span>Jul</span>
-                                    <span>Ago</span>
-                                    <span>Set</span>
-                                    <span>Out</span>
-                                </div>
+                                <div class="meses" aria-hidden="true"></div>
                             </div>
                         </div>
                     </article>
@@ -250,5 +233,7 @@
 
         </main>
 
-    </body>
+    <script src="${pageContext.request.contextPath}/js/dashboard.js" defer></script>
+        <script src="${pageContext.request.contextPath}/js/menu.js" defer></script>
+</body>
     </html>

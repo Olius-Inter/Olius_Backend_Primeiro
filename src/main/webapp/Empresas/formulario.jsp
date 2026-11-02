@@ -5,7 +5,7 @@
             <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
         </header>
         <p id="mensagemFormulario" class="aviso" role="status"></p>
-        <form id="formEmpresa" action="${pageContext.request.contextPath}/empresas" method="post" data-retorno="${pageContext.request.contextPath}/Empresas/empresa.jsp">
+        <form id="formEmpresa" action="${pageContext.request.contextPath}/empresas" method="post" data-retorno="${pageContext.request.contextPath}/adm/Empresas/empresa.jsp">
 
             <div class="campos">
 

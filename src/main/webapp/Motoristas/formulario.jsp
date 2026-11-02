@@ -13,7 +13,7 @@
         <p id="mensagemFormulario" class="aviso" role="status"></p>
 
         <!-- Formulário que recebe os dados do motorista e envia as informações para o servlet responsável pelo cadastro. Depois do envio, o usuário retorna para a página de motoristas. -->
-        <form id="formMotorista" action="${pageContext.request.contextPath}/motoristas" method="post" data-retorno="${pageContext.request.contextPath}/Motoristas/motoristas.jsp">
+        <form id="formMotorista" action="${pageContext.request.contextPath}/motoristas" method="post" data-retorno="${pageContext.request.contextPath}/adm/Motoristas/motoristas.jsp">
 
 
              <!-- Agrupa os campos com as informações do motorista, incluindo nome, empresa responsável, CNH, status e telefone. -->

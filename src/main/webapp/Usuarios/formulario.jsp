@@ -11,7 +11,7 @@
         <p id="mensagemFormulario" class="aviso" role="status"></p>
 
          <!-- Formulário que envia os dados do usuário para o sistema -->
-        <form id="formUsuario" action="${pageContext.request.contextPath}/usuarios" method="post" data-retorno="${pageContext.request.contextPath}/Usuarios/usuarios.jsp">
+        <form id="formUsuario" action="${pageContext.request.contextPath}/usuarios" method="post" data-retorno="${pageContext.request.contextPath}/adm/Usuarios/usuarios.jsp">
 
             <div class="campos">
 

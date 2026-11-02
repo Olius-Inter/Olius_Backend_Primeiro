@@ -1,37 +1,22 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="pt-BR">
+<%@ page pageEncoding="UTF-8" %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cria a janela usada para cadastrar um novo motorista ou editar um motorista já cadastrado. -->
+    <dialog id="modalFormulario" class="modal" aria-labelledby="tituloFormulario" data-novo="Novo Motorista" data-editar="Editar Motorista">
 
-    <title>${not empty param.id ? 'Editar Motorista' : 'Novo Motorista'} - Olius</title>
+         <!-- Parte superior da janela, onde aparece o título do formulário e o botão para fechá-lo. -->
+        <header class="topo-modal">
+            <h2 id="tituloFormulario">Novo Motorista</h2>
+            <button type="button" data-fechar-modal aria-label="Fechar formulário">×</button>
+        </header>
 
-    <!-- estilos da página -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/adm/css/adicionar/novo-motorista.css">
+        <!-- Espaço onde aparecem mensagens para informar se alguma ação foi realizada ou se existe algum aviso. -->
+        <p id="mensagemFormulario" class="aviso" role="status"></p>
 
-    <!-- fonte Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-
-<body data-api="${pageContext.request.contextPath}/motoristas" data-id="id_motorista">
-
-    <main class="formulario">
-
-        <h1>${not empty param.id ? 'Editar Motorista' : 'Novo Motorista'}</h1>
-
-        <!-- dados do motorista -->
+        <!-- Formulário que recebe os dados do motorista e envia as informações para o servlet responsável pelo cadastro. Depois do envio, o usuário retorna para a página de motoristas. -->
         <form id="formMotorista" action="${pageContext.request.contextPath}/motoristas" method="post" data-retorno="${pageContext.request.contextPath}/adm/Motoristas/motoristas.jsp">
 
 
-            <!-- verifica se o id existe, se existir: mostra o id-->
-            <c:if test = "${not empty param.id}">
-                <input type="hidden" name="id" value="${param.id}">
-            </c:if>
-
-
+             <!-- Agrupa os campos com as informações do motorista, incluindo nome, empresa responsável, CNH, status e telefone. -->
             <div class="campos">
 
                 <div class="campo">
@@ -40,20 +25,11 @@
                         type="text"
                         id="nome"
                         name="nome"
-                        value="<c:out value='${motorista.nome}'/>" maxlength="150"
+                        maxlength="150"
                         required
                     >
                 </div>
 
-                <div class="campo">
-                    <label for="cpf">CPF (opcional)</label>
-                    <input
-                        type="text"
-                        id="cpf"
-                        name="cpf"
-                        value="<c:out value='${motorista.cpf}'/>" maxlength="15"
-                    >
-                </div>
 
                 <div class="campo">
                     <label for="empresa">Empresa responsável *</label>
@@ -61,7 +37,7 @@
                         type="text"
                         id="empresa"
                         name="empresa"
-                        value="<c:out value='${motorista.empresa}'/>" maxlength="150"
+                        maxlength="150"
                         required
                     >
                 </div>
@@ -72,18 +48,18 @@
                         type="text"
                         id="cnh"
                         name="cnh"
-                        value="<c:out value='${motorista.cnh}'/>" maxlength="20"
+                        maxlength="50"
                         required
                     >
                 </div>
 
+                 <!-- Campo que permite escolher a situação atual do motorista, indicando se ele está disponível ou ocupado. -->
                 <div class="campo campo-completo">
                     <label for="status">Status *</label>
                     <select id="status" name="status" required>
-                        <option value="" disabled ${empty motorista.status ? 'selected' : ''}>Selecione o status</option>
-                        <option value="ativo" ${motorista.status == 'ativo' ? 'selected' : ''}>Ativo</option>
-                        <option value="inativo" ${motorista.status == 'inativo' ? 'selected' : ''}>Inativo</option>
-                        <option value="pendente" ${motorista.status == 'pendente' ? 'selected' : ''}>Pendente</option>
+                        <option value="" disabled >Selecione o status</option>
+                        <option value="Disponivel">Disponível</option>
+                        <option value="Ocupado">Ocupado</option>
                     </select>
                 </div>
 
@@ -99,22 +75,16 @@
                 </div>
             </div>
 
-            <!-- botões do formulário -->
+            <!-- Botões que permitem cancelar o preenchimento ou enviar as informações para cadastrar o motorista. -->
             <div class="botoes-formulario">
 
-                <button type="button" class="botao-cancelar" onclick="window.location.href='${pageContext.request.contextPath}/adm/Motoristas/motoristas.jsp'">Cancelar</button>
+                <button type="button" class="botao-cancelar" data-fechar-modal>Cancelar</button>
 
                 <button type="submit" class="botao-adicionar">
-                    ${empty param.id ? 'Adicionar' : 'Salvar'}
+                    Adicionar
                 </button>
 
             </div>
 
         </form>
-
-    </main>
-
-    <script src="${pageContext.request.contextPath}/adm/js/editar.js" defer></script>
-
-</body>
-</html>
+    </dialog>

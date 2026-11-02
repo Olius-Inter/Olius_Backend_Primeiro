@@ -2,6 +2,7 @@ package Organizacao.Dao;
 
 import Organizacao.Model.B2cModel;
 import Organizacao.Conexao.Conexao_Banco;
+import Organizacao.Utilitarios.CpfUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,7 +33,7 @@ public class B2cDAO {
 
             // associa os campos de usuario b dois c aos parametros da insercao
             stmt.setInt(2, b2c.getId_usuario());
-            stmt.setString(1, b2c.getCpf());
+            stmt.setString(1, CpfUtil.criptografar(b2c.getCpf()));
 
             // executa a gravacao dos dados de usuario b dois c
             stmt.executeUpdate();
@@ -57,7 +58,7 @@ public class B2cDAO {
 
             // converte os campos de cada linha consultada em usuario b dois c
             while (rs.next()) {
-                String cpf = rs.getString("cpf");
+                String cpf = CpfUtil.descriptografar(rs.getString("cpf"));
                 String telefone = rs.getString("telefone");
                 int id_usuario = rs.getInt("id_usuario");
 
@@ -91,7 +92,7 @@ public class B2cDAO {
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             // associa os campos de usuario b dois c aos parametros da atualizacao
-            stmt.setString(1, b2c.getCpf());
+            stmt.setString(1, CpfUtil.criptografar(b2c.getCpf()));
             stmt.setInt(2, b2c.getId_usuario());
 
             // executa a atualizacao dos dados de usuario b dois c

@@ -3,6 +3,7 @@ package Organizacao.Dao;
 import Organizacao.Conexao.Conexao_Banco;
 import Organizacao.Model.AdmModel;
 import Organizacao.Model.Enum.EmAtivo;
+import Organizacao.Utilitarios.SenhaUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,12 +25,18 @@ public class AdmDAO {
 
             stmt.setString(1, adm.getNome());
             stmt.setString(2, adm.getEmail());
-            stmt.setString(3, adm.getSenha());
+            stmt.setString(3, senhaParaGravar(adm.getSenha()));
             stmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir administrador: " + e.getMessage(), e);
         }
+    }
+
+    // protege a senha recebida e preserva os hashes ja preparados
+    private String senhaParaGravar(String senha) {
+        if (senha == null || senha.isEmpty()) return null;
+        return senha.startsWith("pbkdf2$") ? senha : SenhaUtil.gerarHash(senha);
     }
 
     // lista todos os administradores (sem a senha)
@@ -113,7 +120,7 @@ public class AdmDAO {
             stmt.setString(1, adm.getNome());
             stmt.setString(2, adm.getEmail());
             if (trocaSenha) {
-                stmt.setString(3, adm.getSenha());
+                stmt.setString(3, senhaParaGravar(adm.getSenha()));
                 stmt.setInt(4, adm.getIdAdm());
             } else {
                 stmt.setInt(3, adm.getIdAdm());

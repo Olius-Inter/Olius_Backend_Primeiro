@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import Organizacao.Utilitarios.SenhaUtil;
+import Organizacao.Utilitarios.CpfUtil;
 
 
 // acessa e administra os registros de usuario
@@ -80,7 +81,7 @@ public class UsuarioDAO {
                         rs.getString("tipo_usuario"),
                         rs.getString("telefone")
                 );
-                u.setCpf(rs.getString("cpf"));
+                u.setCpf(CpfUtil.descriptografar(rs.getString("cpf")));
                 lista.add(u);
             }
         }

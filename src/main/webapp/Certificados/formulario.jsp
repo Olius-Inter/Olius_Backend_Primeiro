@@ -13,7 +13,7 @@
         <p id="mensagemFormulario" class="aviso" role="status"></p>
 
         <! Formulario que recebe as informações da certificação e envia os dados para o servlet responsável por esse cadastro. Depois do envio, o usuario retorna para a página de certificações -->
-        <form id="formCertificado" action="${pageContext.request.contextPath}/certificado" method="post" data-retorno="${pageContext.request.contextPath}/Certificados/certificados.jsp" >
+        <form id="formCertificado" action="${pageContext.request.contextPath}/certificado" method="post" data-retorno="${pageContext.request.contextPath}/adm/Certificados/certificados.jsp" >
 
             <!-- Agrupa os campos que precisam ser preenchidos para cadastrar uma certificação, como a empresa responsável, o volume de óleo e o arquivo PDF -->
             <div class="campos">

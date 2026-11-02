@@ -20,16 +20,16 @@
     <!-- ===================================================================== -->
     <header class="header">
         <div class="luz-amarela"></div>
-        <a href="${pageContext.request.contextPath}/index.jsp" class="logo">
+        <a href="${pageContext.request.contextPath}/index/index.html" class="logo">
             <img class="logo-icon" src="${pageContext.request.contextPath}/assets/global/logo-normal.svg" alt="Logotipo Olius">
             <span class="logo-texto">Olius</span>
         </a>
-        <nav class="nav-links">
+        <nav class="nav-links" aria-label="Navegação principal">
+            <a href="${pageContext.request.contextPath}/index/index.html">Início</a>
             <a href="${pageContext.request.contextPath}/como_funciona.jsp">Como funciona</a>
             <a href="${pageContext.request.contextPath}/planos.jsp">Planos</a>
             <a href="${pageContext.request.contextPath}/contato.jsp" class="active">Sobre</a>
-            <a href="#agendar" class="btn-agendar">Agendar coleta</a>
-            <a href="${pageContext.request.contextPath}/login?sair=1">Sair</a>
+            
         </nav>
     </header>
 
@@ -244,7 +244,7 @@
         </section>
 
         <!-- ===================================================================== -->
-        <!-- SEÇÃO CTA (Call to Action): Chamada final para agendamento              -->
+        <!-- SEÇÃO CTA (Call to Action): Chamada final              -->
         <!-- ===================================================================== -->
         <section class="cta-banner">
             <div class="cta-conteudo">
@@ -252,8 +252,6 @@
                 <p>Transforme o descarte de óleo em impacto positivo para o meio ambiente, sua comunidade e o futuro.</p>
             </div>
             
-            <a href="#agendar" class="btn-cta">Agendar coleta agora</a>
-
             <!-- Imagem decorativa do respingo de óleo -->
             <img src="${pageContext.request.contextPath}/assets/global/oleo.png" alt="Respingo de óleo decorativo" class="cta-imagem-oleo">
         </section>
@@ -267,7 +265,7 @@
 
             <!-- Logo e Slogan -->
             <div class="footer-brand">
-                <a href="${pageContext.request.contextPath}/index.jsp" class="logo">
+                <a href="${pageContext.request.contextPath}/index/index.html" class="logo">
                     <img class="logo-icon" src="${pageContext.request.contextPath}/assets/global/logo-branco.svg" alt="Logotipo Olius">
                     <span class="logo-texto">Olius</span>
                 </a>
@@ -278,7 +276,7 @@
             <nav class="footer-links" aria-label="Links do Rodapé">
                 <h4>Navegação</h4>
                 <ul>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Início</a></li>
+                    <li><a href="${pageContext.request.contextPath}/index/index.html">Início</a></li>
                     <li><a href="${pageContext.request.contextPath}/como_funciona.jsp">Como funciona</a></li>
                     <li><a href="${pageContext.request.contextPath}/planos.jsp">Planos</a></li>
                     <li><a href="${pageContext.request.contextPath}/contato.jsp">Sobre nós</a></li>
@@ -299,7 +297,7 @@
             <div class="footer-proposito">
                 <h4>Desenvolvido com propósito para um futuro sustentável.</h4>
                 <p class="copyright">© 2026 Olius. Todos os direitos reservados.</p>
-                <a href="#" class="acesso-adm">Acesso ADM</a>
+                <a href="${pageContext.request.contextPath}/login-adm" class="acesso-adm">Acesso ADM</a>
             </div>
         </div>
     </footer>
